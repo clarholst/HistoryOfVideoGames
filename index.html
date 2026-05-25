@@ -329,6 +329,59 @@
             opacity: 1;
         }
 
+        @media (max-width: 540px) {
+            body {
+                align-items: stretch;
+                padding: 8px 0 0;
+            }
+
+            #game-container {
+                width: 100vw;
+                height: 100vh;
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            #scene {
+                bottom: 220px;
+            }
+
+            #dialogue-area {
+                height: auto;
+                min-height: 220px;
+                padding: 14px 16px;
+            }
+
+            #dialogue-text {
+                font-size: 14px;
+            }
+
+            #choices-container {
+                max-height: 180px;
+            }
+
+            .choice-btn {
+                flex: 1 1 100%;
+                max-width: 100%;
+                font-size: 14px;
+                padding: 12px 14px;
+            }
+
+            .next-btn {
+                width: 100%;
+                padding: 10px 0;
+                font-size: 14px;
+                margin-top: 10px;
+            }
+
+            #loop-indicator,
+            #timer-display {
+                font-size: 11px;
+            }
+        }
+
         /* ===== LOCATION-SPECIFIC SCENE STYLES ===== */
 
         /* --- APARTMENT --- */
