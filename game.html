@@ -88,19 +88,19 @@
                 opacity: 1;
             }
             15% {
-                opacity: 0.7;
+                opacity: 0.85;
             }
             16% {
-                opacity: 0.3;
+                opacity: 0.75;
             }
             17% {
-                opacity: 0.9;
+                opacity: 0.95;
             }
             45% {
                 opacity: 1;
             }
             46% {
-                opacity: 0.5;
+                opacity: 0.8;
             }
             47% {
                 opacity: 0.95;
@@ -109,10 +109,10 @@
                 opacity: 1;
             }
             79% {
-                opacity: 0.4;
+                opacity: 0.75;
             }
             80% {
-                opacity: 0.85;
+                opacity: 0.9;
             }
         }
 
@@ -192,13 +192,14 @@
             left: 0;
             right: 0;
             height: 200px;
-            background: linear-gradient(to top, #0d0d16 0%, #151520 30%, #1a1a28 100%);
+            background: linear-gradient(to top, rgba(13,13,22,0.96) 0%, rgba(21,21,32,0.94) 30%, rgba(26,26,40,0.92) 100%);
             border-top: 2px solid rgba(255, 255, 255, 0.08);
             padding: 18px 20px;
             z-index: 40;
             transition: filter 1.2s ease, background 1.2s ease;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(8px);
         }
 
         #speaker-name {
@@ -218,10 +219,12 @@
             transition: color 1.2s ease, opacity 0.3s ease;
             overflow-y: auto;
             min-height: 50px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
         }
 
         #dialogue-text.glitching {
             animation: textFlicker 0.25s infinite;
+            text-shadow: 0 0 16px rgba(0, 0, 0, 0.85);
         }
 
         #choices-container {
@@ -230,13 +233,16 @@
             gap: 8px;
             margin-top: 8px;
             transition: opacity 0.3s ease;
+            max-height: 132px;
+            overflow-y: auto;
+            padding-right: 4px;
         }
 
         .choice-btn {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #e8d5c0;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
@@ -245,8 +251,11 @@
             letter-spacing: 0.03em;
             white-space: normal;
             min-width: 0;
+            max-width: calc(100% - 16px);
+            flex: 1 1 calc(50% - 12px);
             word-wrap: break-word;
             word-break: break-word;
+            text-align: left;
         }
         .choice-btn:hover {
             background: rgba(255, 255, 255, 0.14);
@@ -903,6 +912,7 @@
             const speakerName = document.getElementById('speaker-name');
             const dialogueText = document.getElementById('dialogue-text');
             const choicesContainer = document.getElementById('choices-container');
+            const dialogueArea = document.getElementById('dialogue-area');
             const loopIndicator = document.getElementById('loop-indicator');
             const timerDisplay = document.getElementById('timer-display');
             const titleOverlay = document.getElementById('title-overlay');
@@ -1164,6 +1174,12 @@
 
                 state.currentLocation = 'apartment';
                 state.loopActive = true;
+                if (sceneEl) {
+                    sceneEl.style.top = '0';
+                    sceneEl.style.bottom = '200px';
+                    sceneEl.style.height = '';
+                }
+                if (dialogueArea) dialogueArea.style.display = 'flex';
                 renderApartment();
                 applyDegradation();
                 updateTimerDisplay();
@@ -1341,7 +1357,7 @@
                     '',
                     'why?',
                     'you did this',
-                    'THE PLANT REMEMBERS / HARUKI KNOWS',
+                    'HARUKI KNOWS',
                 ];
                 const gText = state.graffitiLevel > 0 ? graffitiTexts[Math.min(state.graffitiLevel, 3)] : '';
 
@@ -1603,14 +1619,16 @@
             async function buyItem(itemKey) {
                 if (!state.loopActive) return;
                 if (itemKey === 'strong-zero') {
-                    state.kindChoicesTotal++; // counts as an action
-                    setDialogue('…', 'You buy a can of Strong Zero. The clerk barely looks up as you pay.');
+                    state.cruelChoicesTotal++;
+                    state.recentCruelActions.push('bought strong zero');
+                    state.harukiTrust = Math.max(0, state.harukiTrust - 1);
+                    setDialogue('…', 'You grab a can of Strong Zero from the shelf. It tastes sharp and empty. The clerk does not look pleased, but he does not stop you.' );
                     await waitForNext();
-                    setDialogue('…', 'You drink it. The alcohol hits you faster than you expected. Your vision blurs.');
+                    setDialogue('…', 'You drink it cold and fast. The burn goes straight to your head. Your vision wavers.');
                     await waitForNext();
-                    setDialogue('…', 'You pass out on the store floor. When you wake, the evening has reset.');
-                    // small mental drop to reflect intoxication
-                    state.mentalState = Math.max(5, state.mentalState - 25);
+                    setDialogue('…', 'The world tilts. You collapse to the floor of the store, the fluorescent lights buzzing overhead. When you wake, the evening has reset and your choices are gone.' );
+                    // harsh mental penalty to reflect a bad choice
+                    state.mentalState = Math.max(5, state.mentalState - 30);
                     await waitForNext();
                     endLoop('passed-out');
                     return;
@@ -1667,8 +1685,12 @@
                     clearInterval(state.loopTimerInterval);
                     state.loopTimerInterval = null;
                 }
+                if (dialogueArea) dialogueArea.style.display = 'none';
                 clearScene();
                 sceneEl.innerHTML = '';
+                sceneEl.style.top = '0';
+                sceneEl.style.bottom = '0';
+                sceneEl.style.height = '100%';
                 sceneEl.style.background = 'linear-gradient(180deg, #f5e6d0 0%, #e8d5b8 40%, #d4c4a8 100%)';
                 sceneEl.style.display = 'flex';
                 sceneEl.style.alignItems = 'center';
@@ -1709,8 +1731,12 @@
                     clearInterval(state.loopTimerInterval);
                     state.loopTimerInterval = null;
                 }
+                if (dialogueArea) dialogueArea.style.display = 'none';
                 clearScene();
                 sceneEl.innerHTML = '';
+                sceneEl.style.top = '0';
+                sceneEl.style.bottom = '0';
+                sceneEl.style.height = '100%';
                 sceneEl.style.background = '#0a0a12';
                 sceneEl.style.display = 'flex';
                 sceneEl.style.alignItems = 'center';
@@ -1779,6 +1805,12 @@
                 clearScene();
                 fadeOverlay.classList.remove('active');
 
+                if (sceneEl) {
+                    sceneEl.style.top = '0';
+                    sceneEl.style.bottom = '200px';
+                    sceneEl.style.height = '';
+                }
+                if (dialogueArea) dialogueArea.style.display = 'flex';
                 renderApartment();
                 applyDegradation();
                 updateTimerDisplay();
