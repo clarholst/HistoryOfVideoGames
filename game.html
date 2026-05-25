@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心の蝕 - Mind's Eclipse</title>
+    <style>
+        :root {
+            --bg: #1a1a24;
+            --wall: #e8dcc8;
+            --wall-dark: #c4b99a;
+            --tatami: #b8a88a;
+            --tatami-dark: #9b8b6f;
+            --wood: #6b4e3d;
+            --wood-dark: #4a3328;
+            --light-warm: #f5e6d0;
+            --text: #f0e6d3;
+            --text-dark: #3a3028;
+            --accent: #c0392b;
+            --accent-soft: #d4695a;
+            --night: #0d1b2a;
+            --plant-green: #5a8a4a;
+            --plant-dead: #8b7355;
+            --door-color: #8b6f5e;
+            --corridor-wall: #c8c0b8;
+            --corridor-floor: #9b9085;
+            --store-light: #f8f4ee;
+            --graffiti-color: #2a1a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a12;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Georgia', 'Noto Serif JP', 'Times New Roman', serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 1.5s ease;
+        }
+
+        /* Screen shake animation */
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            10% {
+                transform: translate(-3px, 1px);
+            }
+            20% {
+                transform: translate(2px, -2px);
+            }
+            30% {
+                transform: translate(-1px, 3px);
+            }
+            40% {
+                transform: translate(3px, -1px);
+            }
+            50% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(1px, 2px);
+            }
+            70% {
+                transform: translate(-3px, -1px);
+            }
+            80% {
+                transform: translate(2px, 1px);
+            }
+            90% {
+                transform: translate(-1px, -3px);
+            }
+        }
+
+        @keyframes textFlicker {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            15% {
+                opacity: 0.7;
+            }
+            16% {
+                opacity: 0.3;
+            }
+            17% {
+                opacity: 0.9;
+            }
+            45% {
+                opacity: 1;
+            }
+            46% {
+                opacity: 0.5;
+            }
+            47% {
+                opacity: 0.95;
+            }
+            78% {
+                opacity: 1;
+            }
+            79% {
+                opacity: 0.4;
+            }
+            80% {
+                opacity: 0.85;
+            }
+        }
+
+        @keyframes subtlePulse {
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.08);
+            }
+        }
+
+        @keyframes vignettePulse {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        #game-container {
+            width: 480px;
+            height: 720px;
+            max-width: 98vw;
+            max-height: 96vh;
+            background: #1a1a24;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.05);
+            transition: filter 1.2s ease, box-shadow 1.2s ease;
+        }
+
+        /* Vignette overlay */
+        #vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 85%, rgba(0, 0, 0, 0.85) 100%);
+            transition: opacity 1.5s ease;
+            opacity: 0.35;
+        }
+
+        /* Scanline effect */
+        #scanlines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 51;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.03) 2px,
+                    rgba(0, 0, 0, 0.03) 4px);
+            opacity: 0.4;
+            transition: opacity 1s ease;
+        }
+
+        /* Scene area */
+        #scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 200px;
+            transition: filter 1.2s ease, opacity 0.6s ease;
+        }
+
+        /* Dialogue area */
+        #dialogue-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, #0d0d16 0%, #151520 30%, #1a1a28 100%);
+            border-top: 2px solid rgba(255, 255, 255, 0.08);
+            padding: 18px 20px;
+            z-index: 40;
+            transition: filter 1.2s ease, background 1.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #speaker-name {
+            color: #d4a574;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            font-style: italic;
+            transition: color 1.2s ease, opacity 0.3s ease;
+        }
+
+        #dialogue-text {
+            color: #f0e6d3;
+            font-size: 15px;
+            line-height: 1.6;
+            flex: 1;
+            transition: color 1.2s ease, opacity 0.3s ease;
+            overflow-y: auto;
+            min-height: 50px;
+        }
+
+        #dialogue-text.glitching {
+            animation: textFlicker 0.25s infinite;
+        }
+
+        #choices-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            transition: opacity 0.3s ease;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e8d5c0;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.25s ease;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        .choice-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(200, 160, 120, 0.2);
+            transform: translateY(-1px);
+        }
+        .choice-btn:active {
+            transform: scale(0.96);
+            transition: transform 0.08s ease;
+        }
+        .choice-btn.special {
+            border-color: rgba(212, 165, 116, 0.6);
+            background: rgba(180, 120, 60, 0.15);
+            animation: subtlePulse 3s infinite;
+        }
+
+        /* Loop indicator - subtle */
+        #loop-indicator {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            z-index: 45;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            pointer-events: none;
+            transition: color 1.2s ease, opacity 1.2s ease;
+        }
+
+        /* Timer */
+        #timer-display {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            z-index: 45;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            pointer-events: none;
+            transition: color 1.2s ease;
+        }
+
+        /* Fade overlay for transitions */
+        #fade-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 60;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        #fade-overlay.active {
+            opacity: 1;
+        }
+
+        /* ===== LOCATION-SPECIFIC SCENE STYLES ===== */
+
+        /* --- APARTMENT --- */
+        .scene-apartment {
+            background: linear-gradient(180deg, #e8dcc8 0%, #d9cdb8 60%, #c4b99a 100%);
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .apt-wall {
+            position: absolute;
+            background: #e8dcc8;
+        }
+        .apt-tatami {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            background: repeating-linear-gradient(0deg,
+                    #b8a88a 0px,
+                    #b8a88a 8px,
+                    #c2b295 8px,
+                    #c2b295 9px,
+                    #b8a88a 9px,
+                    #b8a88a 22px);
+            border-top: 3px solid #9b8b6f;
+        }
+        .apt-window {
+            position: absolute;
+            top: 12%;
+            left: 55%;
+            width: 28%;
+            height: 28%;
+            background: #0d1b2a;
+            border: 6px solid #6b4e3d;
+            border-radius: 3px;
+            box-shadow: inset 0 0 30px rgba(20, 40, 70, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+        .apt-window::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 8px;
+            height: 8px;
+            background: #f5f0e0;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #f5f0e0, 0 0 25px rgba(240, 230, 200, 0.5);
+            opacity: 0.7;
+        }
+        .apt-window:hover {
+            box-shadow: inset 0 0 40px rgba(30, 50, 80, 0.7), 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        .apt-plant-shelf {
+            position: absolute;
+            top: 50%;
+            left: 18%;
+            width: 55px;
+            height: 8px;
+            background: #6b4e3d;
+            border-radius: 2px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        .apt-plant {
+            position: absolute;
+            top: 32%;
+            left: 20%;
+            width: 40px;
+            height: 55px;
+            cursor: pointer;
+            transition: all 0.7s ease;
+        }
+        .apt-plant .pot {
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            width: 30px;
+            height: 22px;
+            background: #c47a5a;
+            border-radius: 3px 3px 8px 8px;
+            border-top: 3px solid #a05a3a;
+        }
+        .apt-plant .stem {
+            position: absolute;
+            bottom: 20px;
+            left: 18px;
+            width: 4px;
+            height: 20px;
+            background: #5a8a4a;
+            border-radius: 2px;
+            transition: all 0.7s ease;
+        }
+        .apt-plant .leaf {
+            position: absolute;
+            width: 16px;
+            height: 10px;
+            background: #5a8a4a;
+            border-radius: 50% 50% 10% 50%;
+            transition: all 0.7s ease;
+        }
+        .apt-plant .leaf:nth-child(3) {
+            bottom: 30px;
+            left: 8px;
+            transform: rotate(-25deg);
+        }
+        .apt-plant .leaf:nth-child(4) {
+            bottom: 35px;
+            left: 20px;
+            transform: rotate(20deg);
+        }
+        .apt-plant .flower {
+            position: absolute;
+            bottom: 40px;
+            left: 13px;
+            width: 10px;
+            height: 10px;
+            background: #f0c0c0;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.7s ease;
+            box-shadow: 0 0 6px rgba(240, 180, 180, 0.5);
+        }
+        .apt-plant.healthy .stem {
+            background: #4a7a3a;
+            height: 24px;
+        }
+        .apt-plant.healthy .leaf {
+            background: #4a7a3a;
+        }
+        .apt-plant.healthy .flower {
+            opacity: 0.9;
+        }
+        .apt-plant.wilting .stem {
+            background: #8a9a40;
+            height: 16px;
+        }
+        .apt-plant.wilting .leaf {
+            background: #8a9a40;
+            width: 12px;
+            height: 7px;
+        }
+        .apt-plant.dead .stem {
+            background: #8b7355;
+            height: 10px;
+        }
+        .apt-plant.dead .leaf {
+            background: #7a6350;
+            width: 8px;
+            height: 5px;
+            border-radius: 30%;
+        }
+        .apt-plant.dead .pot {
+            background: #9b7b6a;
+        }
+        .apt-futon {
+            position: absolute;
+            bottom: 8%;
+            left: 10%;
+            width: 35%;
+            height: 18%;
+            background: #d5cfc5;
+            border-radius: 18px 18px 4px 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .apt-futon::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            right: 15%;
+            bottom: 20%;
+            background: #e8e2d8;
+            border-radius: 10px;
+        }
+        .apt-futon:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+        .apt-door {
+            position: absolute;
+            top: 8%;
+            right: 8%;
+            width: 18%;
+            height: 40%;
+            background: #8b6f5e;
+            border: 4px solid #6b4e3d;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+        .apt-door::after {
+            content: '';
+            position: absolute;
+            top: 40%;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            background: #c4a060;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(200, 160, 100, 0.4);
+        }
+        .apt-door:hover {
+            background: #9b7f6e;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        }
+        .apt-lamp {
+            position: absolute;
+            top: 18%;
+            left: 42%;
+            width: 25px;
+            height: 35px;
+            background: radial-gradient(ellipse at center, #f5e6d0 0%, #d4b896 60%, #a08060 100%);
+            border-radius: 50% 50% 30% 30%;
+            box-shadow: 0 0 40px rgba(240, 210, 170, 0.5), 0 0 80px rgba(220, 180, 140, 0.25);
+            pointer-events: none;
+            transition: all 1.2s ease;
+        }
+
+        /* --- CORRIDOR --- */
+        .scene-corridor {
+            background: linear-gradient(180deg, #c8c0b8 0%, #b8b0a8 50%, #9b9085 100%);
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .corr-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 28%;
+            background: #8b8075;
+            border-top: 2px solid #70655c;
+        }
+        .corr-light {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 8px;
+            background: #f8f4ee;
+            border-radius: 3px;
+            box-shadow: 0 0 40px rgba(255, 250, 240, 0.7), 0 0 80px rgba(240, 230, 210, 0.3);
+            pointer-events: none;
+            transition: all 1.2s ease;
+        }
+        .corr-door {
+            position: absolute;
+            top: 14%;
+            width: 16%;
+            height: 42%;
+            background: #7a6a5c;
+            border: 3px solid #5a4a3c;
+            border-radius: 3px 3px 0 0;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .corr-door.door-apt {
+            right: 10%;
+        }
+        .corr-door.door-haruki {
+            left: 12%;
+            background: #7d6d5f;
+        }
+        .corr-door:hover {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+        .corr-notice {
+            position: absolute;
+            top: 22%;
+            left: 38%;
+            width: 50px;
+            height: 40px;
+            background: #e8e0d5;
+            border: 2px solid #c0b8a8;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        }
+        .corr-notice:hover {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        .corr-graffiti {
+            position: absolute;
+            top: 30%;
+            right: 28%;
+            color: #2a1a3a;
+            font-size: 9px;
+            letter-spacing: 0.06em;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            font-style: italic;
+            transform: rotate(-3deg);
+        }
+        .corr-graffiti.visible {
+            opacity: 0.7;
+        }
+        .corr-graffiti.level2 {
+            opacity: 0.85;
+            font-size: 10px;
+            color: #1a0a2a;
+        }
+        .corr-graffiti.level3 {
+            opacity: 0.95;
+            font-size: 11px;
+            color: #0a0018;
+            text-shadow: 0 0 3px rgba(30, 10, 50, 0.4);
+        }
+        .corr-stairs {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 12%;
+            background: #70655c;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .corr-stairs::after {
+            content: '▼';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #b0a090;
+            font-size: 14px;
+        }
+        .corr-stairs:hover {
+            background: #7a6f66;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        /* --- CONVENIENCE STORE --- */
+        .scene-store {
+            background: linear-gradient(180deg, #f8f4ee 0%, #efe8dc 40%, #e0d8c8 100%);
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .store-shelf {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 35%;
+            height: 50%;
+            background: #e8e0d0;
+            border: 3px solid #c8c0a8;
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .store-shelf::after {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #d0c8b0;
+            box-shadow: 0 15px 0 #d0c8b0, 0 30px 0 #d0c8b0;
+        }
+        .store-shelf:hover {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+        .store-counter {
+            position: absolute;
+            bottom: 10%;
+            left: 15%;
+            width: 50%;
+            height: 18%;
+            background: #d5cbb8;
+            border-top: 6px solid #c0b598;
+            border-radius: 3px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .store-counter:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .store-light-fixture {
+            position: absolute;
+            top: 4%;
+            left: 25%;
+            width: 50%;
+            height: 6px;
+            background: #fffef8;
+            border-radius: 3px;
+            box-shadow: 0 0 50px rgba(255, 252, 240, 0.8), 0 0 100px rgba(240, 235, 210, 0.4);
+            pointer-events: none;
+        }
+        .store-exit {
+            position: absolute;
+            bottom: 3%;
+            right: 8%;
+            width: 20%;
+            height: 22%;
+            background: #c8c0b0;
+            border: 3px solid #a09888;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .store-exit:hover {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        /* --- HARUKI CHARACTER --- */
+        .haruki-figure {
+            position: absolute;
+            bottom: 15%;
+            left: 25%;
+            width: 28px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+        .haruki-figure .body {
+            position: absolute;
+            bottom: 0;
+            left: 4px;
+            width: 20px;
+            height: 28px;
+            background: #5a6a7a;
+            border-radius: 6px 6px 2px 2px;
+        }
+        .haruki-figure .head {
+            position: absolute;
+            top: 0;
+            left: 6px;
+            width: 16px;
+            height: 18px;
+            background: #f0dcc8;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .haruki-figure:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+
+        /* ===== DEGRADATION CLASSES ===== */
+        #game-container.degraded-mild {
+            filter: saturate(0.85) brightness(0.95);
+        }
+        #game-container.degraded-moderate {
+            filter: saturate(0.6) brightness(0.88) contrast(0.9);
+        }
+        #game-container.degraded-severe {
+            filter: saturate(0.3) brightness(0.78) contrast(0.8);
+            animation: shake 0.6s infinite;
+            animation-play-state: paused;
+        }
+        #game-container.degraded-severe.shaking {
+            animation-play-state: running;
+        }
+        #game-container.degraded-critical {
+            filter: saturate(0.1) brightness(0.65) contrast(0.7) blur(0.5px);
+            animation: shake 0.3s infinite;
+            animation-play-state: running;
+        }
+
+        /* Title screen */
+        #title-overlay {
+            position: absolute;
+            inset: 0;
+            background: #0a0a14;
+            z-index: 70;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+        #title-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #title-jp {
+            font-size: 38px;
+            color: #d4a574;
+            letter-spacing: 0.15em;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        #title-en {
+            font-size: 16px;
+            color: #8b7b6b;
+            letter-spacing: 0.2em;
+            margin-bottom: 30px;
+        }
+        #title-start {
+            font-size: 13px;
+            color: #6b5b4b;
+            letter-spacing: 0.15em;
+            animation: subtlePulse 4s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            #game-container {
+                width: 100vw;
+                height: 100vh;
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+            #dialogue-area {
+                height: 180px;
+                padding: 12px 14px;
+            }
+            #dialogue-text {
+                font-size: 13px;
+            }
+            .choice-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+            #title-jp {
+                font-size: 28px;
+            }
+            #title-en {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Vignette -->
+        <div id="vignette"></div>
+        <!-- Scanlines -->
+        <div id="scanlines"></div>
+        <!-- Loop indicator -->
+        <div id="loop-indicator">夜 ・ ループ</div>
+        <!-- Timer -->
+        <div id="timer-display"></div>
+        <!-- Scene -->
+        <div id="scene"></div>
+        <!-- Fade overlay -->
+        <div id="fade-overlay"></div>
+        <!-- Dialogue -->
+        <div id="dialogue-area">
+            <div id="speaker-name"></div>
+            <div id="dialogue-text"></div>
+            <div id="choices-container"></div>
+        </div>
+        <!-- Title -->
+        <div id="title-overlay">
+            <div id="title-jp">心の蝕</div>
+            <div id="title-en">MIND'S ECLIPSE</div>
+            <div id="title-start">click to begin</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== DOM ELEMENTS ====================
+            const gameContainer = document.getElementById('game-container');
+            const sceneEl = document.getElementById('scene');
+            const fadeOverlay = document.getElementById('fade-overlay');
+            const vignetteEl = document.getElementById('vignette');
+            const scanlinesEl = document.getElementById('scanlines');
+            const speakerName = document.getElementById('speaker-name');
+            const dialogueText = document.getElementById('dialogue-text');
+            const choicesContainer = document.getElementById('choices-container');
+            const loopIndicator = document.getElementById('loop-indicator');
+            const timerDisplay = document.getElementById('timer-display');
+            const titleOverlay = document.getElementById('title-overlay');
+
+            // ==================== GAME STATE ====================
+            const state = {
+                loopCount: 0,
+                mentalState: 100,
+                plantHealth: 3, // 3=healthy, 2=wilting, 1=dying, 0=dead
+                plantWateredThisLoop: false,
+                harukiTrust: 0, // 0-10
+                harukiInteractionsThisLoop: false,
+                graffitiLevel: 0, // 0-3
+                kindChoicesTotal: 0,
+                cruelChoicesTotal: 0,
+                currentLocation: 'apartment',
+                loopActive: false,
+                loopTimeRemaining: 150, // seconds (2.5 min for demo)
+                loopTimerInterval: null,
+                dialogueHistory: [], // across loops for Haruki's memory
+                recentKindActions: [],
+                recentCruelActions: [],
+                trueEndingUnlocked: false,
+                trueEndingTriggered: false,
+                badEndingTriggered: false,
+            };
+
+            // ==================== HELPER FUNCTIONS ====================
+            function clearScene() {
+                sceneEl.innerHTML = '';
+                sceneEl.className = '';
+            }
+
+            function clearChoices() {
+                choicesContainer.innerHTML = '';
+            }
+
+            function setDialogue(speaker, text, choices = null) {
+                speakerName.textContent = speaker;
+                dialogueText.textContent = text;
+                dialogueText.classList.remove('glitching');
+                clearChoices();
+                if (choices && choices.length > 0) {
+                    choices.forEach(choice => {
+                        const btn = document.createElement('button');
+                        btn.className = 'choice-btn';
+                        if (choice.special) btn.classList.add('special');
+                        btn.textContent = choice.label;
+                        btn.addEventListener('click', () => {
+                            clearChoices();
+                            if (choice.action) choice.action();
+                        });
+                        choicesContainer.appendChild(btn);
+                    });
+                }
+                // Apply glitch if mental state is low
+                if (state.mentalState < 35 && Math.random() < 0.3) {
+                    dialogueText.classList.add('glitching');
+                    // Occasionally scramble word order slightly
+                    if (state.mentalState < 20 && Math.random() < 0.4) {
+                        const words = text.split(' ');
+                        if (words.length > 4) {
+                            const i = Math.floor(Math.random() * (words.length - 2));
+                            [words[i], words[i + 1]] = [words[i + 1], words[i]];
+                            dialogueText.textContent = words.join(' ');
+                        }
+                    }
+                }
+            }
+
+            function getPlantClass() {
+                if (state.plantHealth >= 3) return 'healthy';
+                if (state.plantHealth === 2) return 'wilting';
+                if (state.plantHealth === 1) return 'wilting';
+                return 'dead';
+            }
+
+            function getDegradationClass() {
+                if (state.mentalState >= 80) return '';
+                if (state.mentalState >= 55) return 'degraded-mild';
+                if (state.mentalState >= 35) return 'degraded-moderate';
+                if (state.mentalState >= 15) return 'degraded-severe';
+                return 'degraded-critical';
+            }
+
+            function applyDegradation() {
+                const cls = getDegradationClass();
+                gameContainer.className = cls;
+                // Update vignette
+                if (state.mentalState < 40) {
+                    vignetteEl.style.opacity = 0.35 + (40 - state.mentalState) * 0.015;
+                } else {
+                    vignetteEl.style.opacity = 0.35;
+                }
+                // Update scanlines
+                if (state.mentalState < 25) {
+                    scanlinesEl.style.opacity = 0.4 + (25 - state.mentalState) * 0.02;
+                } else {
+                    scanlinesEl.style.opacity = 0.4;
+                }
+                // Shaking
+                if (state.mentalState < 35 && state.mentalState >= 15 && Math.random() < 0.08) {
+                    gameContainer.classList.add('shaking');
+                    setTimeout(() => gameContainer.classList.remove('shaking'), 400);
+                }
+                // Update loop indicator
+                loopIndicator.style.opacity = state.mentalState < 20 ? 0.3 : 0.7;
+                loopIndicator.style.color = state.mentalState < 30 ?
+                    `rgba(200,150,130,${0.3 + (state.mentalState/100)})` :
+                    'rgba(255,255,255,0.3)';
+            }
+
+            function updateTimerDisplay() {
+                const mins = Math.floor(state.loopTimeRemaining / 60);
+                const secs = state.loopTimeRemaining % 60;
+                timerDisplay.textContent = `残り ${mins}:${secs.toString().padStart(2, '0')}`;
+                if (state.loopTimeRemaining < 30) {
+                    timerDisplay.style.color = 'rgba(200,140,120,0.6)';
+                } else {
+                    timerDisplay.style.color = 'rgba(255,255,255,0.25)';
+                }
+            }
+
+            function startLoopTimer() {
+                state.loopTimeRemaining = 150;
+                updateTimerDisplay();
+                if (state.loopTimerInterval) clearInterval(state.loopTimerInterval);
+                state.loopTimerInterval = setInterval(() => {
+                    state.loopTimeRemaining--;
+                    updateTimerDisplay();
+                    if (state.loopTimeRemaining <= 0) {
+                        clearInterval(state.loopTimerInterval);
+                        state.loopTimerInterval = null;
+                        if (state.loopActive) {
+                            endLoop('exhaustion');
+                        }
+                    }
+                }, 1000);
+            }
+
+            async function fadeToBlack(duration = 800) {
+                fadeOverlay.classList.add('active');
+                await new Promise(r => setTimeout(r, duration));
+            }
+
+            async function fadeFromBlack(duration = 800) {
+                fadeOverlay.classList.remove('active');
+                await new Promise(r => setTimeout(r, duration));
+            }
+
+            // ==================== LOOP MANAGEMENT ====================
+            function endLoop(reason) {
+                if (!state.loopActive) return;
+                state.loopActive = false;
+                if (state.loopTimerInterval) {
+                    clearInterval(state.loopTimerInterval);
+                    state.loopTimerInterval = null;
+                }
+                clearChoices();
+
+                // Update plant health if not watered
+                if (!state.plantWateredThisLoop && state.plantHealth > 0) {
+                    state.plantHealth--;
+                }
+                if (state.plantWateredThisLoop && state.plantHealth < 3) {
+                    state.plantHealth++;
+                }
+
+                // Mental state changes
+                if (!state.plantWateredThisLoop) state.mentalState -= 4;
+                if (!state.harukiInteractionsThisLoop) state.mentalState -= 2;
+                if (state.cruelChoicesTotal > state.kindChoicesTotal) state.mentalState -= 3;
+                state.mentalState = Math.max(5, Math.min(100, state.mentalState));
+
+                // Graffiti updates
+                if (state.cruelChoicesTotal >= 2 && state.graffitiLevel < 1) state.graffitiLevel = 1;
+                if (state.cruelChoicesTotal >= 4 && state.graffitiLevel < 2) state.graffitiLevel = 2;
+                if (state.cruelChoicesTotal >= 6 && state.graffitiLevel < 3) state.graffitiLevel = 3;
+
+                // Check for true ending conditions
+                if (state.harukiTrust >= 7 && state.plantHealth >= 3 && state.kindChoicesTotal >= 5 &&
+                    state.loopCount >= 3 && !state.trueEndingUnlocked) {
+                    state.trueEndingUnlocked = true;
+                }
+
+                // Check for bad ending
+                if (state.mentalState <= 10 && state.loopCount >= 4 && !state.badEndingTriggered) {
+                    state.badEndingTriggered = true;
+                }
+
+                // Store dialogue memory for Haruki
+                state.dialogueHistory.push({
+                    loop: state.loopCount,
+                    plantWatered: state.plantWateredThisLoop,
+                    harukiInteraction: state.harukiInteractionsThisLoop,
+                    kindActions: [...state.recentKindActions],
+                    cruelActions: [...state.recentCruelActions],
+                });
+                if (state.dialogueHistory.length > 5) state.dialogueHistory.shift();
+
+                // Reset per-loop flags
+                state.plantWateredThisLoop = false;
+                state.harukiInteractionsThisLoop = false;
+                state.recentKindActions = [];
+                state.recentCruelActions = [];
+
+                state.loopCount++;
+                startNewLoop();
+            }
+
+            async function startNewLoop() {
+                state.loopActive = false;
+                if (state.loopTimerInterval) {
+                    clearInterval(state.loopTimerInterval);
+                    state.loopTimerInterval = null;
+                }
+                clearChoices();
+                await fadeToBlack(900);
+
+                // Check for bad ending
+                if (state.badEndingTriggered && state.loopCount >= 5) {
+                    triggerBadEnding();
+                    return;
+                }
+
+                // Check for true ending trigger
+                if (state.trueEndingTriggered) {
+                    triggerTrueEnding();
+                    return;
+                }
+
+                state.currentLocation = 'apartment';
+                state.loopActive = true;
+                renderApartment();
+                applyDegradation();
+                updateTimerDisplay();
+                startLoopTimer();
+                await fadeFromBlack(900);
+
+                // Wake-up dialogue
+                const wakeLines = [
+                    { s: '…', t: 'The ceiling is familiar. Too familiar.' },
+                    { s: '…', t: 'Evening light filters through the window. The same light as always.' },
+                    { s: '…', t: 'You sit up. The futon is warm. Everything is in its place.' },
+                ];
+                if (state.loopCount === 0) {
+                    wakeLines.push({ s: '…', t: 'A quiet evening. Nothing out of the ordinary. You feel... fine.' });
+                } else if (state.loopCount === 1) {
+                    wakeLines.push({ s: '…',
+                        t: 'You blink. Wasn\'t it just...? No. Must have been a dream. Just a dream.' });
+                } else if (state.loopCount >= 2) {
+                    wakeLines.push({ s: '…',
+                        t: 'Again. The weight of repetition settles on your chest. You know this evening. You\'ve lived it before.'
+                        });
+                }
+                if (state.plantHealth <= 1 && state.loopCount >= 2) {
+                    wakeLines.push({ s: '…',
+                        t: 'Out of the corner of your eye, the plant looks... wrong. Smaller. Dimmer.' });
+                }
+                if (state.graffitiLevel >= 2 && state.loopCount >= 3) {
+                    wakeLines.push({ s: '…',
+                        t: 'A faint memory of something written on a wall flickers through your mind.' });
+                }
+
+                for (const line of wakeLines) {
+                    setDialogue(line.s, line.t);
+                    await new Promise(r => setTimeout(r, 1800));
+                }
+
+                // Present choices for the apartment
+                presentApartmentChoices();
+            }
+
+            function presentApartmentChoices() {
+                if (!state.loopActive && !state.trueEndingTriggered && !state.badEndingTriggered) return;
+                const choices = [
+                    { label: 'Look out the window', action: () => lookOutWindow() },
+                    { label: 'Check the plant', action: () => interactWithPlant() },
+                    { label: 'Go to the corridor', action: () => goToCorridor() },
+                    { label: 'Rest on the futon', action: () => restOnFuton() },
+                ];
+                setDialogue('…', 'What would you like to do?', choices);
+            }
+
+            // ==================== APARTMENT SCENE ====================
+            function renderApartment() {
+                clearScene();
+                sceneEl.className = 'scene-apartment';
+                state.currentLocation = 'apartment';
+
+                const plantClass = getPlantClass();
+                const plantHealthLabel = state.plantHealth >= 3 ? 'Vibrant' : state.plantHealth === 2 ? 'Drooping' :
+                    state.plantHealth === 1 ? 'Yellowing' : 'Dead';
+
+                sceneEl.innerHTML = `
+                    <div class="apt-tatami"></div>
+                    <div class="apt-window" id="click-window" title="Look outside"></div>
+                    <div class="apt-plant-shelf"></div>
+                    <div class="apt-plant ${plantClass}" id="click-plant" title="${plantHealthLabel} plant">
+                        <div class="stem"></div>
+                        <div class="leaf"></div>
+                        <div class="leaf"></div>
+                        <div class="flower"></div>
+                        <div class="pot"></div>
+                    </div>
+                    <div class="apt-futon" id="click-futon" title="Rest"></div>
+                    <div class="apt-door" id="click-door" title="Corridor"></div>
+                    <div class="apt-lamp"></div>
+                `;
+
+                // Add click handlers
+                document.getElementById('click-window')?.addEventListener('click', lookOutWindow);
+                document.getElementById('click-plant')?.addEventListener('click', interactWithPlant);
+                document.getElementById('click-futon')?.addEventListener('click', restOnFuton);
+                document.getElementById('click-door')?.addEventListener('click', goToCorridor);
+            }
+
+            async function lookOutWindow() {
+                if (!state.loopActive) return;
+                const lines = [
+                    'The city stretches out below, bathed in the amber glow of evening.',
+                    'Streetlights flicker on one by one. The convenience store sign hums with pale blue light.',
+                    'Somewhere in the distance, a train passes. You can almost feel the vibration.',
+                ];
+                if (state.loopCount >= 3) {
+                    lines.push(
+                        'The sky looks... the same as it did last time. Exactly the same. The clouds haven\'t moved.'
+                        );
+                }
+                setDialogue('…', lines[Math.floor(Math.random() * lines.length)]);
+                await new Promise(r => setTimeout(r, 1500));
+                presentApartmentChoices();
+            }
+
+            async function interactWithPlant() {
+                if (!state.loopActive) return;
+                if (state.plantWateredThisLoop) {
+                    setDialogue('…', 'The soil is still moist. You\'ve already watered it this evening.');
+                    await new Promise(r => setTimeout(r, 1200));
+                    presentApartmentChoices();
+                    return;
+                }
+                const plantDesc = state.plantHealth >= 3 ?
+                    'The little plant sits on its shelf, leaves reaching toward the window. It looks healthy. The soil is dry — it could use some water.' :
+                    state.plantHealth === 2 ?
+                    'The plant looks tired. Its leaves droop slightly. The soil is bone-dry. It needs care.' :
+                    state.plantHealth === 1 ?
+                    'The plant is struggling. Yellowed leaves curl at the edges. The soil is cracked. It might not survive much longer.' :
+                    'The plant is dead. Brown, brittle stems. The pot is a small grave. You look away.';
+
+                setDialogue('…', plantDesc, [
+                    { label: 'Water the plant', action: () => waterPlant() },
+                    { label: 'Leave it', action: () => { leavePlant();
+                            presentApartmentChoices(); } },
+                    { label: 'Go back', action: () => presentApartmentChoices() },
+                ]);
+            }
+
+            async function waterPlant() {
+                if (!state.loopActive) return;
+                state.plantWateredThisLoop = true;
+                state.recentKindActions.push('watered plant');
+                state.kindChoicesTotal++;
+                state.mentalState = Math.min(100, state.mentalState + 3);
+                setDialogue('…',
+                    'You pour water into the small pot. The soil darkens. For a moment, the plant seems to stand a little taller.'
+                    );
+                applyDegradation();
+                // Refresh plant visual
+                const plantEl = document.getElementById('click-plant');
+                if (plantEl) {
+                    plantEl.className = 'apt-plant healthy';
+                }
+                await new Promise(r => setTimeout(r, 1500));
+                presentApartmentChoices();
+            }
+
+            async function leavePlant() {
+                if (!state.loopActive) return;
+                state.recentCruelActions.push('ignored plant');
+                state.cruelChoicesTotal++;
+                state.mentalState = Math.max(5, state.mentalState - 2);
+                setDialogue('…', 'You turn away. It\'s just a plant. It doesn\'t matter. (Does it?)');
+                applyDegradation();
+                await new Promise(r => setTimeout(r, 1200));
+            }
+
+            async function restOnFuton() {
+                if (!state.loopActive) return;
+                setDialogue('…', 'You lie down on the futon. A wave of drowsiness washes over you...', [
+                    { label: 'Close your eyes', action: () => endLoop('sleep') },
+                    { label: 'Get back up', action: () => presentApartmentChoices() },
+                ]);
+            }
+
+            // ==================== CORRIDOR SCENE ====================
+            async function goToCorridor() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-corridor';
+                state.currentLocation = 'corridor';
+
+                const graffitiClasses = state.graffitiLevel >= 3 ? 'corr-graffiti visible level3' :
+                    state.graffitiLevel >= 2 ? 'corr-graffiti visible level2' :
+                    state.graffitiLevel >= 1 ? 'corr-graffiti visible' : 'corr-graffiti';
+
+                const graffitiTexts = [
+                    '',
+                    'why?',
+                    'you did this',
+                    'THE PLANT REMEMBERS / HARUKI KNOWS',
+                ];
+                const gText = state.graffitiLevel > 0 ? graffitiTexts[Math.min(state.graffitiLevel, 3)] : '';
+
+                sceneEl.innerHTML = `
+                    <div class="corr-floor"></div>
+                    <div class="corr-light"></div>
+                    <div class="corr-door door-haruki" id="click-haruki-door" title="Haruki's apartment"></div>
+                    <div class="corr-door door-apt" id="click-my-door" title="Your apartment"></div>
+                    <div class="corr-notice" id="click-notice" title="Notice board"></div>
+                    <div class="${graffitiClasses}" id="graffiti-text">${gText}</div>
+                    <div class="corr-stairs" id="click-stairs" title="Downstairs"></div>
+                    <div class="haruki-figure" id="click-haruki" title="Haruki" style="bottom:18%;left:18%;">
+                        <div class="head"></div><div class="body"></div>
+                    </div>
+                `;
+
+                document.getElementById('click-haruki-door')?.addEventListener('click', interactWithHaruki);
+                document.getElementById('click-haruki')?.addEventListener('click', interactWithHaruki);
+                document.getElementById('click-my-door')?.addEventListener('click', () => {
+                    renderApartment();
+                    presentApartmentChoices();
+                });
+                document.getElementById('click-notice')?.addEventListener('click', checkNoticeBoard);
+                document.getElementById('click-stairs')?.addEventListener('click', goToStore);
+
+                setDialogue('…', 'The corridor is quiet. Fluorescent light hums overhead. Haruki\'s door is to the left.',
+                    [
+                        { label: 'Knock on Haruki\'s door', action: () => interactWithHaruki() },
+                        { label: 'Check the notice board', action: () => checkNoticeBoard() },
+                        { label: 'Go downstairs to the store',
+                            action: () => goToStore() },
+                        { label: 'Return to your apartment', action: () => { renderApartment();
+                                presentApartmentChoices(); } },
+                    ]);
+            }
+
+            async function interactWithHaruki() {
+                if (!state.loopActive) return;
+                state.harukiInteractionsThisLoop = true;
+                state.currentLocation = 'corridor';
+
+                let harukiDialogue = '';
+                let harukiChoices = [];
+
+                if (state.loopCount === 0) {
+                    harukiDialogue =
+                        'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny — I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
+                    harukiChoices = [
+                        { label: '"I don\'t think so. I\'m your neighbour."',
+                            action: () => harukiResponse('neutral') },
+                        { label: '"Maybe in another life." (smile)',
+                            action: () => harukiResponse('kind') },
+                        { label: '"I doubt it." (look away)',
+                            action: () => harukiResponse('cruel') },
+                    ];
+                } else if (state.loopCount === 1) {
+                    harukiDialogue =
+                        'Haruki leans against the doorframe. "I had the strangest dream last night. You were in it. We were... I don\'t know, talking about something important. But I can\'t remember what."';
+                    harukiChoices = [
+                        { label: '"Dreams are weird like that."',
+                            action: () => harukiResponse('neutral') },
+                        { label: '"Maybe it wasn\'t a dream." (hold his gaze)',
+                            action: () => harukiResponse('kind') },
+                        { label: '"I don\'t have time for this."',
+                            action: () => harukiResponse('cruel') },
+                    ];
+                } else if (state.loopCount >= 2) {
+                    const memoryRef = state.dialogueHistory.length >= 2 ?
+                        state.dialogueHistory[state.dialogueHistory.length - 2] : null;
+                    let extraLine = '';
+                    if (memoryRef && memoryRef.kindActions && memoryRef.kindActions.includes('was kind to Haruki')) {
+                        extraLine =
+                            ' "In my dream... you were kind to me. It felt warm. I keep holding onto that feeling."';
+                    } else if (memoryRef && memoryRef.cruelActions && memoryRef.cruelActions.includes(
+                            'was rude to Haruki')) {
+                        extraLine =
+                            ' "There was something cold in my dream. Something I can\'t shake off. Like being alone in a crowded room."';
+                    }
+                    harukiDialogue =
+                        `Haruki looks at you with an intensity that wasn't there before. "It keeps happening. The dreams. They're getting clearer. I remember... fragments. Conversations we've never had.${extraLine}"`;
+                    harukiChoices = [
+                        { label: '"Tell me more about these dreams."',
+                            action: () => harukiResponse('kind') },
+                        { label: '"That sounds... unsettling."',
+                            action: () => harukiResponse('neutral') },
+                        { label: '"You should probably get more sleep." (dismissive)',
+                            action: () => harukiResponse('cruel') },
+                    ];
+                    if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
+                        harukiChoices.push({
+                            label: '"Haruki... I think I remember too. I think we\'re connected."',
+                            action: () => harukiTrueEndingChoice(),
+                            special: true,
+                        });
+                    }
+                }
+
+                setDialogue('Haruki', harukiDialogue, harukiChoices);
+            }
+
+            async function harukiResponse(type) {
+                if (!state.loopActive) return;
+                if (type === 'kind') {
+                    state.harukiTrust = Math.min(10, state.harukiTrust + 2);
+                    state.kindChoicesTotal++;
+                    state.recentKindActions.push('was kind to Haruki');
+                    state.mentalState = Math.min(100, state.mentalState + 2);
+                    setDialogue('Haruki',
+                        'He smiles — a real smile, soft and unguarded. "Thank you. I don\'t know why, but that means something to me."'
+                        );
+                } else if (type === 'cruel') {
+                    state.harukiTrust = Math.max(0, state.harukiTrust - 1);
+                    state.cruelChoicesTotal++;
+                    state.recentCruelActions.push('was rude to Haruki');
+                    state.mentalState = Math.max(5, state.mentalState - 3);
+                    setDialogue('Haruki',
+                        'His expression closes off, like a door gently shutting. "Right. Sorry to bother you." He steps back into his apartment.'
+                        );
+                } else {
+                    state.harukiTrust = Math.min(10, state.harukiTrust + 1);
+                    setDialogue('Haruki',
+                        'He nods slowly, as if trying to grasp something just out of reach. "Yeah... maybe."');
+                }
+                applyDegradation();
+                await new Promise(r => setTimeout(r, 1600));
+                // Return to corridor choices
+                setDialogue('…', 'Haruki lingers for a moment, then retreats into his apartment. The corridor is quiet again.',
+                    [
+                        { label: 'Check the notice board', action: () => checkNoticeBoard() },
+                        { label: 'Go downstairs', action: () => goToStore() },
+                        { label: 'Return to your apartment', action: () => { renderApartment();
+                                presentApartmentChoices(); } },
+                    ]);
+            }
+
+            async function harukiTrueEndingChoice() {
+                state.trueEndingTriggered = true;
+                state.harukiTrust = 10;
+                state.mentalState = 100;
+                setDialogue('Haruki',
+                    'His eyes widen. For a long moment, he just stares at you. Then, barely above a whisper: "...You feel it too. The repetition. The loops. I thought I was going insane. I thought I was the only one."'
+                    );
+                await new Promise(r => setTimeout(r, 2500));
+                setDialogue('Haruki',
+                    '"The plant. The store. The evenings that never end. You\'ve been here too. With me. Every time." Tears form at the corners of his eyes. "What if... what if we\'re the ones keeping each other here? And what if we\'re the only way out?"'
+                    );
+                await new Promise(r => setTimeout(r, 3000));
+                setDialogue('…',
+                    'Haruki reaches out and takes your hand. His grip is warm and steady. The fluorescent light above flickers — and for the first time, it feels like something is *changing*. The loop is breaking. Not because of a puzzle solved, but because of a connection made.'
+                    );
+                await new Promise(r => setTimeout(r, 2500));
+                endLoop('true-ending');
+            }
+
+            async function checkNoticeBoard() {
+                if (!state.loopActive) return;
+                let noticeText =
+                    'A small cork board. Community notices, a faded flyer for a local festival, a reminder about recycling day.';
+                if (state.graffitiLevel >= 1) {
+                    noticeText +=
+                        ' There\'s a small mark in the corner — was that always there? It looks almost like handwriting.';
+                }
+                if (state.graffitiLevel >= 2) {
+                    noticeText += ' The mark has grown. It clearly says something now. The letters seem... accusatory.';
+                }
+                setDialogue('…', noticeText);
+                await new Promise(r => setTimeout(r, 1800));
+                setDialogue('…', 'The corridor waits.', [
+                    { label: 'Talk to Haruki', action: () => interactWithHaruki() },
+                    { label: 'Go downstairs', action: () => goToStore() },
+                    { label: 'Return to your apartment', action: () => { renderApartment();
+                            presentApartmentChoices(); } },
+                ]);
+            }
+
+            // ==================== STORE SCENE ====================
+            async function goToStore() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-store';
+                state.currentLocation = 'store';
+
+                sceneEl.innerHTML = `
+                    <div class="store-light-fixture"></div>
+                    <div class="store-shelf" id="click-shelf" title="Browse shelves"></div>
+                    <div class="store-counter" id="click-counter" title="Counter"></div>
+                    <div class="store-exit" id="click-store-exit" title="Go back"></div>
+                `;
+
+                document.getElementById('click-shelf')?.addEventListener('click', browseStore);
+                document.getElementById('click-counter')?.addEventListener('click', approachCounter);
+                document.getElementById('click-store-exit')?.addEventListener('click', () => {
+                    clearScene();
+                    sceneEl.className = 'scene-corridor';
+                    state.currentLocation = 'corridor';
+                    goToCorridor();
+                });
+
+                setDialogue('…',
+                    'The convenience store is bright and sterile. Rows of packaged snacks, drinks, and everyday necessities. The clerk barely glances up.',
+                    [
+                        { label: 'Browse the shelves', action: () => browseStore() },
+                        { label: 'Approach the counter', action: () => approachCounter() },
+                        { label: 'Go back upstairs', action: () => { clearScene();
+                                sceneEl.className = 'scene-corridor';
+                                state.currentLocation = 'corridor';
+                                goToCorridor(); } },
+                    ]);
+            }
+
+            async function browseStore() {
+                if (!state.loopActive) return;
+                const items = [
+                    'Onigiri, neatly wrapped. The same brand as always.',
+                    'A row of canned coffee. You consider buying one, but the thought passes.',
+                    'Instant ramen. Comforting in its predictability.',
+                ];
+                if (state.loopCount >= 3) {
+                    items.push('Everything is exactly where it was last time. The same products. The same prices. The same...');
+                }
+                setDialogue('…', items[Math.floor(Math.random() * items.length)]);
+                await new Promise(r => setTimeout(r, 1500));
+                setDialogue('…', 'The store hums with fluorescent light.', [
+                    { label: 'Approach the counter', action: () => approachCounter() },
+                    { label: 'Go back upstairs', action: () => { clearScene();
+                            sceneEl.className = 'scene-corridor';
+                            state.currentLocation = 'corridor';
+                            goToCorridor(); } },
+                ]);
+            }
+
+            async function approachCounter() {
+                if (!state.loopActive) return;
+                setDialogue('…',
+                    'The clerk looks up. A tired young man with kind eyes. "Find everything okay?" There\'s something familiar about his tone. But of course there is — you\'ve been here before. Many times.'
+                    );
+                state.kindChoicesTotal++;
+                state.mentalState = Math.min(100, state.mentalState + 1);
+                applyDegradation();
+                await new Promise(r => setTimeout(r, 2000));
+                setDialogue('…', 'You nod and step away from the counter.', [
+                    { label: 'Browse shelves', action: () => browseStore() },
+                    { label: 'Go back upstairs', action: () => { clearScene();
+                            sceneEl.className = 'scene-corridor';
+                            state.currentLocation = 'corridor';
+                            goToCorridor(); } },
+                ]);
+            }
+
+            // ==================== ENDINGS ====================
+            async function triggerTrueEnding() {
+                state.loopActive = false;
+                if (state.loopTimerInterval) {
+                    clearInterval(state.loopTimerInterval);
+                    state.loopTimerInterval = null;
+                }
+                clearScene();
+                sceneEl.innerHTML = '';
+                sceneEl.style.background = 'linear-gradient(180deg, #f5e6d0 0%, #e8d5b8 40%, #d4c4a8 100%)';
+                sceneEl.style.display = 'flex';
+                sceneEl.style.alignItems = 'center';
+                sceneEl.style.justifyContent = 'center';
+                sceneEl.style.flexDirection = 'column';
+                sceneEl.style.textAlign = 'center';
+                sceneEl.style.padding = '40px';
+                const endDiv = document.createElement('div');
+                endDiv.innerHTML = `
+                    <div style="font-size:28px;color:#6b4e3d;letter-spacing:0.1em;margin-bottom:16px;">心の蝕</div>
+                    <div style="font-size:15px;color:#8b6f5e;line-height:1.8;max-width:350px;">
+                        The loop breaks not with a bang,<br>but with a hand held in the dark.<br><br>
+                        Haruki remembers. You remember.<br>
+                        Two minds, eclipsed no longer.<br><br>
+                        <span style="color:#4a7a3a;">The plant blooms.</span><br>
+                        <span style="color:#d4a574;">The graffiti fades.</span><br>
+                        <span style="color:#5a6a7a;">Morning comes.</span>
+                    </div>
+                    <div style="margin-top:30px;font-size:12px;color:#a09080;letter-spacing:0.15em;">
+                        真実の結末 ・ TRUE ENDING
+                    </div>
+                `;
+                sceneEl.appendChild(endDiv);
+                setDialogue('…', '');
+                speakerName.textContent = '';
+                timerDisplay.textContent = '';
+                loopIndicator.textContent = '朝 ・ 終わり';
+                loopIndicator.style.color = 'rgba(180,160,140,0.8)';
+                gameContainer.className = '';
+                vignetteEl.style.opacity = '0.2';
+                scanlinesEl.style.opacity = '0.1';
+                await fadeFromBlack(1200);
+            }
+
+            async function triggerBadEnding() {
+                state.loopActive = false;
+                if (state.loopTimerInterval) {
+                    clearInterval(state.loopTimerInterval);
+                    state.loopTimerInterval = null;
+                }
+                clearScene();
+                sceneEl.innerHTML = '';
+                sceneEl.style.background = '#0a0a12';
+                sceneEl.style.display = 'flex';
+                sceneEl.style.alignItems = 'center';
+                sceneEl.style.justifyContent = 'center';
+                sceneEl.style.flexDirection = 'column';
+                sceneEl.style.textAlign = 'center';
+                const endDiv = document.createElement('div');
+                endDiv.innerHTML = `
+                    <div style="font-size:24px;color:#3a2a2a;letter-spacing:0.15em;margin-bottom:16px;">心の蝕</div>
+                    <div style="font-size:14px;color:#5a4040;line-height:1.8;max-width:320px;">
+                        The mind erodes.<br>
+                        The loops blur together.<br>
+                        Haruki's face becomes a stranger's.<br>
+                        The plant is dust.<br><br>
+                        <span style="color:#3a2020;">You forget what you were trying to remember.</span><br><br>
+                        The eclipse is total.
+                    </div>
+                    <div style="margin-top:30px;font-size:11px;color:#4a3030;letter-spacing:0.12em;">
+                        悪い結末 ・ BAD ENDING
+                    </div>
+                `;
+                sceneEl.appendChild(endDiv);
+                setDialogue('…', '');
+                speakerName.textContent = '';
+                timerDisplay.textContent = '';
+                loopIndicator.textContent = '闇 ・ 終わり';
+                loopIndicator.style.color = 'rgba(80,40,40,0.6)';
+                gameContainer.className = 'degraded-critical';
+                vignetteEl.style.opacity = '0.8';
+                scanlinesEl.style.opacity = '0.7';
+                await fadeFromBlack(1500);
+            }
+
+            // ==================== GAME INITIALIZATION ====================
+            async function initGame() {
+                state.loopCount = 0;
+                state.mentalState = 100;
+                state.plantHealth = 3;
+                state.plantWateredThisLoop = false;
+                state.harukiTrust = 0;
+                state.harukiInteractionsThisLoop = false;
+                state.graffitiLevel = 0;
+                state.kindChoicesTotal = 0;
+                state.cruelChoicesTotal = 0;
+                state.dialogueHistory = [];
+                state.recentKindActions = [];
+                state.recentCruelActions = [];
+                state.trueEndingUnlocked = false;
+                state.trueEndingTriggered = false;
+                state.badEndingTriggered = false;
+                state.loopActive = true;
+                state.currentLocation = 'apartment';
+
+                gameContainer.className = '';
+                vignetteEl.style.opacity = '0.35';
+                scanlinesEl.style.opacity = '0.4';
+                loopIndicator.textContent = '夜 ・ ループ';
+                loopIndicator.style.color = 'rgba(255,255,255,0.3)';
+                loopIndicator.style.opacity = '0.7';
+                timerDisplay.style.color = 'rgba(255,255,255,0.25)';
+                speakerName.textContent = '';
+                dialogueText.textContent = '';
+                clearChoices();
+                clearScene();
+                fadeOverlay.classList.remove('active');
+
+                renderApartment();
+                applyDegradation();
+                updateTimerDisplay();
+                startLoopTimer();
+                await fadeFromBlack(800);
+
+                setDialogue('…', 'You wake up in your apartment. Evening light filters through the window.');
+                await new Promise(r => setTimeout(r, 1800));
+                setDialogue('…', 'Everything is as it should be. The plant sits on its shelf. The futon is warm beneath you.');
+                await new Promise(r => setTimeout(r, 1800));
+                presentApartmentChoices();
+            }
+
+            // ==================== TITLE SCREEN ====================
+            titleOverlay.addEventListener('click', async () => {
+                titleOverlay.classList.add('hidden');
+                await new Promise(r => setTimeout(r, 500));
+                initGame();
+            });
+
+            // Allow starting with Enter key too
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !titleOverlay.classList.contains('hidden') === false) {
+                    if (!state.loopActive && state.loopCount === 0 && !state.trueEndingTriggered && !state
+                        .badEndingTriggered) {
+                        // Initial state before title click
+                    }
+                }
+                if (e.key === 'Enter' && titleOverlay.classList.contains('hidden') === false) {
+                    titleOverlay.click();
+                }
+            });
+
+            // Initial setup
+            sceneEl.innerHTML = '';
+            speakerName.textContent = '';
+            dialogueText.textContent = '';
+            timerDisplay.textContent = '';
+            loopIndicator.textContent = '';
+            gameContainer.className = '';
+
+            console.log('心の蝕 - Mind\'s Eclipse');
+            console.log('A time-loop narrative game');
+            console.log('Click the title screen to begin.');
+            console.log('Pay attention. Your choices matter.');
+            console.log('The plant remembers. Haruki remembers.');
+            console.log('Break the loop by connecting.');
+        })();
+    </script>
+</body>
+</html>
