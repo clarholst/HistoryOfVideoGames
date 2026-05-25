@@ -1267,7 +1267,7 @@
                     return;
                 }
                 const plantDesc = state.plantHealth >= 3 ?
-                    'The little plant sits on its shelf, leaves reaching toward the window. It looks healthy. The soil is dry — it could use some water.' :
+                    'The little plant sits on its shelf, leaves reaching toward the window. It looks healthy. The soil is dry, it could use some water.' :
                     state.plantHealth === 2 ?
                     'The plant looks tired. Its leaves droop slightly. The soil is bone-dry. It needs care.' :
                     state.plantHealth === 1 ?
@@ -1381,7 +1381,7 @@
 
                 if (state.loopCount === 0) {
                     harukiDialogue =
-                        'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny — I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
+                        'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny, I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
                     harukiChoices = [
                         { label: '"I don\'t think so. I\'m your neighbour."',
                             action: () => harukiResponse('neutral') },
@@ -1443,7 +1443,7 @@
                     state.recentKindActions.push('was kind to Haruki');
                     state.mentalState = Math.min(100, state.mentalState + 2);
                     setDialogue('Haruki',
-                        'He smiles — a real smile, soft and unguarded. "Thank you. I don\'t know why, but that means something to me."'
+                        'He smiles, a real smile, soft and unguarded. "Thank you. I don\'t know why, but that means something to me."'
                         );
                 } else if (type === 'cruel') {
                     state.harukiTrust = Math.max(0, state.harukiTrust - 1);
@@ -1483,7 +1483,7 @@
                     );
                 await waitForNext();
                 setDialogue('…',
-                    'Haruki reaches out and takes your hand. His grip is warm and steady. The fluorescent light above flickers — and for the first time, it feels like something is *changing*. The loop is breaking. Not because of a puzzle solved, but because of a connection made.'
+                    'Haruki reaches out and takes your hand. His grip is warm and steady. The fluorescent light above flickers, and for the first time, it feels like something is *changing*. The loop is breaking. Not because of a puzzle solved, but because of a connection made.'
                     );
                 await waitForNext();
                 endLoop('true-ending');
@@ -1495,7 +1495,7 @@
                     'A small cork board. Community notices, a faded flyer for a local festival, a reminder about recycling day.';
                 if (state.graffitiLevel >= 1) {
                     noticeText +=
-                        ' There\'s a small mark in the corner — was that always there? It looks almost like handwriting.';
+                        ' There\'s a small mark in the corner, was that always there? It looks almost like handwriting.';
                 }
                 if (state.graffitiLevel >= 2) {
                     noticeText += ' The mark has grown. It clearly says something now. The letters seem... accusatory.';
@@ -1569,7 +1569,7 @@
             async function approachCounter() {
                 if (!state.loopActive) return;
                 setDialogue('…',
-                    'The clerk looks up. A tired young man with kind eyes. "Find everything okay?" There\'s something familiar about his tone. But of course there is — you\'ve been here before. Many times.'
+                    'The clerk looks up. A tired young man with kind eyes. "Find everything okay?" There\'s something familiar about his tone. But of course there is, you\'ve been here before. Many times.'
                     );
                 state.kindChoicesTotal++;
                 state.mentalState = Math.min(100, state.mentalState + 1);
