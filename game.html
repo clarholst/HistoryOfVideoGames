@@ -932,6 +932,8 @@
                 plantWateredThisLoop: false,
                 harukiTrust: 0, // 0-10
                 harukiInteractionsThisLoop: false,
+                harukiTalksThisLoop: 0,
+                readNoticeThisLoop: false,
                 graffitiLevel: 0, // 0-3
                 kindChoicesTotal: 0,
                 cruelChoicesTotal: 0,
@@ -1127,6 +1129,8 @@
                 // Reset per-loop flags
                 state.plantWateredThisLoop = false;
                 state.harukiInteractionsThisLoop = false;
+                state.harukiTalksThisLoop = 0;
+                state.readNoticeThisLoop = false;
                 state.recentKindActions = [];
                 state.recentCruelActions = [];
 
@@ -1373,62 +1377,88 @@
 
             async function interactWithHaruki() {
                 if (!state.loopActive) return;
+                // allow up to two talks per loop; second talk is a "retalk" with different dialogue
+                state.harukiTalksThisLoop = state.harukiTalksThisLoop || 0;
+                if (state.harukiTalksThisLoop >= 2) {
+                    setDialogue('…', 'Haruki is not available right now.');
+                    await waitForNext();
+                    setDialogue('…', 'The corridor is quiet.', [
+                        { label: 'Go downstairs', action: () => goToStore() },
+                        { label: 'Return to your apartment', action: () => { renderApartment(); presentApartmentChoices(); } },
+                    ]);
+                    return;
+                }
+
+                // Count this conversation
+                state.harukiTalksThisLoop++;
                 state.harukiInteractionsThisLoop = true;
                 state.currentLocation = 'corridor';
 
                 let harukiDialogue = '';
                 let harukiChoices = [];
 
-                if (state.loopCount === 0) {
-                    harukiDialogue =
-                        'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny, I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
-                    harukiChoices = [
-                        { label: '"I don\'t think so. I\'m your neighbour."',
-                            action: () => harukiResponse('neutral') },
-                        { label: '"Maybe in another life." (smile)',
-                            action: () => harukiResponse('kind') },
-                        { label: '"I doubt it." (look away)',
-                            action: () => harukiResponse('cruel') },
-                    ];
-                } else if (state.loopCount === 1) {
-                    harukiDialogue =
-                        'Haruki leans against the doorframe. "I had the strangest dream last night. You were in it. We were... I don\'t know, talking about something important. But I can\'t remember what."';
-                    harukiChoices = [
-                        { label: '"Dreams are weird like that."',
-                            action: () => harukiResponse('neutral') },
-                        { label: '"Maybe it wasn\'t a dream." (hold his gaze)',
-                            action: () => harukiResponse('kind') },
-                        { label: '"I don\'t have time for this."',
-                            action: () => harukiResponse('cruel') },
-                    ];
-                } else if (state.loopCount >= 2) {
-                    const memoryRef = state.dialogueHistory.length >= 2 ?
-                        state.dialogueHistory[state.dialogueHistory.length - 2] : null;
-                    let extraLine = '';
-                    if (memoryRef && memoryRef.kindActions && memoryRef.kindActions.includes('was kind to Haruki')) {
-                        extraLine =
-                            ' "In my dream... you were kind to me. It felt warm. I keep holding onto that feeling."';
-                    } else if (memoryRef && memoryRef.cruelActions && memoryRef.cruelActions.includes(
-                            'was rude to Haruki')) {
-                        extraLine =
-                            ' "There was something cold in my dream. Something I can\'t shake off. Like being alone in a crowded room."';
+                if (state.harukiTalksThisLoop === 1) {
+                    // First conversation: original behavior based on loopCount
+                    if (state.loopCount === 0) {
+                        harukiDialogue =
+                            'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny, I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
+                        harukiChoices = [
+                            { label: '"I don\'t think so. I\'m your neighbour."', action: () => harukiResponse('neutral') },
+                            { label: '"Maybe in another life." (smile)', action: () => harukiResponse('kind') },
+                            { label: '"I doubt it." (look away)', action: () => harukiResponse('cruel') },
+                        ];
+                    } else if (state.loopCount === 1) {
+                        harukiDialogue =
+                            'Haruki leans against the doorframe. "I had the strangest dream last night. You were in it. We were... I don\'t know, talking about something important. But I can\'t remember what."';
+                        harukiChoices = [
+                            { label: '"Dreams are weird like that."', action: () => harukiResponse('neutral') },
+                            { label: '"Maybe it wasn\'t a dream." (hold his gaze)', action: () => harukiResponse('kind') },
+                            { label: '"I don\'t have time for this."', action: () => harukiResponse('cruel') },
+                        ];
+                    } else {
+                        const memoryRef = state.dialogueHistory.length >= 2 ? state.dialogueHistory[state.dialogueHistory.length - 2] : null;
+                        let extraLine = '';
+                        if (memoryRef && memoryRef.kindActions && memoryRef.kindActions.includes('was kind to Haruki')) {
+                            extraLine = ' "In my dream... you were kind to me. It felt warm. I keep holding onto that feeling."';
+                        } else if (memoryRef && memoryRef.cruelActions && memoryRef.cruelActions.includes('was rude to Haruki')) {
+                            extraLine = ' "There was something cold in my dream. Something I can\'t shake off. Like being alone in a crowded room."';
+                        }
+                        harukiDialogue = `Haruki looks at you with an intensity that wasn't there before. "It keeps happening. The dreams. They're getting clearer. I remember... fragments. Conversations we've never had.${extraLine}"`;
+                        harukiChoices = [
+                            { label: '"Tell me more about these dreams."', action: () => harukiResponse('kind') },
+                            { label: '"That sounds... unsettling."', action: () => harukiResponse('neutral') },
+                            { label: '"You should probably get more sleep." (dismissive)', action: () => harukiResponse('cruel') },
+                        ];
+                        if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
+                            harukiChoices.push({ label: '"Haruki... I think I remember too. I think we\'re connected."', action: () => harukiTrueEndingChoice(), special: true });
+                        }
                     }
-                    harukiDialogue =
-                        `Haruki looks at you with an intensity that wasn't there before. "It keeps happening. The dreams. They're getting clearer. I remember... fragments. Conversations we've never had.${extraLine}"`;
-                    harukiChoices = [
-                        { label: '"Tell me more about these dreams."',
-                            action: () => harukiResponse('kind') },
-                        { label: '"That sounds... unsettling."',
-                            action: () => harukiResponse('neutral') },
-                        { label: '"You should probably get more sleep." (dismissive)',
-                            action: () => harukiResponse('cruel') },
-                    ];
-                    if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
-                        harukiChoices.push({
-                            label: '"Haruki... I think I remember too. I think we\'re connected."',
-                            action: () => harukiTrueEndingChoice(),
-                            special: true,
-                        });
+                } else {
+                    // Second conversation: retalk with different lines and choices
+                    if (state.loopCount === 0) {
+                        harukiDialogue = 'Haruki seems more relaxed this time. "Hey again. You seem different tonight, did something happen?"';
+                        harukiChoices = [
+                            { label: '"I was just thinking about you again."', action: () => harukiResponse('kind') },
+                            { label: '"I felt like talking to you."', action: () => harukiResponse('neutral') },
+                            { label: '"It\'s nothing."', action: () => harukiResponse('cruel') },
+                        ];
+                    } else if (state.loopCount === 1) {
+                        harukiDialogue = 'Haruki pauses, then asks quietly: "Do you ever remember things between evenings? I keep getting flashes."';
+                        harukiChoices = [
+                            { label: '"Sometimes. Small things."', action: () => harukiResponse('neutral') },
+                            { label: '"I remember you in them."', action: () => harukiResponse('kind') },
+                            { label: '"No, I don\'t."', action: () => harukiResponse('cruel') },
+                        ];
+                    } else {
+                        harukiDialogue = 'Haruki speaks with a new certainty: "The dreams are like signals. I think we\'re connected somehow. Does that scare you?"';
+                        harukiChoices = [
+                            { label: '"A little."', action: () => harukiResponse('neutral') },
+                            { label: '"No, it feels like hope."', action: () => harukiResponse('kind') },
+                            { label: '"We should stop this."', action: () => harukiResponse('cruel') },
+                        ];
+                        if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
+                            harukiChoices.push({ label: '"Maybe together we can leave."', action: () => harukiTrueEndingChoice(), special: true });
+                        }
                     }
                 }
 
@@ -1500,6 +1530,8 @@
                 if (state.graffitiLevel >= 2) {
                     noticeText += ' The mark has grown. It clearly says something now. The letters seem... accusatory.';
                 }
+                // Mark that the player has read the notice this loop so they may talk to Haruki again
+                state.readNoticeThisLoop = true;
                 setDialogue('…', noticeText);
                 await waitForNext();
                 setDialogue('…', 'The corridor waits.', [
@@ -1555,15 +1587,58 @@
                 if (state.loopCount >= 3) {
                     items.push('Everything is exactly where it was last time. The same products. The same prices. The same...');
                 }
+                // Show a random item description then present purchase options
                 setDialogue('…', items[Math.floor(Math.random() * items.length)]);
                 await waitForNext();
-                setDialogue('…', 'The store hums with fluorescent light.', [
-                    { label: 'Approach the counter', action: () => approachCounter() },
-                    { label: 'Go back upstairs', action: () => { clearScene();
-                            sceneEl.className = 'scene-corridor';
-                            state.currentLocation = 'corridor';
-                            goToCorridor(); } },
+                setDialogue('…', 'The store hums with fluorescent light. You can buy something if you like.', [
+                    { label: 'Buy Strong Zero (beer)', action: () => buyItem('strong-zero') },
+                    { label: 'Buy Onigiri', action: () => buyItem('onigiri') },
+                    { label: 'Buy Instant Ramen', action: () => buyItem('ramen') },
+                    { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
                 ]);
+            }
+
+            // Purchase handling
+            async function buyItem(itemKey) {
+                if (!state.loopActive) return;
+                if (itemKey === 'strong-zero') {
+                    state.kindChoicesTotal++; // counts as an action
+                    setDialogue('…', 'You buy a can of Strong Zero. The clerk barely looks up as you pay.');
+                    await waitForNext();
+                    setDialogue('…', 'You drink it. The alcohol hits you faster than you expected. Your vision blurs.');
+                    await waitForNext();
+                    setDialogue('…', 'You pass out on the store floor. When you wake, the evening has reset.');
+                    // small mental drop to reflect intoxication
+                    state.mentalState = Math.max(5, state.mentalState - 25);
+                    await waitForNext();
+                    endLoop('passed-out');
+                    return;
+                }
+
+                if (itemKey === 'onigiri') {
+                    state.kindChoicesTotal++;
+                    setDialogue('…', 'You buy an onigiri. It feels comforting, small, familiar, warm in your hands.');
+                    await waitForNext();
+                    setDialogue('…', 'You eat it and feel a little steadier.');
+                    state.mentalState = Math.min(100, state.mentalState + 2);
+                    await waitForNext();
+                    setDialogue('…', 'The store hums with fluorescent light.', [
+                        { label: 'Approach the counter', action: () => approachCounter() },
+                        { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
+                    ]);
+                    return;
+                }
+
+                if (itemKey === 'ramen') {
+                    state.kindChoicesTotal++;
+                    setDialogue('…', 'You buy some instant ramen. The packet promises warmth and predictable taste.');
+                    await waitForNext();
+                    state.mentalState = Math.min(100, state.mentalState + 1);
+                    setDialogue('…', 'You put it in your bag and head back upstairs.', [
+                        { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
+                    ]);
+                    return;
+                }
             }
 
             async function approachCounter() {
@@ -1676,6 +1751,8 @@
                 state.plantWateredThisLoop = false;
                 state.harukiTrust = 0;
                 state.harukiInteractionsThisLoop = false;
+                state.harukiTalksThisLoop = 0;
+                state.readNoticeThisLoop = false;
                 state.graffitiLevel = 0;
                 state.kindChoicesTotal = 0;
                 state.cruelChoicesTotal = 0;
