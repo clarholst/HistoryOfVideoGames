@@ -243,7 +243,10 @@
             font-size: 13px;
             transition: all 0.25s ease;
             letter-spacing: 0.03em;
-            white-space: nowrap;
+            white-space: normal;
+            min-width: 0;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         .choice-btn:hover {
             background: rgba(255, 255, 255, 0.14);
@@ -1403,17 +1406,17 @@
                         harukiDialogue =
                             'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny, I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
                         harukiChoices = [
-                            { label: '"I don\'t think so. I\'m your neighbour."', action: () => harukiResponse('neutral') },
-                            { label: '"Maybe in another life." (smile)', action: () => harukiResponse('kind') },
-                            { label: '"I doubt it." (look away)', action: () => harukiResponse('cruel') },
+                            { label: '"I don\'t think so. I\'m your neighbour."', action: () => harukiResponse('neutral', 'He looks a little relieved. "Oh — right. Sorry, you just looked familiar. I guess I was thinking too much."') },
+                            { label: '"Maybe in another life." (smile)', action: () => harukiResponse('kind', 'His smile deepens. "Maybe… that would explain why you seem familiar. I like that idea."') },
+                            { label: '"I doubt it." (look away)', action: () => harukiResponse('cruel', 'He stiffens slightly. "Oh. Alright then. Sorry to bother you."') },
                         ];
                     } else if (state.loopCount === 1) {
                         harukiDialogue =
                             'Haruki leans against the doorframe. "I had the strangest dream last night. You were in it. We were... I don\'t know, talking about something important. But I can\'t remember what."';
                         harukiChoices = [
-                            { label: '"Dreams are weird like that."', action: () => harukiResponse('neutral') },
-                            { label: '"Maybe it wasn\'t a dream." (hold his gaze)', action: () => harukiResponse('kind') },
-                            { label: '"I don\'t have time for this."', action: () => harukiResponse('cruel') },
+                            { label: '"Dreams are weird like that."', action: () => harukiResponse('neutral', 'He chuckles nervously. "Yeah, they are. But this one felt weirdly real, like a memory I can\'t place."') },
+                            { label: '"Maybe it wasn\'t a dream." (hold his gaze)', action: () => harukiResponse('kind', 'He studies you. "If it wasn\'t, then what are we supposed to do with it?"') },
+                            { label: '"I don\'t have time for this."', action: () => harukiResponse('cruel', 'His smile fades. "Right. Sorry. I didn\'t mean to take up your time."') },
                         ];
                     } else {
                         const memoryRef = state.dialogueHistory.length >= 2 ? state.dialogueHistory[state.dialogueHistory.length - 2] : null;
@@ -1425,9 +1428,9 @@
                         }
                         harukiDialogue = `Haruki looks at you with an intensity that wasn't there before. "It keeps happening. The dreams. They're getting clearer. I remember... fragments. Conversations we've never had.${extraLine}"`;
                         harukiChoices = [
-                            { label: '"Tell me more about these dreams."', action: () => harukiResponse('kind') },
-                            { label: '"That sounds... unsettling."', action: () => harukiResponse('neutral') },
-                            { label: '"You should probably get more sleep." (dismissive)', action: () => harukiResponse('cruel') },
+                            { label: '"Tell me more about these dreams."', action: () => harukiResponse('kind', 'His eyes widen. "I wish I could. They come in pieces, but they always feel like they\'re trying to tell me something important about you."') },
+                            { label: '"That sounds... unsettling."', action: () => harukiResponse('neutral', 'He nods slowly. "It is. But it also feels like it means something. Like I\'m supposed to remember it."') },
+                            { label: '"You should probably get more sleep." (dismissive)', action: () => harukiResponse('cruel', 'He flinches. "Maybe I should. I just can\'t stop thinking about it."') },
                         ];
                         if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
                             harukiChoices.push({ label: '"Haruki... I think I remember too. I think we\'re connected."', action: () => harukiTrueEndingChoice(), special: true });
@@ -1438,23 +1441,23 @@
                     if (state.loopCount === 0) {
                         harukiDialogue = 'Haruki seems more relaxed this time. "Hey again. You seem different tonight, did something happen?"';
                         harukiChoices = [
-                            { label: '"I was just thinking about you again."', action: () => harukiResponse('kind') },
-                            { label: '"I felt like talking to you."', action: () => harukiResponse('neutral') },
-                            { label: '"It\'s nothing."', action: () => harukiResponse('cruel') },
+                            { label: '"I was just thinking about you again."', action: () => harukiResponse('kind', 'He blushes faintly. "Really? That... that means a lot. I guess I felt like you were here even before I saw you."') },
+                            { label: '"I felt like talking to you."', action: () => harukiResponse('neutral', 'He tilts his head. "I\'m glad you did. I was actually wondering if I should come out and say something."') },
+                            { label: '"It\'s nothing."', action: () => harukiResponse('cruel', 'He looks down for a second. "Okay. If you say so."') },
                         ];
                     } else if (state.loopCount === 1) {
                         harukiDialogue = 'Haruki pauses, then asks quietly: "Do you ever remember things between evenings? I keep getting flashes."';
                         harukiChoices = [
-                            { label: '"Sometimes. Small things."', action: () => harukiResponse('neutral') },
-                            { label: '"I remember you in them."', action: () => harukiResponse('kind') },
-                            { label: '"No, I don\'t."', action: () => harukiResponse('cruel') },
+                            { label: '"Sometimes. Small things."', action: () => harukiResponse('neutral', 'He nods slowly. "Same here. It\'s like an echo that won\'t fade. I don\'t know what it means."') },
+                            { label: '"I remember you in them."', action: () => harukiResponse('kind', 'His eyes widen. "You do? Then maybe it isn\'t just me. That makes it... less lonely."') },
+                            { label: '"No, I don\'t."', action: () => harukiResponse('cruel', 'He sighs quietly. "I guess I\'m the only one who gets them then."') },
                         ];
                     } else {
                         harukiDialogue = 'Haruki speaks with a new certainty: "The dreams are like signals. I think we\'re connected somehow. Does that scare you?"';
                         harukiChoices = [
-                            { label: '"A little."', action: () => harukiResponse('neutral') },
-                            { label: '"No, it feels like hope."', action: () => harukiResponse('kind') },
-                            { label: '"We should stop this."', action: () => harukiResponse('cruel') },
+                            { label: '"A little."', action: () => harukiResponse('neutral', 'He holds your gaze. "A little is enough to make this feel real, though. That\'s the strange part."') },
+                            { label: '"No, it feels like hope."', action: () => harukiResponse('kind', 'He exhales, relief softening his face. "Thank you. I wanted someone else to feel that too."') },
+                            { label: '"We should stop this."', action: () => harukiResponse('cruel', 'He flinches, then asks quietly. "Stop what? The dreams, or whatever this is between us?"') },
                         ];
                         if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
                             harukiChoices.push({ label: '"Maybe together we can leave."', action: () => harukiTrueEndingChoice(), special: true });
@@ -1465,29 +1468,27 @@
                 setDialogue('Haruki', harukiDialogue, harukiChoices);
             }
 
-            async function harukiResponse(type) {
+            async function harukiResponse(type, responseText) {
                 if (!state.loopActive) return;
                 if (type === 'kind') {
                     state.harukiTrust = Math.min(10, state.harukiTrust + 2);
                     state.kindChoicesTotal++;
                     state.recentKindActions.push('was kind to Haruki');
                     state.mentalState = Math.min(100, state.mentalState + 2);
-                    setDialogue('Haruki',
-                        'He smiles, a real smile, soft and unguarded. "Thank you. I don\'t know why, but that means something to me."'
-                        );
                 } else if (type === 'cruel') {
                     state.harukiTrust = Math.max(0, state.harukiTrust - 1);
                     state.cruelChoicesTotal++;
                     state.recentCruelActions.push('was rude to Haruki');
                     state.mentalState = Math.max(5, state.mentalState - 3);
-                    setDialogue('Haruki',
-                        'His expression closes off, like a door gently shutting. "Right. Sorry to bother you." He steps back into his apartment.'
-                        );
                 } else {
                     state.harukiTrust = Math.min(10, state.harukiTrust + 1);
-                    setDialogue('Haruki',
-                        'He nods slowly, as if trying to grasp something just out of reach. "Yeah... maybe."');
                 }
+                const reply = responseText || (type === 'kind' ?
+                    'He smiles, a real smile, soft and unguarded. "Thank you. I don\'t know why, but that means something to me."' :
+                    type === 'cruel' ?
+                        'His expression closes off, like a door gently shutting. "Right. Sorry to bother you." He steps back into his apartment.' :
+                        'He nods slowly, as if trying to grasp something just out of reach. "Yeah... maybe."');
+                setDialogue('Haruki', reply);
                 applyDegradation();
                 await waitForNext();
                 // Return to corridor choices
