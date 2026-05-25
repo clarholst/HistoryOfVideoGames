@@ -262,6 +262,21 @@
             animation: subtlePulse 3s infinite;
         }
 
+        /* Next button */
+        .next-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #e8d5c0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            align-self: flex-end;
+            margin-top: 8px;
+            transition: all 0.18s ease;
+        }
+        .next-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
         /* Loop indicator - subtle */
         #loop-indicator {
             position: absolute;
@@ -863,6 +878,7 @@
         <div id="dialogue-area">
             <div id="speaker-name"></div>
             <div id="dialogue-text"></div>
+            <button id="next-button" class="next-btn" style="display:none;">Next</button>
             <div id="choices-container"></div>
         </div>
         <!-- Title -->
@@ -887,6 +903,26 @@
             const loopIndicator = document.getElementById('loop-indicator');
             const timerDisplay = document.getElementById('timer-display');
             const titleOverlay = document.getElementById('title-overlay');
+            const nextButton = document.getElementById('next-button');
+
+            // Next control: manual-only advancement for each message
+            let _currentNextResolve = null;
+            function waitForNext() {
+                return new Promise(resolve => {
+                    // show Next button
+                    if (nextButton) nextButton.style.display = '';
+                    _currentNextResolve = () => {
+                        if (!nextButton) return;
+                        nextButton.style.display = 'none';
+                        const r = _currentNextResolve;
+                        _currentNextResolve = null;
+                        if (r) resolve();
+                    };
+                });
+            }
+            if (nextButton) nextButton.addEventListener('click', () => {
+                if (_currentNextResolve) _currentNextResolve();
+            });
 
             // ==================== GAME STATE ====================
             const state = {
@@ -926,6 +962,10 @@
                 dialogueText.textContent = text;
                 dialogueText.classList.remove('glitching');
                 clearChoices();
+                // Hide Next button when presenting choices
+                if (choices && choices.length > 0) {
+                    if (nextButton) nextButton.style.display = 'none';
+                }
                 if (choices && choices.length > 0) {
                     choices.forEach(choice => {
                         const btn = document.createElement('button');
@@ -1150,7 +1190,7 @@
 
                 for (const line of wakeLines) {
                     setDialogue(line.s, line.t);
-                    await new Promise(r => setTimeout(r, 1800));
+                    await waitForNext();
                 }
 
                 // Present choices for the apartment
@@ -1214,7 +1254,7 @@
                         );
                 }
                 setDialogue('…', lines[Math.floor(Math.random() * lines.length)]);
-                await new Promise(r => setTimeout(r, 1500));
+                await waitForNext();
                 presentApartmentChoices();
             }
 
@@ -1222,7 +1262,7 @@
                 if (!state.loopActive) return;
                 if (state.plantWateredThisLoop) {
                     setDialogue('…', 'The soil is still moist. You\'ve already watered it this evening.');
-                    await new Promise(r => setTimeout(r, 1200));
+                    await waitForNext();
                     presentApartmentChoices();
                     return;
                 }
@@ -1257,7 +1297,7 @@
                 if (plantEl) {
                     plantEl.className = 'apt-plant healthy';
                 }
-                await new Promise(r => setTimeout(r, 1500));
+                await waitForNext();
                 presentApartmentChoices();
             }
 
@@ -1268,7 +1308,7 @@
                 state.mentalState = Math.max(5, state.mentalState - 2);
                 setDialogue('…', 'You turn away. It\'s just a plant. It doesn\'t matter. (Does it?)');
                 applyDegradation();
-                await new Promise(r => setTimeout(r, 1200));
+                await waitForNext();
             }
 
             async function restOnFuton() {
@@ -1419,7 +1459,7 @@
                         'He nods slowly, as if trying to grasp something just out of reach. "Yeah... maybe."');
                 }
                 applyDegradation();
-                await new Promise(r => setTimeout(r, 1600));
+                await waitForNext();
                 // Return to corridor choices
                 setDialogue('…', 'Haruki lingers for a moment, then retreats into his apartment. The corridor is quiet again.',
                     [
@@ -1437,15 +1477,15 @@
                 setDialogue('Haruki',
                     'His eyes widen. For a long moment, he just stares at you. Then, barely above a whisper: "...You feel it too. The repetition. The loops. I thought I was going insane. I thought I was the only one."'
                     );
-                await new Promise(r => setTimeout(r, 2500));
+                await waitForNext();
                 setDialogue('Haruki',
                     '"The plant. The store. The evenings that never end. You\'ve been here too. With me. Every time." Tears form at the corners of his eyes. "What if... what if we\'re the ones keeping each other here? And what if we\'re the only way out?"'
                     );
-                await new Promise(r => setTimeout(r, 3000));
+                await waitForNext();
                 setDialogue('…',
                     'Haruki reaches out and takes your hand. His grip is warm and steady. The fluorescent light above flickers — and for the first time, it feels like something is *changing*. The loop is breaking. Not because of a puzzle solved, but because of a connection made.'
                     );
-                await new Promise(r => setTimeout(r, 2500));
+                await waitForNext();
                 endLoop('true-ending');
             }
 
@@ -1461,7 +1501,7 @@
                     noticeText += ' The mark has grown. It clearly says something now. The letters seem... accusatory.';
                 }
                 setDialogue('…', noticeText);
-                await new Promise(r => setTimeout(r, 1800));
+                await waitForNext();
                 setDialogue('…', 'The corridor waits.', [
                     { label: 'Talk to Haruki', action: () => interactWithHaruki() },
                     { label: 'Go downstairs', action: () => goToStore() },
@@ -1516,7 +1556,7 @@
                     items.push('Everything is exactly where it was last time. The same products. The same prices. The same...');
                 }
                 setDialogue('…', items[Math.floor(Math.random() * items.length)]);
-                await new Promise(r => setTimeout(r, 1500));
+                await waitForNext();
                 setDialogue('…', 'The store hums with fluorescent light.', [
                     { label: 'Approach the counter', action: () => approachCounter() },
                     { label: 'Go back upstairs', action: () => { clearScene();
@@ -1534,7 +1574,7 @@
                 state.kindChoicesTotal++;
                 state.mentalState = Math.min(100, state.mentalState + 1);
                 applyDegradation();
-                await new Promise(r => setTimeout(r, 2000));
+                await waitForNext();
                 setDialogue('…', 'You nod and step away from the counter.', [
                     { label: 'Browse shelves', action: () => browseStore() },
                     { label: 'Go back upstairs', action: () => { clearScene();
@@ -1668,9 +1708,9 @@
                 await fadeFromBlack(800);
 
                 setDialogue('…', 'You wake up in your apartment. Evening light filters through the window.');
-                await new Promise(r => setTimeout(r, 1800));
+                await waitForNext();
                 setDialogue('…', 'Everything is as it should be. The plant sits on its shelf. The futon is warm beneath you.');
-                await new Promise(r => setTimeout(r, 1800));
+                await waitForNext();
                 presentApartmentChoices();
             }
 
