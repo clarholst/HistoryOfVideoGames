@@ -427,7 +427,7 @@
             id: "everyday",
             aliases: ["every day", "daily", "yes every day", "always", "i miss them every day", "everyday", "yes", "yeah", "y"],
             hint: "Answer: every day.",
-            target: "train_two",
+            target: "location_pause",
             effects: { belonging: 2, honesty: 1 },
             status: "Your answer lands softly, like rain on glass."
           },
@@ -435,15 +435,15 @@
             id: "sometimes",
             aliases: ["sometimes", "maybe sometimes", "on and off", "once in a while", "kind of", "some days"],
             hint: "Answer: sometimes.",
-            target: "train_two",
+            target: "location_pause",
             effects: { belonging: 1, honesty: 1 },
             status: "You leave room for both distance and warmth."
           },
           {
             id: "notreally",
-            aliases: ["not really", "no", "no not really", "rarely", "hardly", "i do not"],
+            aliases: ["not really", "no", "n", "no not really", "rarely", "hardly", "i do not"],
             hint: "Answer: not really.",
-            target: "train_two",
+            target: "location_pause",
             effects: { risk: 1, avoidance: 1 },
             status: "The carriage quiets, as if listening harder."
           },
@@ -451,7 +451,7 @@
             id: "changesubject",
             aliases: ["change subject", "avoid question", "skip", "deflect", "talk about weather", "change the topic"],
             hint: "Change the subject.",
-            target: "train_two",
+            target: "location_pause",
             effects: { avoidance: 2 },
             status: "You point to the window and let the moment pass."
           },
@@ -459,7 +459,7 @@
             id: "askback",
             aliases: ["ask back", "you tell me", "ask same question", "what about you", "your family", "ask stranger"],
             hint: "Ask the stranger the same question.",
-            target: "train_two",
+            target: "location_pause",
             effects: { curiosity: 1, honesty: 1, wonder: 1 },
             status: "For a moment, the question belongs to both of you."
           },
@@ -467,7 +467,7 @@
             id: "letters",
             aliases: ["i write letters", "write letters", "letters", "send letters", "i miss them in letters", "i keep writing"],
             hint: "Say you still write letters.",
-            target: "train_two",
+            target: "location_pause",
             effects: { belonging: 2, wonder: 1 },
             status: "You describe envelopes that always smell like rain."
           },
@@ -475,9 +475,61 @@
             id: "cantremember",
             aliases: ["i cant remember", "can't remember", "forgot", "memory blank", "i forgot them", "my memory is gone", "idk", "i dont know", "don't know"],
             hint: "Admit you cannot remember clearly.",
-            target: "train_two",
+            target: "location_pause",
             effects: { honesty: 1, wonder: 1, avoidance: 1 },
             status: "The stranger nods as if this answer is older than both of you."
+          }
+        ]
+      },
+
+      location_pause: {
+        title: "Still Here",
+        text: "The question is behind you. The station takes a breath and lets the place settle around you.",
+        options: [
+          {
+            id: "pause_city",
+            aliases: ["board city", "take city", "city of glass", "go city", "train city", "board glass"],
+            hint: "Board the City of Glass.",
+            target: "q_before",
+            train: "City of Glass",
+            effects: { wonder: 2, risk: 1 },
+            status: "You move toward the glass train and feel the night shift around you."
+          },
+          {
+            id: "pause_coast",
+            aliases: ["board coast", "take coast", "endless coast", "go coast", "train coast", "board sea"],
+            hint: "Board the Endless Coast.",
+            target: "q_before",
+            train: "Endless Coast",
+            effects: { curiosity: 2, wonder: 1 },
+            status: "You follow the line of the ocean and the air brightens with salt."
+          },
+          {
+            id: "pause_library",
+            aliases: ["board library", "take library", "last library", "go library", "train library", "board books"],
+            hint: "Board the Last Library.",
+            target: "q_before",
+            train: "Last Library",
+            effects: { curiosity: 1, honesty: 1, wonder: 1 },
+            status: "You step back onto the train, the paper-scented air returning with you."
+          },
+          {
+            id: "pause_observatory",
+            aliases: ["board observatory", "mountain observatory", "go observatory", "take observatory", "board mountain", "star train"],
+            hint: "Board the Mountain Observatory.",
+            target: "q_before",
+            train: "Mountain Observatory",
+            effects: { curiosity: 2, risk: 1 },
+            status: "A cold hush surrounds the carriage as you walk toward starlight."
+          },
+          {
+            id: "pause_market",
+            aliases: ["board market", "floating market", "go market", "take market", "train market", "board floating market"],
+            hint: "Board the Floating Market.",
+            target: "q_before",
+            train: "Floating Market",
+            effects: { belonging: 1, wonder: 1 },
+            status: "Lantern light flickers in time with your pulse as you move toward the market." 
           }
         ]
       },
@@ -498,15 +550,15 @@
             id: "sometimes_platform",
             aliases: ["sometimes", "maybe sometimes", "on and off", "once in a while", "kind of", "some days"],
             hint: "Answer: sometimes.",
-            target: "train_two",
+            target: "platform_hold",
             effects: { belonging: 1, honesty: 1 },
             status: "You leave room for both distance and warmth."
           },
           {
             id: "notreally_platform",
-            aliases: ["not really", "no not really", "rarely", "hardly", "i do not"],
+            aliases: ["not really", "no", "n", "no not really", "rarely", "hardly", "i do not"],
             hint: "Answer: not really.",
-            target: "train_two",
+            target: "platform_hold",
             effects: { risk: 1, avoidance: 1 },
             status: "The stranger nods once and looks down the tracks."
           },
@@ -514,7 +566,7 @@
             id: "changesubject_platform",
             aliases: ["change subject", "avoid question", "skip", "deflect", "talk about weather", "change the topic"],
             hint: "Change the subject.",
-            target: "train_two",
+            target: "platform_hold",
             effects: { avoidance: 2 },
             status: "You point to the arrival board and let the moment pass."
           },
@@ -522,7 +574,7 @@
             id: "askback_platform",
             aliases: ["ask back", "you tell me", "ask same question", "what about you", "your family", "ask stranger"],
             hint: "Ask the stranger the same question.",
-            target: "train_two",
+            target: "platform_hold",
             effects: { curiosity: 1, honesty: 1, wonder: 1 },
             status: "For a moment, both of you are waiting for each other to answer."
           },
@@ -582,7 +634,7 @@
 
       train_two: {
         title: "Another Arrival",
-        text: "At the next stop, fresh doors bloom open. Destination signs flicker with impossible names.",
+        text: "At the next stop, fresh doors bloom open.",
         options: [
           {
             id: "observatory",
@@ -841,34 +893,64 @@
 
     const IDENTITY_ARCHETYPES = [
       {
-        id: "unknown_seeker",
-        when: (s) => s.curiosity + s.risk >= 10 && s.curiosity >= s.belonging,
-        line: "You became someone who always chose the unknown.",
-        ending: "You followed strange routes not to escape life, but to feel its edges widen."
-      },
-      {
         id: "harbor_keeper",
-        when: (s) => s.belonging >= 7 && s.belonging > s.risk,
-        line: "You became someone who stayed when others left.",
-        ending: "You learned that agency can also mean tending one place until it becomes shelter for many."
+        when: (s) => s.belonging >= 8 && s.belonging > s.curiosity,
+        line: "You became someone who stayed when others drifted away.",
+        ending: "You discovered that the deepest journeys can happen in the same room, when you make it a harbor for what was lost."
       },
       {
-        id: "honest_witness",
-        when: (s) => s.honesty >= 7,
-        line: "You became someone who answered even when certainty hurt.",
-        ending: "In a station full of mirrors, you chose clarity over softness."
+        id: "quiet_guardian",
+        when: (s) => s.belonging >= 6 && s.avoidance >= 5 && s.honesty >= 4,
+        line: "You became someone who kept the station safe by learning when to stay.",
+        ending: "Your choices were soft, but firm. You held space for others by refusing to rush past the places that needed care."
       },
       {
-        id: "dream_cartographer",
-        when: (s) => s.wonder >= 7,
-        line: "You became someone who followed wonder and made meaning from symbols.",
-        ending: "You treated every destination like a poem, and let each one rewrite you."
+        id: "truthsayer",
+        when: (s) => s.honesty >= 7 && s.wonder >= 4,
+        line: "You became someone who spoke in quiet truths.",
+        ending: "You let words carry the weight they deserved, and the station shifted around the steadiness of your answer."
+      },
+      {
+        id: "mapmaker",
+        when: (s) => s.curiosity >= 6 && s.belonging >= 6,
+        line: "You became someone who mapped the world from both the inside and the outside.",
+        ending: "You followed curiosity without abandoning the people you carry with you. Every route became part of a larger, gentler map."
+      },
+      {
+        id: "glass_listener",
+        when: (s) => s.curiosity >= 7 && s.wonder >= 6 && s.risk >= 4,
+        line: "You became someone who heard the city in reflections.",
+        ending: "You treated every surface as something that could answer back, and your own voice changed when it met glass and light."
+      },
+      {
+        id: "tidekeeper",
+        when: (s) => s.wonder >= 7 && s.belonging >= 5,
+        line: "You became someone who moved like the shore does around the tide.",
+        ending: "You kept something steady in the swirl of new places, and the world around you felt more like a home than a series of departures."
+      },
+      {
+        id: "fearless_wanderer",
+        when: (s) => s.curiosity + s.risk >= 10 && s.avoidance <= 4,
+        line: "You became someone who walked toward the next train without apology.",
+        ending: "The station remembers you as a story that never stayed still, not because you were restless, but because you wanted to see what would happen next."
+      },
+      {
+        id: "song_of_silence",
+        when: (s) => s.wonder >= 8 && s.avoidance >= 6,
+        line: "You became someone who listened to the quiet between arrivals.",
+        ending: "Your path was less about choosing a destination and more about learning the music made by waiting."
+      },
+      {
+        id: "keeper_of_pages",
+        when: (s) => s.honesty >= 6 && s.curiosity >= 5 && s.belonging >= 5,
+        line: "You became someone who kept a story for every stop.",
+        ending: "You did not simply collect routes. You carried the weight of what each one taught you, like pages in a book you were still writing."
       },
       {
         id: "restless_runner",
-        when: (s) => s.avoidance >= 7 && s.avoidance >= s.belonging,
-        line: "You became someone who kept moving so no place could ask too much.",
-        ending: "The station remembers your footsteps long after it forgets your voice."
+        when: (s) => s.avoidance >= 8 && s.avoidance >= s.belonging,
+        line: "You became someone who moved so that the world did not close in.",
+        ending: "You survived by staying in motion, and the station kept the echo of your footsteps long after you were gone."
       },
       {
         id: "woven_self",
@@ -957,6 +1039,139 @@
       return IDENTITY_ARCHETYPES[IDENTITY_ARCHETYPES.length - 1];
     }
 
+    function getLocationDescription(sceneId) {
+      const lastTrain = state.chosenStops[state.chosenStops.length - 1];
+      const descriptions = {
+        "City of Glass": "The carriage rocks as it slips into a station of mirrored facades and fogged neon. Everywhere you look, glass panes collect another reflection of you, of the people passing, of a city that seems equal parts crystal cathedral and crowded fairground. For a moment the world outside feels like a story written in light and rain, and every sound is softened by shimmering walls.",
+        "Endless Coast": "You feel the ocean moving through the train even before you see it: a low, constant sigh beneath the wheels. The platform beyond is lined with kelp-green lamps and weathered benches, and the air carries the bright, bitter sweetness of sea salt, old rope, and driftwood varnish. In the carriage the windows are streaked with spray, as if the coast itself has decided to lean in close and listen to you.",
+        "Last Library": "Books spill out into the station like a slow flood, pages fluttering in a draft that smells of old paper, ink, and rain on pavement. The platform is a nest of quiet conversations and the soft rustle of spines, as if the whole place is breathing with stories it has not yet told. A narrow study table waits beneath a lamp of green glass, a spiral staircase vanishes between librarians' stacks, and a row of unread journals hums softly with ideas. Even the light takes on a sepia cast, making every face and shadow feel like a line in a forgotten letter.",
+        "Floating Market": "The next platform rises and falls with the rhythm of an unseen tide. Stalls hang from cables and lanterns bob over polished wood, casting gold and crimson pools onto the tile. Spices drift by you in dark, warm clouds; someone laughs in a language that sounds like bells. In the carriage the air is rich with ginger and citrus, and every stranger passing by seems to be carrying a secret wrapped in cloth.",
+        "Mountain Observatory": "The station feels thinner here, as if the air has been stretched to touch the stars. Frost paints the windows in delicate geometries and the lamps burn with a pale, steady glow. Outside, towers of metal and glass rise into a sky filled with quiet constellations, and you can hear the distant chime of instruments measuring something vast and patient. The platform smells faintly of cold stone and the kind of silence that makes you think you might finally hear your own pulse."
+      };
+
+      if (!lastTrain) return "";
+      if (sceneId === "q_family" || sceneId === "q_before" || sceneId === "location_pause") {
+        return descriptions[lastTrain] || "";
+      }
+      return "";
+    }
+
+    function getExplorationHint(sceneId) {
+      if (sceneId === "q_family" || sceneId === "q_before" || sceneId === "location_pause") {
+        return "Take your time to explore this area. When you are ready, ask for what to do next? (next)";
+      }
+      return "";
+    }
+
+    function getLocationExplorationItems(sceneId) {
+      const lastTrain = state.chosenStops[state.chosenStops.length - 1];
+      const exploration = {
+        "City of Glass": [
+          {
+            aliases: ["ask about reflections", "reflections", "examine reflections", "look at reflections"],
+            hint: "Ask about the reflections in the glass.",
+            text: "The reflections are layered: one shows your face, another shows the train, and a third suggests a person you have not yet met. If you listen closely, they almost sound like half-remembered directions."
+          },
+          {
+            aliases: ["touch glass", "feel glass", "press glass", "hand on glass"],
+            hint: "Touch the cold glass and feel its pulse.",
+            text: "The glass feels cool and strangely alive, as if the city itself is a living wall. Your fingertips leave no mark, but the sensation stays with you long after."
+          },
+          {
+            aliases: ["look at neon", "ask about neon", "neon", "bright signs"],
+            hint: "Ask about the neon signs and light.",
+            text: "The neon writes in a language of color more than words. It seems to lean toward the motion of your own thoughts, brightening when you think of the next step and dimming when you hesitate."
+          }
+        ],
+        "Endless Coast": [
+          {
+            aliases: ["listen to tide", "hear tide", "talk about tide", "tide"],
+            hint: "Listen to the way the tide moves through the station.",
+            text: "The tide is a low, patient voice beneath the platform. It is not water so much as feeling, present in every hollow and seam of the station."
+          },
+          {
+            aliases: ["smell salt", "ask about salt", "salt", "smell ocean"],
+            hint: "Ask about the salt and the sea air.",
+            text: "The salt air is sharp and clean, layered with the smell of old rope and driftwood. It tastes of memory and of the next place you have not yet reached."
+          },
+          {
+            aliases: ["examine benches", "bench", "look at benches", "weathered benches"],
+            hint: "Examine the weathered benches.",
+            text: "The benches have been worn by many people who waited, doubted, and decided. Each crack holds the suggestion that you are not the first person to ask what comes next."
+          }
+        ],
+        "Last Library": [
+          {
+            aliases: ["examine shelves", "shelves", "look at shelves", "book shelves"],
+            hint: "Examine the shelves of books.",
+            text: "The shelves are full of books that feel like doors. Some seem warm with recent use, others cold and patient. A page turns somewhere on its own."
+          },
+          {
+            aliases: ["ask about lamp", "green lamp", "lamp", "study table"],
+            hint: "Ask about the green lamp and study table.",
+            text: "The green glass lamp bathes the table in a soft, private glow. It suggests a quiet place where someone sat down to decide, to remember, or to write a different ending."
+          },
+          {
+            aliases: ["sit at study table", "sit table", "sit down", "sit at table"],
+            hint: "Sit at the study table.",
+            text: "You pull out a chair and sit. The paper-scented air seems to slow, and the table invites a quiet thought: this choice is yours to keep."
+          },
+          {
+            aliases: ["read journal", "journal", "unread journals", "read journals"],
+            hint: "Look at the unread journals.",
+            text: "The unread journals hum like sleeping machines. Their pages seem full of futures you might still choose, and you feel a light pull as if they await your hand."
+          },
+          {
+            aliases: ["walk staircase", "spiral staircase", "stairs", "look at staircase"],
+            hint: "Walk toward the spiral staircase.",
+            text: "The staircase disappears upward between stacked books, its steps worn by ideas rather than feet. It looks like a path to somewhere quiet and important."
+          }
+        ],
+        "Floating Market": [
+          {
+            aliases: ["ask about lanterns", "lanterns", "light", "look at lanterns"],
+            hint: "Ask about the floating lanterns.",
+            text: "The lanterns bob like slow fireflies, casting light that moves with the rhythm of the platform. They feel almost human, alive with the stories of people who have walked under them."
+          },
+          {
+            aliases: ["smell spices", "spices", "ask about spice", "look at spices"],
+            hint: "Ask about the spices in the air.",
+            text: "The spices are bright and immediate, like bright paintings you can taste. Each breath brings a different memory: ginger, cumin, cardamom. They make the world feel larger."
+          },
+          {
+            aliases: ["touch silk", "silk", "fabric", "ask about silk"],
+            hint: "Touch the silk and inspect the fabric.",
+            text: "The silk is cool and soft, but there is also a faint grit to it, like civilities polished by travel. It reminds you that in this place, even beauty moves."
+          }
+        ],
+        "Mountain Observatory": [
+          {
+            aliases: ["ask about frost", "frost", "look at frost", "examine frost"],
+            hint: "Ask about the frost on the windows.",
+            text: "The frost has grown in patterns that seem like diagrams of stars. It is delicate and precise, as if the night air has annotated the glass with its own mathematics."
+          },
+          {
+            aliases: ["listen to instruments", "instruments", "ask about instruments", "hear instruments"],
+            hint: "Listen to the quiet instruments.",
+            text: "The instruments are far away but insistent, humming with an ordered patience. They make the station feel like a machine carefully keeping watch over what is uncertain."
+          },
+          {
+            aliases: ["look at constellations", "stars", "constellations", "sky"],
+            hint: "Look at the constellations above.",
+            text: "The stars are sharp and slow. They seem to move not across the sky but through your thoughts, as if each one contains a choice you have already made in a different light."
+          }
+        ]
+      };
+
+      if (sceneId !== "q_family" && sceneId !== "q_before" && sceneId !== "location_pause") return [];
+      return exploration[lastTrain] || [];
+    }
+
+    function findExplorationCommand(command) {
+      const items = getLocationExplorationItems(state.sceneId);
+      return items.find((item) => item.aliases.some((alias) => aliasMatches(command, alias)));
+    }
+
     function getMainTravelDestinations(sceneId) {
       const scene = SCENES[sceneId];
       if (!scene || !Array.isArray(scene.options)) return [];
@@ -985,13 +1200,25 @@
         destinations = getMainTravelDestinations("platform_hold");
       }
 
-      if (destinations.length > 0 && state.sceneId !== "museum") {
+      if (destinations.length > 0 && state.sceneId !== "museum" && state.sceneId !== "q_family" && state.sceneId !== "q_before" && state.sceneId !== "location_pause") {
         storyOptions.push(`You can travel to: ${destinations.join(", ")}.`);
       }
 
-      const sceneWithOptions = storyOptions.length > 0
-        ? `${scene.text}\n\n${storyOptions.join("\n")}`
-        : scene.text;
+      const locationText = getLocationDescription(state.sceneId);
+      const explorationText = getExplorationHint(state.sceneId);
+      const sceneParts = [];
+      if (locationText) {
+        sceneParts.push(locationText);
+      }
+      sceneParts.push(scene.text);
+      if (explorationText) {
+        sceneParts.push(explorationText);
+      }
+      if (storyOptions.length > 0) {
+        sceneParts.push(storyOptions.join("\n"));
+      }
+
+      const sceneWithOptions = sceneParts.join("\n\n");
 
       document.getElementById("sceneTitle").textContent = scene.title;
       document.getElementById("sceneText").textContent = sceneWithOptions;
@@ -1051,6 +1278,14 @@
         addLine(`- ${opt.hint}`, "sys");
       });
 
+      const exploreItems = getLocationExplorationItems(state.sceneId);
+      if (exploreItems.length > 0) {
+        addLine("Explore options:", "sys");
+        exploreItems.forEach((item) => {
+          addLine(`- ${item.hint}`, "sys");
+        });
+      }
+
       if (groups.other.length > 0) {
         addLine("Other options:", "sys");
       }
@@ -1087,6 +1322,7 @@
         const identity = chooseIdentity();
         state.ended = true;
 
+        document.getElementById("sceneButtons").innerHTML = "";
         document.getElementById("sceneTitle").textContent = "Final Reveal";
         document.getElementById("sceneText").textContent = `${identity.line}\n\n${identity.ending}\n\nRoutes you chose:\n${state.chosenStops.map((s) => `- ${s}`).join("\n") || "- You mostly stayed at Platform 8."}`;
         document.getElementById("statusText").textContent = "Journey complete. Type restart to begin a new run.";
@@ -1095,7 +1331,9 @@
       }
 
       state.sceneId = option.target;
-      state.arrival += 1;
+      if (option.target !== "platform_hold") {
+        state.arrival += 1;
+      }
       renderScene();
     }
 
@@ -1228,6 +1466,26 @@
       }
 
       if (command === "options" || command === "commands") {
+        showOptions();
+        return;
+      }
+
+      if (command === "look around" || command === "explore" || command === "look around here") {
+        const items = getLocationExplorationItems(state.sceneId);
+        if (items.length > 0) {
+          addLine("You take a moment to study the place. Try asking about:", "sys");
+          items.forEach((item) => addLine(`- ${item.hint}`, "sys"));
+          return;
+        }
+      }
+
+      const explorationOption = findExplorationCommand(command);
+      if (explorationOption) {
+        addLine(explorationOption.text, "sys");
+        return;
+      }
+
+      if (command === "next") {
         showOptions();
         return;
       }
