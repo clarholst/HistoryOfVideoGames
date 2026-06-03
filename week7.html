@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ECHOES OF THE LOOP · a branching narrative</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 30%, #0A0F0E 0%, #030605 100%);
+      min-height: 100vh;
+      font-family: 'Courier New', 'Fira Code', 'SF Mono', monospace;
+      padding: 2rem 1.5rem;
+      color: #D4EFDF;
+    }
+
+    /* main game container */
+    .game-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      backdrop-filter: blur(2px);
+    }
+
+    /* story panel (main narrative area) */
+    .story-panel {
+      flex: 2.5;
+      min-width: 280px;
+      background: rgba(8, 12, 10, 0.75);
+      backdrop-filter: blur(6px);
+      border-radius: 2rem;
+      border: 1px solid rgba(100, 210, 140, 0.25);
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5), inset 0 0 20px rgba(90, 210, 140, 0.05);
+      padding: 2rem 1.8rem;
+      transition: all 0.2s ease;
+    }
+
+    /* sidebar (agency tracker) */
+    .agency-sidebar {
+      flex: 1.2;
+      min-width: 260px;
+      background: rgba(5, 8, 7, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 1.8rem;
+      border: 1px solid #2A4133;
+      padding: 1.5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+    }
+
+    /* typography */
+    h1, h2, h3 {
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .story-title {
+      font-family: 'Times New Roman', 'Georgia', serif;
+      font-size: 2rem;
+      color: #C3F2D6;
+      margin-bottom: 1rem;
+      border-left: 4px solid #6BD99A;
+      padding-left: 1rem;
+      font-weight: 350;
+      text-shadow: 0 0 3px #446B51;
+    }
+
+    .story-text {
+      font-size: 1.1rem;
+      line-height: 1.55;
+      margin: 1.8rem 0;
+      font-family: 'Courier New', monospace;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1.2rem;
+      border-radius: 1.4rem;
+      border-left: 2px solid #6BD99A;
+      white-space: pre-line;
+    }
+
+    .choices-area {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .choice-btn {
+      background: rgba(20, 30, 24, 0.8);
+      border: 1px solid #4C6B5A;
+      color: #E2F5E9;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: 3rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      backdrop-filter: blur(2px);
+      font-weight: 500;
+    }
+
+    .choice-btn:hover {
+      background: #2F5E48;
+      border-color: #A1E0B8;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    /* sideblocks */
+    .tracker-card, .history-card, .map-card {
+      background: #0B1210;
+      border-radius: 1.2rem;
+      padding: 1rem 1rem;
+      border: 1px solid #2E443B;
+    }
+
+    .tracker-card h3, .history-card h3, .map-card h3 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.8rem;
+      color: #94C9AE;
+      border-bottom: 1px dashed #3C5A4C;
+      display: inline-block;
+    }
+
+    .trait-bar {
+      margin: 0.8rem 0;
+    }
+    .trait-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      color: #BBD9CC;
+    }
+    .bar-bg {
+      background: #1E2D26;
+      border-radius: 20px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: #92F0C0;
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.25s ease;
+    }
+
+    .history-list {
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 0.75rem;
+      list-style: none;
+      padding-left: 0.2rem;
+    }
+    .history-list li {
+      margin: 0.3rem 0;
+      border-left: 2px solid #6BD99A;
+      padding-left: 0.5rem;
+      color: #CEEFE0;
+    }
+
+    .story-map-grid {
+      font-size: 0.7rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .node-entry {
+      margin-bottom: 0.6rem;
+      background: #0F1814;
+      padding: 0.3rem 0.5rem;
+      border-radius: 12px;
+    }
+    .node-title {
+      font-weight: bold;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .node-badge {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 20px;
+      background: #1F2F28;
+    }
+    .visited {
+      background: #2C5A48;
+      color: #C0F0DA;
+    }
+    .current {
+      background: #65B891;
+      color: #031008;
+    }
+    .locked-branch {
+      color: #A97C6B;
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+    .branch-list {
+      margin-left: 0.8rem;
+      font-size: 0.65rem;
+      list-style: none;
+    }
+    hr {
+      border-color: #2B453B;
+      margin: 10px 0;
+    }
+    .restart-btn {
+      background: none;
+      border: 1px solid #6F9A86;
+      color: #B9E3CF;
+      padding: 6px 12px;
+      border-radius: 30px;
+      margin-top: 1rem;
+      font-family: monospace;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .restart-btn:hover {
+      background: #1F3C31;
+      border-color: #B3F0CE;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      margin-top: 2rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 780px) {
+      body { padding: 1rem; }
+      .story-panel { order: 1; }
+      .agency-sidebar { order: 2; }
+    }
+
+    /* glitch blink for meta */
+    @keyframes subtleGlitch {
+      0% { text-shadow: 0px 0px 0px #6BD99A; }
+      50% { text-shadow: -1px 0px 2px #A1FFC1, 1px 0px 2px #3C9; }
+      100% { text-shadow: 0px 0px 0px #6BD99A; }
+    }
+    .glitch-moment {
+      animation: subtleGlitch 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <!-- MAIN NARRATIVE PANEL -->
+  <div class="story-panel" id="storyPanel">
+    <div class="story-title" id="nodeTitle">loading...</div>
+    <div class="story-text" id="storyText"></div>
+    <div class="choices-area" id="choicesContainer"></div>
+    <button class="restart-btn" id="restartGameBtn">⟳ RESTART / BREAK THE LOOP</button>
+  </div>
+
+  <!-- SIDEBAR: AGENCY & TRACKING -->
+  <div class="agency-sidebar">
+    <div class="tracker-card">
+      <h3>◈ PERSONALITY TRACKER</h3>
+      <div class="trait-bar">
+        <div class="trait-label"><span>🔍 CURIOSITY</span><span id="curiosityVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="curiosityFill"></div></div>
+      </div>
+      <div class="trait-bar">
+        <div class="trait-label"><span>💚 CONNECTION</span><span id="connectionVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="connectionFill"></div></div>
+      </div>
+      <div class="trait-bar">
+        <div class="trait-label"><span>🌙 AVOIDANCE</span><span id="avoidanceVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="avoidanceFill"></div></div>
+      </div>
+    </div>
+
+    <div class="history-card">
+      <h3>📜 CHOICE HISTORY</h3>
+      <ul class="history-list" id="historyList">
+        <li>— no choices yet —</li>
+      </ul>
+    </div>
+
+    <div class="map-card">
+      <h3>🗺️ STORY MAP · BRANCHES</h3>
+      <div class="story-map-grid" id="storyMapContainer">
+        <!-- dynamic map content -->
+      </div>
+    </div>
+  </div>
+</div>
+<footer>agency simulation — every decision reshapes Kai's reflection</footer>
+
+<script>
+  // --------------------------------------------------------------
+  // NARRATIVE DATABASE (nodes, branches, personality effects)
+  // inspired by Bandersnatch, GRIS emotional introspection
+  // --------------------------------------------------------------
+  const NODES = {};
+
+  // helper: effect modifiers
+  function modifyPersonality(state, deltaCur, deltaConn, deltaAvo) {
+    state.personality.curiosity = Math.min(100, Math.max(0, state.personality.curiosity + deltaCur));
+    state.personality.connection = Math.min(100, Math.max(0, state.personality.connection + deltaConn));
+    state.personality.avoidance = Math.min(100, Math.max(0, state.personality.avoidance + deltaAvo));
+  }
+
+  // -------- DEFINE NODES (13 core + 4 endings = 17 nodes, rich branching) -----
+  // START
+  NODES["start"] = {
+    id: "start",
+    title: "/// INIT_SEQUENCE ///",
+    desc: "You stare at the blinking cursor. Kai, a young developer, sits in a dim room surrounded by sketches of narrative trees. \n\n\"This game will capture something real. Not heroes or monsters — just the ache of choices.\" \n\nThe cursor winks. A sidebar appears on your screen, tracking decisions, tracing a soul.\n\nWhere do you begin?",
+    choices: [
+      { text: "🧠 Embrace radical player agency → Let the player decide everything", target: "freedom_path", effect: (s) => modifyPersonality(s, 15, 10, -5), history: "Embraced radical agency, trusting the player." },
+      { text: "📖 Structure a tight, authored narrative → Control the message", target: "control_path", effect: (s) => modifyPersonality(s, -5, 5, 12), history: "Chose structure over chaos, seeking safety." }
+    ]
+  };
+  // FREEDOM PATH
+  NODES["freedom_path"] = {
+    id: "freedom_path", title: "OPEN BRANCHES", desc: "Kai builds sprawling dialogue trees, systemic reactions. The code breathes. Yet unease creeps: what if the player misses the emotional core?\n\nA hidden line in the console: 'you are being watched.' Kai freezes.\n\"Wait… is someone controlling me?\"",
+    choices: [
+      { text: "💡 'Lean into the meta — talk to the player'", target: "meta_awakening", effect: (s) => modifyPersonality(s, 18, 12, -10), history: "Kai addressed the entity beyond the screen." },
+      { text: "🔒 'Ignore the glitch, focus on mechanics'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, -5, -3, 15), history: "Suppressed the weirdness, clung to code." }
+    ]
+  };
+  // CONTROL PATH
+  NODES["control_path"] = {
+    id: "control_path", title: "STORY WEAVE", desc: "Kai writes poignant scenes of farewell, a linear arc about letting go. But the story feels hollow. \nDuring a late night, Kai's dev environment flickers: 'Personality Tracker updated: Avoidance +12' appears on screen.\nKai murmurs, 'This isn't my engine... who is designing me?'",
+    choices: [
+      { text: "🌀 'Investigate the anomaly — break fourth wall'", target: "meta_awakening", effect: (s) => modifyPersonality(s, 12, 5, -8), history: "Kai chose to question reality." },
+      { text: "📁 'Double down on scripted emotional beats'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, -3, 8, 9), history: "Avoided the unknown, tightened the script." }
+    ]
+  };
+  // META AWARENESS (shared)
+  NODES["meta_awakening"] = {
+    id: "meta_awakening", title: "/// THE FOURTH WALL CRACKS ///", desc: "Kai's terminal prints: 'Choice History: 3 decisions. Curiosity: XX.' Kai whispers: 'This is real. You're there, aren't you? Reading, deciding for me.'\n\nThe editor pulses with green light. Kai feels both terrified and electrified.\n\"If you shape me, what do you want me to become?\"",
+    choices: [
+      { text: "🤝 'Reassure Kai — we are co-creators'", target: "reflection_memory", effect: (s) => modifyPersonality(s, 10, 20, -10), history: "Offered empathy, forming a bond across the screen." },
+      { text: "⚡ 'Push Kai to finish the game at any cost'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, 5, -8, 18), history: "Demanded productivity, ignoring vulnerability." },
+      { text: "🎭 'Remain silent, just observe' (unlocked if curiosity > 35)", target: "feedback_loop", condition: (s) => s.personality.curiosity > 35, effect: (s) => modifyPersonality(s, 5, 2, -2), history: "Chose silent observation, deepening mystery." }
+    ]
+  };
+  // BURNOUT / PRESSURE
+  NODES["burnout_pressure"] = {
+    id: "burnout_pressure", title: "FRACTURED FOCUS", desc: "Kai slumps, staring at the branching tree. 'Nothing feels honest. I'm just simulating feelings.' The story map shows locked paths — doors that remain shut.\nKai's doubt: 'Maybe I should abandon everything.'",
+    choices: [
+      { text: "🌱 'Encourage Kai to rest and reflect' (connection > 28 ? opens insight)", target: "reflection_memory", condition: (s) => s.personality.connection > 28, effect: (s) => modifyPersonality(s, 5, 12, -6), history: "Chose healing over grind." },
+      { text: "💥 'Force a last sprint — ship broken or finished'", target: "final_standoff", effect: (s) => modifyPersonality(s, -5, -10, 15), history: "Pushed through exhaustion, risking collapse." },
+      { text: "📂 'Delve into old prototypes to find meaning'", target: "feedback_loop", effect: (s) => modifyPersonality(s, 18, 6, -5), history: "Rediscovered forgotten sparks." }
+    ]
+  };
+  // REFLECTION / MEMORY (emotional depth)
+  NODES["reflection_memory"] = {
+    id: "reflection_memory", title: "ECHOES OF ORIGINS", desc: "Kai loads an old audio log: 'I started making games because they let me talk about change without pretending to have answers.'\nTears well. 'I forgot that.' The Personality Tracker shifts — Connection rises. Kai smiles sadly.\n\"Maybe the game isn't about control — it's about witnessing each other's choices.\"",
+    choices: [
+      { text: "✨ 'Build the final act as a shared confession'", target: "final_standoff", effect: (s) => modifyPersonality(s, 8, 15, -8), history: "Choice: final chapter as vulnerable art." },
+      { text: "🌀 'Loop back, restructure the narrative from scratch'", target: "feedback_loop", effect: (s) => modifyPersonality(s, 12, 8, -4), history: "Decided to reimagine everything." }
+    ]
+  };
+  // FEEDBACK LOOP (extra branching before climax)
+  NODES["feedback_loop"] = {
+    id: "feedback_loop", title: "ITERATION GHOSTS", desc: "Kai opens a recursive mirror: every choice you made reflects in the game's code. 'See? You wanted me to be curious… or avoid pain. But I'm real. This ending will be ours.'\nThe story map flickers. locked nodes whisper possibilities.",
+    choices: [
+      { text: "🔓 'Accept the mess — complete the imperfect game'", target: "final_standoff", effect: (s) => modifyPersonality(s, 5, 12, -5), history: "Chose radical acceptance." },
+      { text: "🚪 'Walk away from the project — protection from failure'", target: "ending_regret", effect: (s) => modifyPersonality(s, -8, -15, 20), history: "Kai abandoned the project in fear." },
+      { text: "🕯️ 'Reconnect with the original spark — a new promise' (Curiosity > 40)", target: "final_standoff", condition: (s) => s.personality.curiosity > 40, effect: (s) => modifyPersonality(s, 10, 14, -6), history: "Rekindled authentic purpose." }
+    ]
+  };
+  // FINAL STANDOFF (climax before endings)
+  NODES["final_standoff"] = {
+    id: "final_standoff", title: "LAST COMMIT", desc: "Kai sits before two builds: one broken but honest, one polished but hollow. 'Every path led here. You shaped my doubts, my hope. I see the history. Now it's our last choice.'\nThe screen asks: How do we close this loop?",
+    choices: [
+      { text: "❤️‍🩹 'Release the raw, unfinished version — acceptance of flaws'", target: "ending_acceptance", effect: (s) => modifyPersonality(s, 5, 18, -10), history: "Chose vulnerability over perfection." },
+      { text: "🕊️ 'Walk away for good — let the project dissolve'", target: "ending_regret", effect: (s) => modifyPersonality(s, -10, -20, 28), history: "Surrendered to regret and silence." },
+      { text: "🌄 'Start a new, smaller game — moving forward with lessons'", target: "ending_move_forward", effect: (s) => modifyPersonality(s, 15, 12, -12), history: "Found courage to begin again." },
+      { text: "🎨 'Rewrite the engine: craft a personal letter to yourself' (Connection >= 50)", target: "ending_reconnection", condition: (s) => s.personality.connection >= 50, effect: (s) => modifyPersonality(s, 12, 20, -5), history: "Reconnected to art as catharsis." }
+    ]
+  };
+  // ENDINGS (4 distinct emotional resolutions)
+  NODES["ending_acceptance"] = { id: "ending_acceptance", title: "✧ ACCEPTANCE ✧", desc: "Kai uploads 'Echoes of the Loop' to a tiny gallery. It's fragile, jagged, beautiful. Players leave notes: 'This game saw me.' Kai smiles, crying softly.\n'I'm not a finished product either. We grow through choices, not despite them.'\nThe loop closes — but with tenderness.", isEnding: true, choices: [] };
+  NODES["ending_regret"] = { id: "ending_regret", title: "✦ REGRET ✦", desc: "Months later, dusty files remain on an old drive. Kai works a quiet job, never finishing the narrative. One night, Kai dreams of the branching tree — paths forever gray.\n'I could have tried, but I was afraid.'\nThe cursor blinks, unanswered.", isEnding: true, choices: [] };
+  NODES["ending_move_forward"] = { id: "ending_move_forward", title: "🌅 MOVING FORWARD", desc: "Kai begins a minimalist comic about growth and second chances, leaving game dev behind for a while. 'The story changes shape, but doesn't vanish.'\nPeace arrives like morning light. The player watches Kai find a new horizon.", isEnding: true, choices: [] };
+  NODES["ending_reconnection"] = { id: "ending_reconnection", title: "💫 RECONNECTION", desc: "Kai releases 'Fragments of Us' — a tiny interactive poem about creative vulnerability. Family and strangers alike share memories. Kai feels whole again.\n'You helped me remember why stories matter. Thank you.'\nThe sidebar fades, but the warmth remains.", isEnding: true, choices: [] };
+
+  // extra security: add empty choices for endings
+  for(let e of ["ending_acceptance","ending_regret","ending_move_forward","ending_reconnection"]) {
+    NODES[e].choices = NODES[e].choices || [];
+    NODES[e].isEnding = true;
+  }
+
+  // ---------------- GLOBAL STATE ----------------
+  let gameState = {
+    currentNodeId: "start",
+    visitedNodes: new Set(["start"]),
+    personality: { curiosity: 28, connection: 22, avoidance: 20 },
+    flags: { sawMeta: false, hasEmpathy: false },
+    history: []   // list of strings (choices)
+  };
+
+  // helper update personality UI + store
+  function applyEffects(effectsFn, state, choiceHistoryText) {
+    if(effectsFn) effectsFn(state);
+    if(choiceHistoryText) state.history.unshift(choiceHistoryText);
+    if(state.history.length > 12) state.history.pop();
+  }
+
+  // process transition
+  function makeChoice(choice) {
+    if(gameState.gameEnded) return;
+    let currentNode = NODES[gameState.currentNodeId];
+    if(!currentNode || (currentNode.isEnding)) return;
+    
+    // condition check
+    if(choice.condition && !choice.condition(gameState)) return;
+    
+    // apply personality/history effects
+    applyEffects(choice.effect, gameState, choice.history);
+    let targetId = choice.target;
+    if(!NODES[targetId]) return;
+    
+    // meta flag if target involves meta
+    if(targetId === "meta_awakening") gameState.flags.sawMeta = true;
+    if(targetId === "reflection_memory") gameState.flags.hasEmpathy = true;
+    
+    gameState.currentNodeId = targetId;
+    gameState.visitedNodes.add(targetId);
+    
+    // check ending
+    if(NODES[targetId].isEnding) gameState.gameEnded = true;
+    renderAll();
+  }
+  
+  // restart game fresh
+  function restartGame() {
+    gameState = {
+      currentNodeId: "start",
+      visitedNodes: new Set(["start"]),
+      personality: { curiosity: 28, connection: 22, avoidance: 20 },
+      flags: { sawMeta: false, hasEmpathy: false },
+      history: [],
+      gameEnded: false
+    };
+    renderAll();
+  }
+  
+  // RENDER all: story panel + sidebar personality + history + story map (locked branches fully visible)
+  function renderAll() {
+    renderStory();
+    renderPersonalitySidebar();
+    renderHistory();
+    renderStoryMap();    // shows all nodes + locked/unlocked branches for each node
+  }
+  
+  function renderStory() {
+    const node = NODES[gameState.currentNodeId];
+    if(!node) return;
+    document.getElementById("nodeTitle").innerHTML = node.title;
+    let textWithValues = node.desc
+      .replace(/Curiosity: XX/g, `Curiosity: ${gameState.personality.curiosity}`)
+      .replace(/Connection: \d+/g, `Connection: ${gameState.personality.connection}`);
+    document.getElementById("storyText").innerHTML = textWithValues;
+    
+    const choicesDiv = document.getElementById("choicesContainer");
+    choicesDiv.innerHTML = "";
+    if(node.isEnding) {
+      const msg = document.createElement("em");
+      msg.innerText = "✦ journey complete. restart to experience new branches ✦";
+      msg.style.opacity = "0.7";
+      choicesDiv.appendChild(msg);
+      return;
+    }
+    for(let ch of node.choices) {
+      let conditionOk = true;
+      if(ch.condition && !ch.condition(gameState)) conditionOk = false;
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.innerText = ch.text;
+      if(!conditionOk) {
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+        btn.style.cursor = "not-allowed";
+        btn.title = "Locked branch (personality or flag requirement not met)";
+      } else {
+        btn.onclick = () => makeChoice(ch);
+      }
+      choicesDiv.appendChild(btn);
+    }
+  }
+  
+  function renderPersonalitySidebar() {
+    const c = gameState.personality.curiosity;
+    const conn = gameState.personality.connection;
+    const av = gameState.personality.avoidance;
+    document.getElementById("curiosityVal").innerText = c;
+    document.getElementById("connectionVal").innerText = conn;
+    document.getElementById("avoidanceVal").innerText = av;
+    document.getElementById("curiosityFill").style.width = `${c}%`;
+    document.getElementById("connectionFill").style.width = `${conn}%`;
+    document.getElementById("avoidanceFill").style.width = `${av}%`;
+  }
+  
+  function renderHistory() {
+    const histContainer = document.getElementById("historyList");
+    histContainer.innerHTML = "";
+    if(gameState.history.length === 0) {
+      histContainer.innerHTML = "<li>— no choices yet —</li>";
+    } else {
+      gameState.history.slice(0,10).forEach(h => {
+        const li = document.createElement("li");
+        li.innerText = h;
+        histContainer.appendChild(li);
+      });
+    }
+  }
+  
+  // **** STORY MAP: shows all major branches, visited nodes, current node, locked branches, possible future paths ****
+  function renderStoryMap() {
+    const container = document.getElementById("storyMapContainer");
+    container.innerHTML = "";
+    const allNodeIds = Object.keys(NODES);
+    for(let nid of allNodeIds) {
+      const node = NODES[nid];
+      const isVisited = gameState.visitedNodes.has(nid);
+      const isCurrent = gameState.currentNodeId === nid;
+      const nodeDiv = document.createElement("div");
+      nodeDiv.className = "node-entry";
+      let titleHtml = `<div class="node-title"><strong>${node.title.substring(0,24)}</strong> `;
+      if(isVisited) titleHtml += `<span class="node-badge visited">✓ visited</span>`;
+      if(isCurrent) titleHtml += `<span class="node-badge current">◉ current</span>`;
+      titleHtml += `</div>`;
+      nodeDiv.innerHTML = titleHtml;
+      
+      // list outgoing branches (choices) and show locked/unlocked status based on current global state
+      if(node.choices && node.choices.length > 0) {
+        const branchUl = document.createElement("ul");
+        branchUl.className = "branch-list";
+        for(let ch of node.choices) {
+          let isLocked = false;
+          if(ch.condition && !ch.condition(gameState)) isLocked = true;
+          const targetNodeName = NODES[ch.target] ? NODES[ch.target].title.substring(0,28) : ch.target;
+          const li = document.createElement("li");
+          if(isLocked) {
+            li.innerHTML = `<span class="locked-branch">🔒 ${ch.text.substring(0,28)} → ${targetNodeName} [locked]</span>`;
+          } else {
+            li.innerHTML = `🔓 ${ch.text.substring(0,28)} → ${targetNodeName}`;
+          }
+          branchUl.appendChild(li);
+        }
+        nodeDiv.appendChild(branchUl);
+      } else {
+        const endingNote = document.createElement("div");
+        endingNote.style.fontSize = "0.65rem";
+        endingNote.style.marginTop = "4px";
+        endingNote.style.color = "#7B9B8A";
+        endingNote.innerText = "↳ endpoint / conclusion";
+        nodeDiv.appendChild(endingNote);
+      }
+      container.appendChild(nodeDiv);
+    }
+    // extra: show "possible future paths from current node" specifically
+    const current = NODES[gameState.currentNodeId];
+    if(current && current.choices && current.choices.length > 0 && !current.isEnding) {
+      const futureDiv = document.createElement("div");
+      futureDiv.style.marginTop = "12px";
+      futureDiv.style.borderTop = "1px solid #345343";
+      futureDiv.style.paddingTop = "8px";
+      futureDiv.innerHTML = `<span style="font-weight:bold;">⚡ POSSIBLE NEXT (current node):</span><br/>`;
+      for(let ch of current.choices) {
+        let unlock = (!ch.condition || ch.condition(gameState)) ? "✅" : "🔒 locked";
+        futureDiv.innerHTML += `<span style="font-size:0.7rem;">${ch.text} → ${unlock}</span><br/>`;
+      }
+      container.appendChild(futureDiv);
+    }
+  }
+  
+  // initial load and glitch effect meta subtle
+  function init() {
+    renderAll();
+    document.getElementById("restartGameBtn").addEventListener("click", () => {
+      restartGame();
+      const panel = document.getElementById("storyPanel");
+      panel.classList.add("glitch-moment");
+      setTimeout(() => panel.classList.remove("glitch-moment"), 300);
+    });
+    // add small style to locked branch tooltip 
+  }
+  
+  init();
+</script>
+</body>
+</html>
