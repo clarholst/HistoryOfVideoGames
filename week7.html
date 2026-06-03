@@ -121,6 +121,37 @@
       font-size: 0.92rem;
     }
 
+    .scene-buttons {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .scene-button {
+      appearance: none;
+      border: 1px solid #cbbda2;
+      border-radius: 10px;
+      background: #f4e8d8;
+      color: var(--ink);
+      padding: 10px 12px;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .scene-button:hover,
+    .scene-button:focus {
+      background: #f1dfc4;
+      border-color: #b79b70;
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .scene-button:active {
+      transform: translateY(0);
+    }
+
     .terminal {
       border: 1px solid var(--terminal-line);
       border-radius: 10px;
@@ -279,6 +310,7 @@
 
       <h2 class="scene-title" id="sceneTitle">Loading...</h2>
       <div class="scene-text" id="sceneText"></div>
+      <div class="scene-buttons" id="sceneButtons" aria-label="Scene choices"></div>
 
       <div class="terminal" id="terminal" aria-live="polite"></div>
 
@@ -963,6 +995,20 @@
 
       document.getElementById("sceneTitle").textContent = scene.title;
       document.getElementById("sceneText").textContent = sceneWithOptions;
+
+      const sceneButtons = document.getElementById("sceneButtons");
+      sceneButtons.innerHTML = "";
+      if (state.sceneId === "final_question" && Array.isArray(scene.options)) {
+        scene.options.forEach((opt) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "scene-button";
+          button.textContent = opt.hint;
+          button.addEventListener("click", () => runOption(opt));
+          sceneButtons.appendChild(button);
+        });
+      }
+
       document.getElementById("roundLabel").textContent = `Arrival ${Math.min(state.arrival, 6)}`;
     }
 
