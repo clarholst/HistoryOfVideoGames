@@ -973,7 +973,8 @@
         avoidance: 0
       },
       chosenStops: [],
-      ended: false
+      ended: false,
+      lastSuggestions: null
     };
 
     const terminalEl = document.getElementById("terminal");
@@ -1270,12 +1271,18 @@
       if (groups.travel.length === 0) addLine("- None in this scene.", "sys");
       groups.travel.forEach((opt) => {
         addLine(`- ${opt.hint}`, "sys");
+        if (state.verboseMode && Array.isArray(opt.aliases) && opt.aliases.length) {
+          addLine(`  aliases: ${opt.aliases.join(", ")}`, "sys");
+        }
       });
 
       addLine("People options:", "sys");
       if (groups.people.length === 0) addLine("- None in this scene.", "sys");
       groups.people.forEach((opt) => {
         addLine(`- ${opt.hint}`, "sys");
+        if (state.verboseMode && Array.isArray(opt.aliases) && opt.aliases.length) {
+          addLine(`  aliases: ${opt.aliases.join(", ")}`, "sys");
+        }
       });
 
       const exploreItems = getLocationExplorationItems(state.sceneId);
@@ -1283,6 +1290,9 @@
         addLine("Explore options:", "sys");
         exploreItems.forEach((item) => {
           addLine(`- ${item.hint}`, "sys");
+          if (state.verboseMode && Array.isArray(item.aliases) && item.aliases.length) {
+            addLine(`  aliases: ${item.aliases.join(", ")}`, "sys");
+          }
         });
       }
 
@@ -1340,8 +1350,37 @@
     function findSceneOption(command) {
       const scene = SCENES[state.sceneId];
       if (!scene || !scene.options) return null;
+      // exact alias/id match first
+      const exact = scene.options.find((opt) => (opt.aliases || []).some((alias) => aliasMatches(command, alias)) || (opt.id && aliasMatches(command, opt.id)));
+      if (exact) return exact;
 
-      return scene.options.find((opt) => opt.aliases.some((alias) => aliasMatches(command, alias)));
+      // fuzzy scoring: prefer train, hint, alias contains
+      const lowered = command.toLowerCase();
+      const candidates = scene.options.map((opt) => {
+        let score = 0;
+        if (opt.train && opt.train.toLowerCase().includes(lowered)) score += 60;
+        if (opt.hint && opt.hint.toLowerCase().includes(lowered)) score += 50;
+        if (opt.id && opt.id.toLowerCase().includes(lowered)) score += 40;
+        (opt.aliases || []).forEach((a) => {
+          const la = a.toLowerCase();
+          if (la === lowered) score += 70;
+          else if (la.includes(lowered)) score += 35;
+        });
+        return { opt, score };
+      }).filter(c => c.score > 30).sort((a, b) => b.score - a.score);
+
+      if (candidates.length === 1) {
+        return candidates[0].opt;
+      }
+
+      // store suggestions for user feedback
+      if (candidates.length > 1) {
+        state.lastSuggestions = candidates.map(c => c.opt.hint).slice(0, 6);
+      } else {
+        state.lastSuggestions = null;
+      }
+
+      return null;
     }
 
     function handleDirectionCommand(directionToken) {
@@ -1470,6 +1509,11 @@
         return;
       }
 
+      if (command === "more options" || command === "more") {
+        showOptions();
+        return;
+      }
+
       if (command === "look around" || command === "explore" || command === "look around here") {
         const items = getLocationExplorationItems(state.sceneId);
         if (items.length > 0) {
@@ -1515,6 +1559,12 @@
 
       const option = findSceneOption(command);
       if (!option) {
+        if (state.lastSuggestions && Array.isArray(state.lastSuggestions) && state.lastSuggestions.length) {
+          addLine("Did you mean:", "sys");
+          state.lastSuggestions.forEach((s) => addLine(`- ${s}`, "sys"));
+          state.lastSuggestions = null;
+          return;
+        }
         addLine("The station does not understand that command. Type options.", "bad");
         return;
       }
@@ -1535,6 +1585,7 @@
       };
       state.chosenStops = [];
       state.ended = false;
+      state.lastSuggestions = null;
 
       terminalEl.innerHTML = "";
       document.getElementById("statusText").textContent = "A distant bell rings. Another train is arriving.";
