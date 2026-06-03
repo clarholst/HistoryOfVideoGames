@@ -1265,43 +1265,16 @@
         return;
       }
 
+      // Only reveal travel choices here. Interaction options remain hidden.
       const groups = categorizeOptions(scene.options);
-
       addLine("Travel options:", "sys");
-      if (groups.travel.length === 0) addLine("- None in this scene.", "sys");
-      groups.travel.forEach((opt) => {
-        addLine(`- ${opt.hint}`, "sys");
-        if (state.verboseMode && Array.isArray(opt.aliases) && opt.aliases.length) {
-          addLine(`  aliases: ${opt.aliases.join(", ")}`, "sys");
-        }
-      });
-
-      addLine("People options:", "sys");
-      if (groups.people.length === 0) addLine("- None in this scene.", "sys");
-      groups.people.forEach((opt) => {
-        addLine(`- ${opt.hint}`, "sys");
-        if (state.verboseMode && Array.isArray(opt.aliases) && opt.aliases.length) {
-          addLine(`  aliases: ${opt.aliases.join(", ")}`, "sys");
-        }
-      });
-
-      const exploreItems = getLocationExplorationItems(state.sceneId);
-      if (exploreItems.length > 0) {
-        addLine("Explore options:", "sys");
-        exploreItems.forEach((item) => {
-          addLine(`- ${item.hint}`, "sys");
-          if (state.verboseMode && Array.isArray(item.aliases) && item.aliases.length) {
-            addLine(`  aliases: ${item.aliases.join(", ")}`, "sys");
-          }
-        });
+      if (groups.travel.length === 0) {
+        addLine("- None in this scene.", "sys");
+      } else {
+        groups.travel.forEach((opt) => addLine(`- ${opt.hint}`, "sys"));
       }
-
-      if (groups.other.length > 0) {
-        addLine("Other options:", "sys");
-      }
-      groups.other.forEach((opt) => {
-        addLine(`- ${opt.hint}`, "sys");
-      });
+      // Guide: use 'look' or 'explore' to inspect people or surroundings.
+      addLine("(Use 'look' or 'explore' to view interaction options.)", "sys");
     }
 
     function showRoutes() {
