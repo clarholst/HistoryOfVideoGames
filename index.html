@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History of Video Games · Clara Holst</title>
+  <style>
+    :root {
+      --sky-top: #bfe7ff;
+      --sky-bottom: #eef9ff;
+      --ink: #1d2450;
+      --muted: #475080;
+      --line: #8ca2dc;
+      --panel: #ffffff;
+      --panel-alt: #f7faff;
+      --week6: #ff8b5a;
+      --week6-soft: #ffe4d8;
+      --week7: #3cb38a;
+      --week7-soft: #dbf7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Segoe UI", "Noto Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 420px at 10% 0%, #ffffff 0%, transparent 60%),
+        radial-gradient(1000px 460px at 90% -10%, #d6f2ff 0%, transparent 58%),
+        linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+      padding: 32px 18px;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .header {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f2f8ff 100%);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 0 #b5c7ef;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      right: -48px;
+      top: -70px;
+      background: radial-gradient(circle at 40% 40%, #ffd98a 0%, #ffc35a 65%, transparent 66%);
+      opacity: 0.55;
+    }
+
+    .header h1 {
+      font-size: clamp(1.35rem, 3.6vw, 2.2rem);
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-shadow: 0 2px 0 #ffffff;
+    }
+
+    .meta {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.97rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tagline {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #2f4db6;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: inline-block;
+      background: #e5eeff;
+      border: 1px solid #b9c9f5;
+      border-radius: 999px;
+      padding: 5px 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, var(--panel) 0%, var(--panel-alt) 100%);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 320px;
+      box-shadow: 0 8px 0 #b8c9ef;
+      transition: transform 0.16s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .week {
+      width: fit-content;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 800;
+      border: 1px solid transparent;
+    }
+
+    .week6 {
+      color: #7b2f12;
+      background: var(--week6-soft);
+      border-color: var(--week6);
+    }
+
+    .week7 {
+      color: #0f5b43;
+      background: var(--week7-soft);
+      border-color: var(--week7);
+    }
+
+    .card h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .desc {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.95rem;
+      flex: 1;
+    }
+
+    .desc strong {
+      color: var(--ink);
+    }
+
+    .readmore {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .readmore summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 10px 12px;
+      color: #8a3d20;
+      font-weight: 800;
+      font-size: 0.92rem;
+      border-bottom: 1px solid transparent;
+      background: #ffefe8;
+    }
+
+    .readmore summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .readmore[open] summary {
+      border-bottom-color: var(--line);
+    }
+
+    .readmore-content {
+      padding: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .readmore-content h3 {
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    .readmore-content p {
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #f9fbff;
+      font-weight: 800;
+      border-radius: 12px;
+      padding: 10px 14px;
+      border: 1px solid transparent;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      box-shadow: 0 5px 0 rgba(24, 45, 126, 0.35);
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid #1f3cb2;
+      outline-offset: 2px;
+    }
+
+    .btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(24, 45, 126, 0.3);
+    }
+
+    .btn6 {
+      background: linear-gradient(180deg, #ff9d6b 0%, #f17349 100%);
+      border-color: #d95f36;
+    }
+
+    .btn7 {
+      background: linear-gradient(180deg, #43c79a 0%, #28946f 100%);
+      border-color: #1f7c5d;
+    }
+
+    @media (max-width: 840px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 0;
+      }
+
+      .header {
+        box-shadow: 0 6px 0 #b5c7ef;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="header">
+      <h1>History of Video Games</h1>
+      <p class="meta">Computer Studies 1 · Sophia University</p>
+      <p class="meta">Made by Clara Holst</p>
+      <p class="tagline">Select your mission below</p>
+    </section>
+
+    <section class="cards" aria-label="Game Selection Menu">
+      <article class="card">
+        <div class="week week6">Week 6</div>
+        <h2>Mind's Eclipse</h2>
+        <p class="desc">
+          <strong>Assignment:</strong> Design a mobile game concept around a chosen class theme.
+          This project presents a time-loop narrative focused on life in Japan and cognitive/emotional consequences.
+          It connects to the core game loop, monetization reflection, and ethical concerns in game design.
+        </p>
+        <details class="readmore">
+          <summary>Read more</summary>
+          <div class="readmore-content">
+            <h3>Ideation</h3>
+            <p>
+              This game is based on one of several game development ideas I have been working on. It was initially
+              thought of as a PC game, but the limitations of the phone screen and the natural interruption and
+              resumption of mobile play might actually suit it well.
+            </p>
+            <p>
+              I really like emotional narrative games (Omori), time-loops (Outer Wilds or Until Dawn), and choice-driven
+              consequences (Undertale), which shaped this concept. The time-loop mechanic can also fit mobile sessions,
+              which are often short.
+            </p>
+
+            <h3>Game Name</h3>
+            <p>
+              心の蝕 (Kokoro no Shoku), or Mind's Eclipse.
+            </p>
+            <p>
+              Meaning: Kokoro (心) means mind, heart, or inner self. Shoku (蝕) means eclipse or erosion. It also carries
+              a sense of being gradually eaten away, which fits the deterioration mechanic.
+            </p>
+
+            <h3>Core Gameplay</h3>
+            <p>
+              You play a character who wakes in the same small apartment in Japan every day. Each loop lasts about 8 to
+              12 minutes and covers one evening. You explore a tiny space: apartment, corridor, and convenience store.
+              You talk to Haruki, a neighbor who feels vaguely familiar. You make small choices. Then the loop ends and
+              starts again.
+            </p>
+            <p>
+              The game never directly says it is measuring behavior. Consequences accumulate quietly: a neglected plant
+              dies, graffiti starts reflecting your choices, and the atmosphere shifts. Your mental state appears
+              visually: text flickers, colors desaturate, and dialogue coherence degrades after repeated harmful choices
+              or deaths. The goal is to break the loop by observing patterns and understanding cause and effect.
+            </p>
+
+            <h3>Monetization Strategy</h3>
+            <p>
+              One-time purchase around 3 to 4 euros. No ads, no in-app purchases, no energy systems, and no artificial
+              premium pain points. The full game is available from the start. The experience is intentionally short and
+              complete, not endless.
+            </p>
+
+            <h3>Ethical Concerns</h3>
+            <p>
+              The biggest concern is mental-health representation. Dissociation, paranoia, and psychological breakdown
+              should be treated with care and informed by credible cognitive-science or clinical perspectives. Content
+              warnings are necessary, and negative routes should never glorify harmful behavior.
+            </p>
+            <p>
+              A second concern is using knowledge about guilt, memory, and perception to affect players emotionally.
+              The design should challenge and unsettle without harming the player. External feedback from mental-health
+              experts is important before release.
+            </p>
+          </div>
+        </details>
+        <a class="btn btn6" href="week6.html">Play Week 6 Game</a>
+      </article>
+
+      <article class="card">
+        <div class="week week7">Week 7</div>
+        <h2>The Stranger at Platform 8</h2>
+        <p class="desc">
+          <strong>Assignment:</strong> Choose one theme (Agency, Dissonance, Branching, or Metafiction)
+          and express it through an interactive format.
+          In this game, a traveller arrives at a mysterious train station with no memory of who they are and must choose which trains to board, which destinations to explore, and how to respond to the people they meet along the way.
+        </p>
+        <a class="btn btn7" href="week7.html">Play Week 7 Game</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,605 +1,1262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ECHOES OF THE LOOP · a branching narrative</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Stranger at Platform 8</title>
   <style>
+    :root {
+      --night: #0e1a2b;
+      --night-soft: #152641;
+      --panel: #f7f4ed;
+      --panel-side: #eef3ff;
+      --line: #d3cab7;
+      --line-side: #b6c3ed;
+      --ink: #2a2a36;
+      --muted: #5f6372;
+      --gold: #e2ad42;
+      --gold-dark: #bc8624;
+      --terminal: #fffdf8;
+      --terminal-line: #ddd2be;
+      --blue: #1f355a;
+    }
+
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     body {
-      background: radial-gradient(circle at 20% 30%, #0A0F0E 0%, #030605 100%);
       min-height: 100vh;
-      font-family: 'Courier New', 'Fira Code', 'SF Mono', monospace;
-      padding: 2rem 1.5rem;
-      color: #D4EFDF;
-    }
-
-    /* main game container */
-    .game-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.8rem;
-      backdrop-filter: blur(2px);
-    }
-
-    /* story panel (main narrative area) */
-    .story-panel {
-      flex: 2.5;
-      min-width: 280px;
-      background: rgba(8, 12, 10, 0.75);
-      backdrop-filter: blur(6px);
-      border-radius: 2rem;
-      border: 1px solid rgba(100, 210, 140, 0.25);
-      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5), inset 0 0 20px rgba(90, 210, 140, 0.05);
-      padding: 2rem 1.8rem;
-      transition: all 0.2s ease;
-    }
-
-    /* sidebar (agency tracker) */
-    .agency-sidebar {
-      flex: 1.2;
-      min-width: 260px;
-      background: rgba(5, 8, 7, 0.85);
-      backdrop-filter: blur(8px);
-      border-radius: 1.8rem;
-      border: 1px solid #2A4133;
-      padding: 1.5rem 1.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.6);
-    }
-
-    /* typography */
-    h1, h2, h3 {
-      font-weight: 400;
-      letter-spacing: -0.02em;
-    }
-
-    .story-title {
-      font-family: 'Times New Roman', 'Georgia', serif;
-      font-size: 2rem;
-      color: #C3F2D6;
-      margin-bottom: 1rem;
-      border-left: 4px solid #6BD99A;
-      padding-left: 1rem;
-      font-weight: 350;
-      text-shadow: 0 0 3px #446B51;
-    }
-
-    .story-text {
-      font-size: 1.1rem;
-      line-height: 1.55;
-      margin: 1.8rem 0;
-      font-family: 'Courier New', monospace;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 1.2rem;
-      border-radius: 1.4rem;
-      border-left: 2px solid #6BD99A;
-      white-space: pre-line;
-    }
-
-    .choices-area {
-      margin-top: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .choice-btn {
-      background: rgba(20, 30, 24, 0.8);
-      border: 1px solid #4C6B5A;
-      color: #E2F5E9;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
-      padding: 0.7rem 1.2rem;
-      border-radius: 3rem;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      backdrop-filter: blur(2px);
-      font-weight: 500;
-    }
-
-    .choice-btn:hover {
-      background: #2F5E48;
-      border-color: #A1E0B8;
-      color: #FFFFFF;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    }
-
-    /* sideblocks */
-    .tracker-card, .history-card, .map-card {
-      background: #0B1210;
-      border-radius: 1.2rem;
-      padding: 1rem 1rem;
-      border: 1px solid #2E443B;
-    }
-
-    .tracker-card h3, .history-card h3, .map-card h3 {
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 0.8rem;
-      color: #94C9AE;
-      border-bottom: 1px dashed #3C5A4C;
-      display: inline-block;
-    }
-
-    .trait-bar {
-      margin: 0.8rem 0;
-    }
-    .trait-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      margin-bottom: 4px;
-      color: #BBD9CC;
-    }
-    .bar-bg {
-      background: #1E2D26;
-      border-radius: 20px;
-      height: 6px;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1000px 400px at 20% -20%, #2b4474 0%, transparent 60%),
+        radial-gradient(1000px 430px at 90% -20%, #1d355d 0%, transparent 60%),
+        linear-gradient(180deg, var(--night-soft) 0%, var(--night) 100%);
       overflow: hidden;
     }
-    .bar-fill {
-      background: #92F0C0;
-      width: 0%;
-      height: 100%;
-      border-radius: 20px;
-      transition: width 0.25s ease;
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(280px, 0.9fr);
+      gap: 10px;
+      padding: 10px;
     }
 
-    .history-list {
-      max-height: 150px;
-      overflow-y: auto;
-      font-size: 0.75rem;
-      list-style: none;
-      padding-left: 0.2rem;
-    }
-    .history-list li {
-      margin: 0.3rem 0;
-      border-left: 2px solid #6BD99A;
-      padding-left: 0.5rem;
-      color: #CEEFE0;
-    }
-
-    .story-map-grid {
-      font-size: 0.7rem;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-    .node-entry {
-      margin-bottom: 0.6rem;
-      background: #0F1814;
-      padding: 0.3rem 0.5rem;
-      border-radius: 12px;
-    }
-    .node-title {
-      font-weight: bold;
+    .story {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
       display: flex;
-      gap: 0.5rem;
+      flex-direction: column;
+      min-height: calc(100vh - 20px);
+      overflow: hidden;
+    }
+
+    .header {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #ccbfa7;
+    }
+
+    .header h1 {
+      font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+      margin-bottom: 2px;
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .station-board {
+      margin-top: 8px;
+      display: inline-flex;
       align-items: center;
-      flex-wrap: wrap;
+      gap: 8px;
+      background: var(--blue);
+      color: #f3f6ff;
+      border-radius: 999px;
+      border: 1px solid #415f92;
+      padding: 5px 11px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
-    .node-badge {
-      font-size: 0.6rem;
-      padding: 2px 6px;
-      border-radius: 20px;
-      background: #1F2F28;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(226, 173, 66, 0.7);
+      animation: pulse 1.2s ease-in-out infinite;
     }
-    .visited {
-      background: #2C5A48;
-      color: #C0F0DA;
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
     }
-    .current {
-      background: #65B891;
-      color: #031008;
+
+    .scene-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      margin-bottom: 6px;
     }
-    .locked-branch {
-      color: #A97C6B;
-      text-decoration: line-through;
-      opacity: 0.7;
+
+    .scene-text {
+      border: 1px solid var(--terminal-line);
+      border-radius: 10px;
+      background: var(--terminal);
+      padding: 10px;
+      white-space: pre-line;
+      line-height: 1.45;
+      margin-bottom: 8px;
+      min-height: 104px;
+      font-size: 0.92rem;
     }
-    .branch-list {
-      margin-left: 0.8rem;
-      font-size: 0.65rem;
-      list-style: none;
+
+    .terminal {
+      border: 1px solid var(--terminal-line);
+      border-radius: 10px;
+      background: #fffdf8;
+      padding: 8px;
+      flex: 1;
+      overflow-y: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      min-height: 110px;
     }
-    hr {
-      border-color: #2B453B;
-      margin: 10px 0;
+
+    .line {
+      margin-bottom: 3px;
     }
-    .restart-btn {
-      background: none;
-      border: 1px solid #6F9A86;
-      color: #B9E3CF;
-      padding: 6px 12px;
-      border-radius: 30px;
-      margin-top: 1rem;
-      font-family: monospace;
-      cursor: pointer;
-      transition: all 0.2s;
+
+    .line.cmd {
+      color: #28448a;
+      font-weight: 700;
+    }
+
+    .line.sys {
+      color: #5f6372;
+    }
+
+    .line.ok {
+      color: #514832;
+    }
+
+    .line.bad {
+      color: #8a2a2a;
+    }
+
+    .controls {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .command-input {
       width: 100%;
-    }
-    .restart-btn:hover {
-      background: #1F3C31;
-      border-color: #B3F0CE;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 0.7rem;
-      margin-top: 2rem;
-      opacity: 0.5;
+      border: 1px solid #cbbda2;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.86rem;
+      font-family: Consolas, "Courier New", monospace;
+      background: #fffefb;
     }
 
-    @media (max-width: 780px) {
-      body { padding: 1rem; }
-      .story-panel { order: 1; }
-      .agency-sidebar { order: 2; }
+    .btn {
+      border-radius: 10px;
+      border: 1px solid #ccbfa7;
+      background: #f1e8d8;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 0.84rem;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
-    /* glitch blink for meta */
-    @keyframes subtleGlitch {
-      0% { text-shadow: 0px 0px 0px #6BD99A; }
-      50% { text-shadow: -1px 0px 2px #A1FFC1, 1px 0px 2px #3C9; }
-      100% { text-shadow: 0px 0px 0px #6BD99A; }
+    .btn.primary {
+      border-color: var(--gold-dark);
+      background: linear-gradient(180deg, #edc267 0%, var(--gold) 100%);
     }
-    .glitch-moment {
-      animation: subtleGlitch 0.3s ease-in-out;
+
+    .status {
+      margin-top: 8px;
+      border: 1px solid #d8cfbf;
+      border-radius: 10px;
+      background: #fff8ea;
+      color: #615742;
+      padding: 7px 9px;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+
+    .sidebar {
+      background: var(--panel-side);
+      border: 1px solid var(--line-side);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: calc(100vh - 20px);
+      overflow: hidden;
+    }
+
+    .box {
+      background: #f9fbff;
+      border: 1px solid #c8d4fb;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .box h2 {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .box p,
+    .box li {
+      font-size: 0.78rem;
+      line-height: 1.3;
+      color: #39406a;
+    }
+
+    .box ul {
+      list-style: none;
+      display: grid;
+      gap: 2px;
+    }
+
+    .box li::before {
+      content: "> ";
+      color: #5c79d8;
+      font-weight: 700;
+    }
+
+    #hintList li::before {
+      content: "* ";
+      color: #5c79d8;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .story,
+      .sidebar {
+        min-height: 0;
+        overflow: auto;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
-<div class="game-container">
-  <!-- MAIN NARRATIVE PANEL -->
-  <div class="story-panel" id="storyPanel">
-    <div class="story-title" id="nodeTitle">loading...</div>
-    <div class="story-text" id="storyText"></div>
-    <div class="choices-area" id="choicesContainer"></div>
-    <button class="restart-btn" id="restartGameBtn">⟳ RESTART / BREAK THE LOOP</button>
-  </div>
-
-  <!-- SIDEBAR: AGENCY & TRACKING -->
-  <div class="agency-sidebar">
-    <div class="tracker-card">
-      <h3>◈ PERSONALITY TRACKER</h3>
-      <div class="trait-bar">
-        <div class="trait-label"><span>🔍 CURIOSITY</span><span id="curiosityVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill" id="curiosityFill"></div></div>
+  <main class="app">
+    <section class="story" aria-label="Story Panel">
+      <div class="header">
+        <h1>The Stranger at Platform 8</h1>
+        <p class="sub">Type commands. The station listens.</p>
+        <div class="station-board">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="roundLabel">Arrival 1</span>
+        </div>
       </div>
-      <div class="trait-bar">
-        <div class="trait-label"><span>💚 CONNECTION</span><span id="connectionVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill" id="connectionFill"></div></div>
+
+      <h2 class="scene-title" id="sceneTitle">Loading...</h2>
+      <div class="scene-text" id="sceneText"></div>
+
+      <div class="terminal" id="terminal" aria-live="polite"></div>
+
+      <form class="controls" id="commandForm">
+        <input
+          id="commandInput"
+          class="command-input"
+          type="text"
+          autocomplete="off"
+          placeholder="Type a command: board city, stay, ask back, enter artist, help..."
+        />
+        <button class="btn primary" type="submit">Send</button>
+        <button class="btn" type="button" id="restartBtn">Restart</button>
+      </form>
+
+      <div class="status" id="statusText">A distant bell rings. Another train is arriving.</div>
+    </section>
+
+    <aside class="sidebar" aria-label="How To and Hints">
+      <div class="box">
+        <h2>How To Play</h2>
+        <ul>
+          <li>Type what you want to do and press Enter.</li>
+          <li>Short commands work: look, help, routes.</li>
+          <li>You do not need exact phrasing.</li>
+          <li>Try verbs: board, stay, ask, enter, say.</li>
+          <li>Use restart to begin a fresh run.</li>
+        </ul>
       </div>
-      <div class="trait-bar">
-        <div class="trait-label"><span>🌙 AVOIDANCE</span><span id="avoidanceVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill" id="avoidanceFill"></div></div>
+
+      <div class="box">
+        <h2>Useful Commands</h2>
+        <ul>
+          <li>help or ?</li>
+          <li>look or l</li>
+          <li>options</li>
+          <li>routes</li>
+          <li>stats</li>
+          <li>restart</li>
+        </ul>
       </div>
-    </div>
 
-    <div class="history-card">
-      <h3>📜 CHOICE HISTORY</h3>
-      <ul class="history-list" id="historyList">
-        <li>— no choices yet —</li>
-      </ul>
-    </div>
+    </aside>
+  </main>
 
-    <div class="map-card">
-      <h3>🗺️ STORY MAP · BRANCHES</h3>
-      <div class="story-map-grid" id="storyMapContainer">
-        <!-- dynamic map content -->
-      </div>
-    </div>
-  </div>
-</div>
-<footer>agency simulation — every decision reshapes Kai's reflection</footer>
+  <script>
+    const SCENES = {
+      intro: {
+        title: "Platform 8, Late Night",
+        text: "You step into an empty station where even echoes seem careful.\nA ticket rests in your pocket, but your destination is missing from memory.\n\nThe speaker crackles: 'Next arrivals in three minutes.'\n\nA train glides in and opens its doors like a question.",
+        options: [
+          {
+            id: "city",
+            aliases: ["board city", "take city", "city of glass", "train city", "go city", "board the city of glass"],
+            hint: "Board the City of Glass.",
+            target: "q_family",
+            train: "City of Glass",
+            effects: { wonder: 1, risk: 1, curiosity: 1 },
+            status: "You step toward the glittering unknown."
+          },
+          {
+            id: "stay",
+            aliases: ["stay", "wait", "stay platform", "remain", "watch people", "do nothing"],
+            hint: "Stay and watch the platform.",
+            target: "q_family_platform",
+            train: "Stayed at Platform 8",
+            effects: { belonging: 1, avoidance: 1 },
+            status: "You remain where names drift through the air."
+          },
+          {
+            id: "coast",
+            aliases: ["board coast", "take coast", "endless coast", "go coast", "train coast", "board endless coast"],
+            hint: "Ride to the Endless Coast.",
+            target: "q_family",
+            train: "Endless Coast",
+            effects: { curiosity: 1, wonder: 1 },
+            status: "Salt wind threads through the carriage windows."
+          },
+          {
+            id: "library",
+            aliases: ["board library", "take library", "last library", "go library", "train library", "board the last library"],
+            hint: "Take the Last Library train.",
+            target: "q_family",
+            train: "Last Library",
+            effects: { curiosity: 2, honesty: 1 },
+            status: "You follow the quiet scent of paper and dust."
+          },
+          {
+            id: "marketfirst",
+            aliases: ["board market", "floating market", "go market", "take market", "train market", "board floating market"],
+            hint: "Board the Floating Market train.",
+            target: "q_family",
+            train: "Floating Market",
+            effects: { belonging: 1, wonder: 1 },
+            status: "Lantern light flickers over crowded windows as you step in."
+          },
+          {
+            id: "observatoryfirst",
+            aliases: ["board observatory", "mountain observatory", "go observatory", "take observatory", "board mountain", "star train"],
+            hint: "Board the Mountain Observatory train.",
+            target: "q_family",
+            train: "Mountain Observatory",
+            effects: { curiosity: 2, risk: 1 },
+            status: "The carriage smells like cold metal and starlight."
+          }
+        ]
+      },
 
-<script>
-  // --------------------------------------------------------------
-  // NARRATIVE DATABASE (nodes, branches, personality effects)
-  // inspired by Bandersnatch, GRIS emotional introspection
-  // --------------------------------------------------------------
-  const NODES = {};
+      q_family: {
+        title: "Question in the Carriage",
+        text: "Across from you, a stranger folds a newspaper with slow hands and asks:\n\"Do you miss your family?\"",
+        options: [
+          {
+            id: "everyday",
+            aliases: ["every day", "daily", "yes every day", "always", "i miss them every day", "everyday", "yes", "yeah", "y"],
+            hint: "Answer: every day.",
+            target: "train_two",
+            effects: { belonging: 2, honesty: 1 },
+            status: "Your answer lands softly, like rain on glass."
+          },
+          {
+            id: "sometimes",
+            aliases: ["sometimes", "maybe sometimes", "on and off", "once in a while", "kind of", "some days"],
+            hint: "Answer: sometimes.",
+            target: "train_two",
+            effects: { belonging: 1, honesty: 1 },
+            status: "You leave room for both distance and warmth."
+          },
+          {
+            id: "notreally",
+            aliases: ["not really", "no", "no not really", "rarely", "hardly", "i do not"],
+            hint: "Answer: not really.",
+            target: "train_two",
+            effects: { risk: 1, avoidance: 1 },
+            status: "The carriage quiets, as if listening harder."
+          },
+          {
+            id: "changesubject",
+            aliases: ["change subject", "avoid question", "skip", "deflect", "talk about weather", "change the topic"],
+            hint: "Change the subject.",
+            target: "train_two",
+            effects: { avoidance: 2 },
+            status: "You point to the window and let the moment pass."
+          },
+          {
+            id: "askback",
+            aliases: ["ask back", "you tell me", "ask same question", "what about you", "your family", "ask stranger"],
+            hint: "Ask the stranger the same question.",
+            target: "train_two",
+            effects: { curiosity: 1, honesty: 1, wonder: 1 },
+            status: "For a moment, the question belongs to both of you."
+          },
+          {
+            id: "letters",
+            aliases: ["i write letters", "write letters", "letters", "send letters", "i miss them in letters", "i keep writing"],
+            hint: "Say you still write letters.",
+            target: "train_two",
+            effects: { belonging: 2, wonder: 1 },
+            status: "You describe envelopes that always smell like rain."
+          },
+          {
+            id: "cantremember",
+            aliases: ["i cant remember", "can't remember", "forgot", "memory blank", "i forgot them", "my memory is gone", "idk", "i dont know", "don't know"],
+            hint: "Admit you cannot remember clearly.",
+            target: "train_two",
+            effects: { honesty: 1, wonder: 1, avoidance: 1 },
+            status: "The stranger nods as if this answer is older than both of you."
+          }
+        ]
+      },
 
-  // helper: effect modifiers
-  function modifyPersonality(state, deltaCur, deltaConn, deltaAvo) {
-    state.personality.curiosity = Math.min(100, Math.max(0, state.personality.curiosity + deltaCur));
-    state.personality.connection = Math.min(100, Math.max(0, state.personality.connection + deltaConn));
-    state.personality.avoidance = Math.min(100, Math.max(0, state.personality.avoidance + deltaAvo));
-  }
+      q_family_platform: {
+        title: "Question on Platform 8",
+        text: "You stay beneath the station lights. A stranger by the vending machine studies your face and asks:\n\"Do you miss your family?\"",
+        options: [
+          {
+            id: "everyday_platform",
+            aliases: ["every day", "daily", "yes every day", "always", "i miss them every day", "everyday", "yes", "yeah", "y"],
+            hint: "Answer: every day.",
+            target: "platform_hold",
+            effects: { belonging: 2, honesty: 1 },
+            status: "Your answer lingers in the cold air between you."
+          },
+          {
+            id: "sometimes_platform",
+            aliases: ["sometimes", "maybe sometimes", "on and off", "once in a while", "kind of", "some days"],
+            hint: "Answer: sometimes.",
+            target: "train_two",
+            effects: { belonging: 1, honesty: 1 },
+            status: "You leave room for both distance and warmth."
+          },
+          {
+            id: "notreally_platform",
+            aliases: ["not really", "no not really", "rarely", "hardly", "i do not"],
+            hint: "Answer: not really.",
+            target: "train_two",
+            effects: { risk: 1, avoidance: 1 },
+            status: "The stranger nods once and looks down the tracks."
+          },
+          {
+            id: "changesubject_platform",
+            aliases: ["change subject", "avoid question", "skip", "deflect", "talk about weather", "change the topic"],
+            hint: "Change the subject.",
+            target: "train_two",
+            effects: { avoidance: 2 },
+            status: "You point to the arrival board and let the moment pass."
+          },
+          {
+            id: "askback_platform",
+            aliases: ["ask back", "you tell me", "ask same question", "what about you", "your family", "ask stranger"],
+            hint: "Ask the stranger the same question.",
+            target: "train_two",
+            effects: { curiosity: 1, honesty: 1, wonder: 1 },
+            status: "For a moment, both of you are waiting for each other to answer."
+          },
+          {
+            id: "waitmore_platform",
+            aliases: ["wait more", "keep waiting", "wait for next train", "just wait", "remain", "stay"],
+            hint: "Keep waiting for the next train.",
+            target: "platform_hold",
+            effects: { belonging: 1, avoidance: 1 },
+            status: "You choose stillness until another train glides in."
+          }
+        ]
+      },
 
-  // -------- DEFINE NODES (13 core + 4 endings = 17 nodes, rich branching) -----
-  // START
-  NODES["start"] = {
-    id: "start",
-    title: "/// INIT_SEQUENCE ///",
-    desc: "You stare at the blinking cursor. Kai, a young developer, sits in a dim room surrounded by sketches of narrative trees. \n\n\"This game will capture something real. Not heroes or monsters — just the ache of choices.\" \n\nThe cursor winks. A sidebar appears on your screen, tracking decisions, tracing a soul.\n\nWhere do you begin?",
-    choices: [
-      { text: "🧠 Embrace radical player agency → Let the player decide everything", target: "freedom_path", effect: (s) => modifyPersonality(s, 15, 10, -5), history: "Embraced radical agency, trusting the player." },
-      { text: "📖 Structure a tight, authored narrative → Control the message", target: "control_path", effect: (s) => modifyPersonality(s, -5, 5, 12), history: "Chose structure over chaos, seeking safety." }
-    ]
-  };
-  // FREEDOM PATH
-  NODES["freedom_path"] = {
-    id: "freedom_path", title: "OPEN BRANCHES", desc: "Kai builds sprawling dialogue trees, systemic reactions. The code breathes. Yet unease creeps: what if the player misses the emotional core?\n\nA hidden line in the console: 'you are being watched.' Kai freezes.\n\"Wait… is someone controlling me?\"",
-    choices: [
-      { text: "💡 'Lean into the meta — talk to the player'", target: "meta_awakening", effect: (s) => modifyPersonality(s, 18, 12, -10), history: "Kai addressed the entity beyond the screen." },
-      { text: "🔒 'Ignore the glitch, focus on mechanics'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, -5, -3, 15), history: "Suppressed the weirdness, clung to code." }
-    ]
-  };
-  // CONTROL PATH
-  NODES["control_path"] = {
-    id: "control_path", title: "STORY WEAVE", desc: "Kai writes poignant scenes of farewell, a linear arc about letting go. But the story feels hollow. \nDuring a late night, Kai's dev environment flickers: 'Personality Tracker updated: Avoidance +12' appears on screen.\nKai murmurs, 'This isn't my engine... who is designing me?'",
-    choices: [
-      { text: "🌀 'Investigate the anomaly — break fourth wall'", target: "meta_awakening", effect: (s) => modifyPersonality(s, 12, 5, -8), history: "Kai chose to question reality." },
-      { text: "📁 'Double down on scripted emotional beats'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, -3, 8, 9), history: "Avoided the unknown, tightened the script." }
-    ]
-  };
-  // META AWARENESS (shared)
-  NODES["meta_awakening"] = {
-    id: "meta_awakening", title: "/// THE FOURTH WALL CRACKS ///", desc: "Kai's terminal prints: 'Choice History: 3 decisions. Curiosity: XX.' Kai whispers: 'This is real. You're there, aren't you? Reading, deciding for me.'\n\nThe editor pulses with green light. Kai feels both terrified and electrified.\n\"If you shape me, what do you want me to become?\"",
-    choices: [
-      { text: "🤝 'Reassure Kai — we are co-creators'", target: "reflection_memory", effect: (s) => modifyPersonality(s, 10, 20, -10), history: "Offered empathy, forming a bond across the screen." },
-      { text: "⚡ 'Push Kai to finish the game at any cost'", target: "burnout_pressure", effect: (s) => modifyPersonality(s, 5, -8, 18), history: "Demanded productivity, ignoring vulnerability." },
-      { text: "🎭 'Remain silent, just observe' (unlocked if curiosity > 35)", target: "feedback_loop", condition: (s) => s.personality.curiosity > 35, effect: (s) => modifyPersonality(s, 5, 2, -2), history: "Chose silent observation, deepening mystery." }
-    ]
-  };
-  // BURNOUT / PRESSURE
-  NODES["burnout_pressure"] = {
-    id: "burnout_pressure", title: "FRACTURED FOCUS", desc: "Kai slumps, staring at the branching tree. 'Nothing feels honest. I'm just simulating feelings.' The story map shows locked paths — doors that remain shut.\nKai's doubt: 'Maybe I should abandon everything.'",
-    choices: [
-      { text: "🌱 'Encourage Kai to rest and reflect' (connection > 28 ? opens insight)", target: "reflection_memory", condition: (s) => s.personality.connection > 28, effect: (s) => modifyPersonality(s, 5, 12, -6), history: "Chose healing over grind." },
-      { text: "💥 'Force a last sprint — ship broken or finished'", target: "final_standoff", effect: (s) => modifyPersonality(s, -5, -10, 15), history: "Pushed through exhaustion, risking collapse." },
-      { text: "📂 'Delve into old prototypes to find meaning'", target: "feedback_loop", effect: (s) => modifyPersonality(s, 18, 6, -5), history: "Rediscovered forgotten sparks." }
-    ]
-  };
-  // REFLECTION / MEMORY (emotional depth)
-  NODES["reflection_memory"] = {
-    id: "reflection_memory", title: "ECHOES OF ORIGINS", desc: "Kai loads an old audio log: 'I started making games because they let me talk about change without pretending to have answers.'\nTears well. 'I forgot that.' The Personality Tracker shifts — Connection rises. Kai smiles sadly.\n\"Maybe the game isn't about control — it's about witnessing each other's choices.\"",
-    choices: [
-      { text: "✨ 'Build the final act as a shared confession'", target: "final_standoff", effect: (s) => modifyPersonality(s, 8, 15, -8), history: "Choice: final chapter as vulnerable art." },
-      { text: "🌀 'Loop back, restructure the narrative from scratch'", target: "feedback_loop", effect: (s) => modifyPersonality(s, 12, 8, -4), history: "Decided to reimagine everything." }
-    ]
-  };
-  // FEEDBACK LOOP (extra branching before climax)
-  NODES["feedback_loop"] = {
-    id: "feedback_loop", title: "ITERATION GHOSTS", desc: "Kai opens a recursive mirror: every choice you made reflects in the game's code. 'See? You wanted me to be curious… or avoid pain. But I'm real. This ending will be ours.'\nThe story map flickers. locked nodes whisper possibilities.",
-    choices: [
-      { text: "🔓 'Accept the mess — complete the imperfect game'", target: "final_standoff", effect: (s) => modifyPersonality(s, 5, 12, -5), history: "Chose radical acceptance." },
-      { text: "🚪 'Walk away from the project — protection from failure'", target: "ending_regret", effect: (s) => modifyPersonality(s, -8, -15, 20), history: "Kai abandoned the project in fear." },
-      { text: "🕯️ 'Reconnect with the original spark — a new promise' (Curiosity > 40)", target: "final_standoff", condition: (s) => s.personality.curiosity > 40, effect: (s) => modifyPersonality(s, 10, 14, -6), history: "Rekindled authentic purpose." }
-    ]
-  };
-  // FINAL STANDOFF (climax before endings)
-  NODES["final_standoff"] = {
-    id: "final_standoff", title: "LAST COMMIT", desc: "Kai sits before two builds: one broken but honest, one polished but hollow. 'Every path led here. You shaped my doubts, my hope. I see the history. Now it's our last choice.'\nThe screen asks: How do we close this loop?",
-    choices: [
-      { text: "❤️‍🩹 'Release the raw, unfinished version — acceptance of flaws'", target: "ending_acceptance", effect: (s) => modifyPersonality(s, 5, 18, -10), history: "Chose vulnerability over perfection." },
-      { text: "🕊️ 'Walk away for good — let the project dissolve'", target: "ending_regret", effect: (s) => modifyPersonality(s, -10, -20, 28), history: "Surrendered to regret and silence." },
-      { text: "🌄 'Start a new, smaller game — moving forward with lessons'", target: "ending_move_forward", effect: (s) => modifyPersonality(s, 15, 12, -12), history: "Found courage to begin again." },
-      { text: "🎨 'Rewrite the engine: craft a personal letter to yourself' (Connection >= 50)", target: "ending_reconnection", condition: (s) => s.personality.connection >= 50, effect: (s) => modifyPersonality(s, 12, 20, -5), history: "Reconnected to art as catharsis." }
-    ]
-  };
-  // ENDINGS (4 distinct emotional resolutions)
-  NODES["ending_acceptance"] = { id: "ending_acceptance", title: "✧ ACCEPTANCE ✧", desc: "Kai uploads 'Echoes of the Loop' to a tiny gallery. It's fragile, jagged, beautiful. Players leave notes: 'This game saw me.' Kai smiles, crying softly.\n'I'm not a finished product either. We grow through choices, not despite them.'\nThe loop closes — but with tenderness.", isEnding: true, choices: [] };
-  NODES["ending_regret"] = { id: "ending_regret", title: "✦ REGRET ✦", desc: "Months later, dusty files remain on an old drive. Kai works a quiet job, never finishing the narrative. One night, Kai dreams of the branching tree — paths forever gray.\n'I could have tried, but I was afraid.'\nThe cursor blinks, unanswered.", isEnding: true, choices: [] };
-  NODES["ending_move_forward"] = { id: "ending_move_forward", title: "🌅 MOVING FORWARD", desc: "Kai begins a minimalist comic about growth and second chances, leaving game dev behind for a while. 'The story changes shape, but doesn't vanish.'\nPeace arrives like morning light. The player watches Kai find a new horizon.", isEnding: true, choices: [] };
-  NODES["ending_reconnection"] = { id: "ending_reconnection", title: "💫 RECONNECTION", desc: "Kai releases 'Fragments of Us' — a tiny interactive poem about creative vulnerability. Family and strangers alike share memories. Kai feels whole again.\n'You helped me remember why stories matter. Thank you.'\nThe sidebar fades, but the warmth remains.", isEnding: true, choices: [] };
+      platform_hold: {
+        title: "Platform 8, Still Waiting",
+        text: "You remain beneath the station lights as trains breathe in and out of the night.\nYou are still at Platform 8, and this time the choice is fully yours.",
+        options: [
+          {
+            id: "hold_city",
+            aliases: ["board city", "take city", "city of glass", "go city", "train city", "board glass"],
+            hint: "Board the City of Glass.",
+            target: "train_two",
+            train: "City of Glass",
+            effects: { wonder: 1, risk: 1 },
+            status: "You finally step into the mirrored lights of the city train."
+          },
+          {
+            id: "hold_coast",
+            aliases: ["board coast", "take coast", "endless coast", "go coast", "train coast", "board sea"],
+            hint: "Board the Endless Coast.",
+            target: "train_two",
+            train: "Endless Coast",
+            effects: { curiosity: 1, wonder: 1 },
+            status: "You choose the line that smells faintly of salt."
+          },
+          {
+            id: "hold_library",
+            aliases: ["board library", "take library", "last library", "go library", "train library", "board books"],
+            hint: "Board the Last Library.",
+            target: "train_two",
+            train: "Last Library",
+            effects: { curiosity: 1, honesty: 1 },
+            status: "The doors close softly behind you, like a book shutting."
+          },
+          {
+            id: "hold_wait",
+            aliases: ["wait", "stay", "keep waiting", "remain", "just wait", "watch tracks"],
+            hint: "Keep waiting on Platform 8.",
+            target: "platform_hold",
+            train: "Stayed at Platform 8",
+            effects: { belonging: 1, avoidance: 1 },
+            status: "Another train comes and goes. You are still here."
+          }
+        ]
+      },
 
-  // extra security: add empty choices for endings
-  for(let e of ["ending_acceptance","ending_regret","ending_move_forward","ending_reconnection"]) {
-    NODES[e].choices = NODES[e].choices || [];
-    NODES[e].isEnding = true;
-  }
+      train_two: {
+        title: "Another Arrival",
+        text: "At the next stop, fresh doors bloom open. Destination signs flicker with impossible names.",
+        options: [
+          {
+            id: "observatory",
+            aliases: ["mountain", "observatory", "go observatory", "board mountain", "take observatory", "mountain observatory"],
+            hint: "Take the Mountain Observatory.",
+            target: "q_before",
+            train: "Mountain Observatory",
+            effects: { curiosity: 2, risk: 1 },
+            status: "You choose height, silence, and faraway light."
+          },
+          {
+            id: "market",
+            aliases: ["floating market", "market", "go market", "board market", "take market", "lantern market"],
+            hint: "Take the Floating Market.",
+            target: "q_before",
+            train: "Floating Market",
+            effects: { belonging: 2, wonder: 1 },
+            status: "Lanterns sway, and voices pull you forward."
+          },
+          {
+            id: "libraryagain",
+            aliases: ["last library", "library", "go library", "train library", "take library", "board library"],
+            hint: "Take the Last Library.",
+            target: "q_before",
+            train: "Last Library",
+            effects: { curiosity: 1, honesty: 1, wonder: 1 },
+            status: "You follow the scent of old paper and rain."
+          },
+          {
+            id: "citytransfer",
+            aliases: ["city transfer", "city of glass", "take city", "go city", "board city", "glass city"],
+            hint: "Take the City of Glass transfer.",
+            target: "q_before",
+            train: "City of Glass",
+            effects: { wonder: 2, risk: 1 },
+            status: "Neon reflections ripple over your hands as you board."
+          }
+        ]
+      },
 
-  // ---------------- GLOBAL STATE ----------------
-  let gameState = {
-    currentNodeId: "start",
-    visitedNodes: new Set(["start"]),
-    personality: { curiosity: 28, connection: 22, avoidance: 20 },
-    flags: { sawMeta: false, hasEmpathy: false },
-    history: []   // list of strings (choices)
-  };
+      q_before: {
+        title: "Question Under Fluorescent Light",
+        text: "An old woman beneath a red umbrella studies you and asks:\n\"Have you ever been here before?\"",
+        options: [
+          {
+            id: "yes",
+            aliases: ["yes", "yeah", "i have", "before yes", "been here yes", "yes i have"],
+            hint: "Answer yes.",
+            target: "museum",
+            effects: { honesty: 1, belonging: 1 },
+            status: "You answer as if memory were a station you can still reach."
+          },
+          {
+            id: "no",
+            aliases: ["no", "never", "not before", "before no", "i have not", "nope"],
+            hint: "Answer no.",
+            target: "museum",
+            effects: { honesty: 1, curiosity: 1 },
+            status: "You keep your voice clear, almost ceremonial."
+          },
+          {
+            id: "dontknow",
+            aliases: ["i dont know", "don't know", "unsure", "not sure", "maybe", "cannot tell", "idk"],
+            hint: "Answer I don't know.",
+            target: "museum",
+            effects: { wonder: 1, curiosity: 1, honesty: 1 },
+            status: "The truth is uncertain, and still somehow true."
+          },
+          {
+            id: "lie",
+            aliases: ["lie", "make it up", "fake answer", "pretend", "dishonest", "tell a lie"],
+            hint: "Lie to her.",
+            target: "museum",
+            effects: { risk: 1, avoidance: 1 },
+            status: "She nods anyway, as if she expected that answer."
+          },
+          {
+            id: "silence",
+            aliases: ["silent", "stay silent", "smile", "smile silently", "no answer", "just smile"],
+            hint: "Smile and stay silent.",
+            target: "museum",
+            effects: { avoidance: 1, wonder: 1 },
+            status: "She accepts your silence as if it were an answer."
+          },
+          {
+            id: "questionback",
+            aliases: ["ask her", "ask back", "have you", "you first", "your turn", "what about you"],
+            hint: "Ask her if she has been here before.",
+            target: "museum",
+            effects: { curiosity: 2, honesty: 1 },
+            status: "She laughs softly, like a clock striking midnight."
+          },
+          {
+            id: "showticket",
+            aliases: ["show ticket", "ticket", "hand ticket", "offer ticket", "i show my ticket", "present ticket"],
+            hint: "Show her your ticket instead of answering.",
+            target: "museum",
+            effects: { risk: 1, wonder: 1 },
+            status: "She reads your blank destination and steps aside."
+          }
+        ]
+      },
 
-  // helper update personality UI + store
-  function applyEffects(effectsFn, state, choiceHistoryText) {
-    if(effectsFn) effectsFn(state);
-    if(choiceHistoryText) state.history.unshift(choiceHistoryText);
-    if(state.history.length > 12) state.history.pop();
-  }
+      museum: {
+        title: "The Museum of Unlived Lives",
+        text: "One train is missing from the board.\nIts sign reads: Museum of Unlived Lives.\n\nInside, rooms stand open:\nArtist, Scientist, Explorer, Teacher, Caregiver, Drifter, Poet, Inventor, Archivist.",
+        options: [
+          {
+            id: "artist",
+            aliases: ["enter artist", "artist", "go artist", "room artist", "choose artist", "visit artist"],
+            hint: "Enter Artist.",
+            target: "final_question",
+            train: "Museum - Artist",
+            effects: { wonder: 2, curiosity: 1 },
+            status: "Color clings to your hands, and you do not wash it away."
+          },
+          {
+            id: "scientist",
+            aliases: ["enter scientist", "scientist", "go scientist", "room scientist", "choose scientist", "visit scientist"],
+            hint: "Enter Scientist.",
+            target: "final_question",
+            train: "Museum - Scientist",
+            effects: { curiosity: 2, honesty: 1 },
+            status: "You write careful notes no one asked you to keep."
+          },
+          {
+            id: "explorer",
+            aliases: ["enter explorer", "explorer", "go explorer", "room explorer", "choose explorer", "visit explorer"],
+            hint: "Enter Explorer.",
+            target: "final_question",
+            train: "Museum - Explorer",
+            effects: { risk: 2, curiosity: 1 },
+            status: "You keep opening doors hidden behind doors."
+          },
+          {
+            id: "teacher",
+            aliases: ["enter teacher", "teacher", "go teacher", "room teacher", "choose teacher", "visit teacher"],
+            hint: "Enter Teacher.",
+            target: "final_question",
+            train: "Museum - Teacher",
+            effects: { belonging: 2, honesty: 1 },
+            status: "You speak, and people lean in without realizing it."
+          },
+          {
+            id: "caregiver",
+            aliases: ["enter caregiver", "caregiver", "go caregiver", "room caregiver", "choose caregiver", "visit caregiver"],
+            hint: "Enter Caregiver.",
+            target: "final_question",
+            train: "Museum - Caregiver",
+            effects: { belonging: 2, wonder: 1 },
+            status: "You stay until everyone else can breathe easier."
+          },
+          {
+            id: "drifter",
+            aliases: ["enter drifter", "drifter", "go drifter", "room drifter", "choose drifter", "visit drifter"],
+            hint: "Enter Drifter.",
+            target: "final_question",
+            train: "Museum - Drifter",
+            effects: { avoidance: 2, risk: 1 },
+            status: "You leave each room before the lights can settle."
+          },
+          {
+            id: "hallway",
+            aliases: ["hallway", "walk hallway", "walk corridor", "choose none", "skip room", "read doors"],
+            hint: "Walk the hallway without entering a room.",
+            target: "final_question",
+            train: "Museum - Hallway",
+            effects: { curiosity: 1, avoidance: 1 },
+            status: "You read every door and choose none of them."
+          },
+          {
+            id: "poet",
+            aliases: ["enter poet", "poet", "go poet", "room poet", "choose poet", "visit poet"],
+            hint: "Enter Poet.",
+            target: "final_question",
+            train: "Museum - Poet",
+            effects: { wonder: 2, honesty: 1 },
+            status: "You collect unfinished lines from the corners of the room."
+          },
+          {
+            id: "inventor",
+            aliases: ["enter inventor", "inventor", "go inventor", "room inventor", "choose inventor", "visit inventor"],
+            hint: "Enter Inventor.",
+            target: "final_question",
+            train: "Museum - Inventor",
+            effects: { curiosity: 2, risk: 1 },
+            status: "Brass gears and strange sketches hum to life around you."
+          },
+          {
+            id: "archivist",
+            aliases: ["enter archivist", "archivist", "go archivist", "room archivist", "choose archivist", "visit archivist"],
+            hint: "Enter Archivist.",
+            target: "final_question",
+            train: "Museum - Archivist",
+            effects: { honesty: 2, belonging: 1 },
+            status: "You catalog moments you thought were already gone."
+          }
+        ]
+      },
 
-  // process transition
-  function makeChoice(choice) {
-    if(gameState.gameEnded) return;
-    let currentNode = NODES[gameState.currentNodeId];
-    if(!currentNode || (currentNode.isEnding)) return;
-    
-    // condition check
-    if(choice.condition && !choice.condition(gameState)) return;
-    
-    // apply personality/history effects
-    applyEffects(choice.effect, gameState, choice.history);
-    let targetId = choice.target;
-    if(!NODES[targetId]) return;
-    
-    // meta flag if target involves meta
-    if(targetId === "meta_awakening") gameState.flags.sawMeta = true;
-    if(targetId === "reflection_memory") gameState.flags.hasEmpathy = true;
-    
-    gameState.currentNodeId = targetId;
-    gameState.visitedNodes.add(targetId);
-    
-    // check ending
-    if(NODES[targetId].isEnding) gameState.gameEnded = true;
-    renderAll();
-  }
-  
-  // restart game fresh
-  function restartGame() {
-    gameState = {
-      currentNodeId: "start",
-      visitedNodes: new Set(["start"]),
-      personality: { curiosity: 28, connection: 22, avoidance: 20 },
-      flags: { sawMeta: false, hasEmpathy: false },
-      history: [],
-      gameEnded: false
-    };
-    renderAll();
-  }
-  
-  // RENDER all: story panel + sidebar personality + history + story map (locked branches fully visible)
-  function renderAll() {
-    renderStory();
-    renderPersonalitySidebar();
-    renderHistory();
-    renderStoryMap();    // shows all nodes + locked/unlocked branches for each node
-  }
-  
-  function renderStory() {
-    const node = NODES[gameState.currentNodeId];
-    if(!node) return;
-    document.getElementById("nodeTitle").innerHTML = node.title;
-    let textWithValues = node.desc
-      .replace(/Curiosity: XX/g, `Curiosity: ${gameState.personality.curiosity}`)
-      .replace(/Connection: \d+/g, `Connection: ${gameState.personality.connection}`);
-    document.getElementById("storyText").innerHTML = textWithValues;
-    
-    const choicesDiv = document.getElementById("choicesContainer");
-    choicesDiv.innerHTML = "";
-    if(node.isEnding) {
-      const msg = document.createElement("em");
-      msg.innerText = "✦ journey complete. restart to experience new branches ✦";
-      msg.style.opacity = "0.7";
-      choicesDiv.appendChild(msg);
-      return;
-    }
-    for(let ch of node.choices) {
-      let conditionOk = true;
-      if(ch.condition && !ch.condition(gameState)) conditionOk = false;
-      const btn = document.createElement("button");
-      btn.className = "choice-btn";
-      btn.innerText = ch.text;
-      if(!conditionOk) {
-        btn.disabled = true;
-        btn.style.opacity = "0.4";
-        btn.style.cursor = "not-allowed";
-        btn.title = "Locked branch (personality or flag requirement not met)";
-      } else {
-        btn.onclick = () => makeChoice(ch);
+      final_question: {
+        title: "Dawn at Platform 8",
+        text: "Morning light spills across the platform.\nAn old conductor appears and studies your face for a long moment.\n\n\"So. After all this time. Who are you?\"",
+        options: [
+          {
+            id: "withoutwords",
+            aliases: ["silent", "without words", "say nothing", "nod", "look at tracks", "answer silently"],
+            hint: "Answer without words.",
+            action: "reveal",
+            effects: {},
+            status: "You look down the tracks and let your choices speak for you."
+          },
+          {
+            id: "searching",
+            aliases: ["i am still searching", "still searching", "searching", "i search", "say searching", "im searching"],
+            hint: "Say: I am still searching.",
+            action: "reveal",
+            effects: { curiosity: 1, risk: 1 },
+            status: "The conductor nods, as if this was always possible."
+          },
+          {
+            id: "stays",
+            aliases: ["i am someone who stays", "someone who stays", "i stay", "stays", "say i stay", "i remain"],
+            hint: "Say: I am someone who stays.",
+            action: "reveal",
+            effects: { belonging: 1, honesty: 1 },
+            status: "The morning air settles around your voice."
+          },
+          {
+            id: "madeofmany",
+            aliases: ["i am made of many versions", "many versions", "many selves", "all of them", "i contain many", "many lives"],
+            hint: "Say: I am made of many versions.",
+            action: "reveal",
+            effects: { wonder: 1, honesty: 1 },
+            status: "The conductor smiles like someone closing a well-loved book."
+          },
+          {
+            id: "stilllearning",
+            aliases: ["i am still learning", "still learning", "learning", "not finished", "i am unfinished", "becoming"],
+            hint: "Say: I am still learning.",
+            action: "reveal",
+            effects: { curiosity: 1, wonder: 1 },
+            status: "The station lights brighten, as if approving unfinished answers."
+          },
+          {
+            id: "protecting",
+            aliases: ["i protect others", "protect others", "guardian", "i am a guardian", "i keep people safe", "protecting"],
+            hint: "Say: I stay to protect others.",
+            action: "reveal",
+            effects: { belonging: 2 },
+            status: "A warm breeze passes, carrying the sound of home."
+          }
+        ]
       }
-      choicesDiv.appendChild(btn);
+    };
+
+    const IDENTITY_ARCHETYPES = [
+      {
+        id: "unknown_seeker",
+        when: (s) => s.curiosity + s.risk >= 10 && s.curiosity >= s.belonging,
+        line: "You became someone who always chose the unknown.",
+        ending: "You followed strange routes not to escape life, but to feel its edges widen."
+      },
+      {
+        id: "harbor_keeper",
+        when: (s) => s.belonging >= 7 && s.belonging > s.risk,
+        line: "You became someone who stayed when others left.",
+        ending: "You learned that agency can also mean tending one place until it becomes shelter for many."
+      },
+      {
+        id: "honest_witness",
+        when: (s) => s.honesty >= 7,
+        line: "You became someone who answered even when certainty hurt.",
+        ending: "In a station full of mirrors, you chose clarity over softness."
+      },
+      {
+        id: "dream_cartographer",
+        when: (s) => s.wonder >= 7,
+        line: "You became someone who followed wonder and made meaning from symbols.",
+        ending: "You treated every destination like a poem, and let each one rewrite you."
+      },
+      {
+        id: "restless_runner",
+        when: (s) => s.avoidance >= 7 && s.avoidance >= s.belonging,
+        line: "You became someone who kept moving so no place could ask too much.",
+        ending: "The station remembers your footsteps long after it forgets your voice."
+      },
+      {
+        id: "woven_self",
+        when: () => true,
+        line: "You became someone made from many directions at once.",
+        ending: "You did not choose one life. You chose a self that can keep changing shape."
+      }
+    ];
+
+    const state = {
+      sceneId: "intro",
+      arrival: 1,
+      verboseMode: true,
+      scores: {
+        curiosity: 0,
+        belonging: 0,
+        honesty: 0,
+        risk: 0,
+        wonder: 0,
+        avoidance: 0
+      },
+      chosenStops: [],
+      ended: false
+    };
+
+    const terminalEl = document.getElementById("terminal");
+    const commandInputEl = document.getElementById("commandInput");
+
+    function categorizeOptions(options) {
+      const travel = [];
+      const people = [];
+      const other = [];
+
+      options.forEach((opt) => {
+        const text = (opt.hint || "").toLowerCase();
+        if (text.includes("train") || text.includes("platform") || text.includes("ride") || text.includes("take ") || text.includes("transfer") || text.includes("hallway") || text.includes("board")) {
+          travel.push(opt);
+        } else if (text.includes("stranger") || text.includes("artist") || text.includes("scientist") || text.includes("explorer") || text.includes("teacher") || text.includes("caregiver") || text.includes("drifter") || text.includes("answer") || text.includes("say")) {
+          people.push(opt);
+        } else {
+          other.push(opt);
+        }
+      });
+
+      return { travel, people, other };
     }
-  }
-  
-  function renderPersonalitySidebar() {
-    const c = gameState.personality.curiosity;
-    const conn = gameState.personality.connection;
-    const av = gameState.personality.avoidance;
-    document.getElementById("curiosityVal").innerText = c;
-    document.getElementById("connectionVal").innerText = conn;
-    document.getElementById("avoidanceVal").innerText = av;
-    document.getElementById("curiosityFill").style.width = `${c}%`;
-    document.getElementById("connectionFill").style.width = `${conn}%`;
-    document.getElementById("avoidanceFill").style.width = `${av}%`;
-  }
-  
-  function renderHistory() {
-    const histContainer = document.getElementById("historyList");
-    histContainer.innerHTML = "";
-    if(gameState.history.length === 0) {
-      histContainer.innerHTML = "<li>— no choices yet —</li>";
-    } else {
-      gameState.history.slice(0,10).forEach(h => {
-        const li = document.createElement("li");
-        li.innerText = h;
-        histContainer.appendChild(li);
+
+    function addLine(text, type = "sys") {
+      const line = document.createElement("div");
+      line.className = `line ${type}`;
+      line.textContent = text;
+      terminalEl.appendChild(line);
+      terminalEl.scrollTop = terminalEl.scrollHeight;
+    }
+
+    function normalize(command) {
+      return command.toLowerCase().trim().replace(/\s+/g, " ");
+    }
+
+    function narrativeResponse(text) {
+      addLine(text, "sys");
+      return true;
+    }
+
+    function aliasMatches(input, alias) {
+      if (input === alias) return true;
+      const aliasWords = alias.split(" ").filter(Boolean);
+      if (!aliasWords.length) return false;
+      return aliasWords.every((w) => input.includes(w));
+    }
+
+    function applyEffects(effects) {
+      Object.entries(effects || {}).forEach(([key, amount]) => {
+        if (state.scores[key] !== undefined) {
+          state.scores[key] = Math.max(0, state.scores[key] + amount);
+        }
       });
     }
-  }
-  
-  // **** STORY MAP: shows all major branches, visited nodes, current node, locked branches, possible future paths ****
-  function renderStoryMap() {
-    const container = document.getElementById("storyMapContainer");
-    container.innerHTML = "";
-    const allNodeIds = Object.keys(NODES);
-    for(let nid of allNodeIds) {
-      const node = NODES[nid];
-      const isVisited = gameState.visitedNodes.has(nid);
-      const isCurrent = gameState.currentNodeId === nid;
-      const nodeDiv = document.createElement("div");
-      nodeDiv.className = "node-entry";
-      let titleHtml = `<div class="node-title"><strong>${node.title.substring(0,24)}</strong> `;
-      if(isVisited) titleHtml += `<span class="node-badge visited">✓ visited</span>`;
-      if(isCurrent) titleHtml += `<span class="node-badge current">◉ current</span>`;
-      titleHtml += `</div>`;
-      nodeDiv.innerHTML = titleHtml;
-      
-      // list outgoing branches (choices) and show locked/unlocked status based on current global state
-      if(node.choices && node.choices.length > 0) {
-        const branchUl = document.createElement("ul");
-        branchUl.className = "branch-list";
-        for(let ch of node.choices) {
-          let isLocked = false;
-          if(ch.condition && !ch.condition(gameState)) isLocked = true;
-          const targetNodeName = NODES[ch.target] ? NODES[ch.target].title.substring(0,28) : ch.target;
-          const li = document.createElement("li");
-          if(isLocked) {
-            li.innerHTML = `<span class="locked-branch">🔒 ${ch.text.substring(0,28)} → ${targetNodeName} [locked]</span>`;
-          } else {
-            li.innerHTML = `🔓 ${ch.text.substring(0,28)} → ${targetNodeName}`;
-          }
-          branchUl.appendChild(li);
+
+    function chooseIdentity() {
+      for (const archetype of IDENTITY_ARCHETYPES) {
+        if (archetype.when(state.scores)) {
+          return archetype;
         }
-        nodeDiv.appendChild(branchUl);
-      } else {
-        const endingNote = document.createElement("div");
-        endingNote.style.fontSize = "0.65rem";
-        endingNote.style.marginTop = "4px";
-        endingNote.style.color = "#7B9B8A";
-        endingNote.innerText = "↳ endpoint / conclusion";
-        nodeDiv.appendChild(endingNote);
       }
-      container.appendChild(nodeDiv);
+      return IDENTITY_ARCHETYPES[IDENTITY_ARCHETYPES.length - 1];
     }
-    // extra: show "possible future paths from current node" specifically
-    const current = NODES[gameState.currentNodeId];
-    if(current && current.choices && current.choices.length > 0 && !current.isEnding) {
-      const futureDiv = document.createElement("div");
-      futureDiv.style.marginTop = "12px";
-      futureDiv.style.borderTop = "1px solid #345343";
-      futureDiv.style.paddingTop = "8px";
-      futureDiv.innerHTML = `<span style="font-weight:bold;">⚡ POSSIBLE NEXT (current node):</span><br/>`;
-      for(let ch of current.choices) {
-        let unlock = (!ch.condition || ch.condition(gameState)) ? "✅" : "🔒 locked";
-        futureDiv.innerHTML += `<span style="font-size:0.7rem;">${ch.text} → ${unlock}</span><br/>`;
+
+    function getMainTravelDestinations(sceneId) {
+      const scene = SCENES[sceneId];
+      if (!scene || !Array.isArray(scene.options)) return [];
+
+      const destinations = [];
+      scene.options.forEach((opt) => {
+        const trainName = (opt.train || "").trim();
+        if (!trainName) return;
+        if (/stayed at platform/i.test(trainName)) return;
+        if (!destinations.includes(trainName)) {
+          destinations.push(trainName);
+        }
+      });
+
+      return destinations;
+    }
+
+    function renderScene() {
+      const scene = SCENES[state.sceneId];
+      if (!scene) return;
+
+      const storyOptions = [];
+
+      let destinations = getMainTravelDestinations(state.sceneId);
+      if (destinations.length === 0 && state.sceneId === "q_family_platform") {
+        destinations = getMainTravelDestinations("platform_hold");
       }
-      container.appendChild(futureDiv);
+
+      if (destinations.length > 0 && state.sceneId !== "museum") {
+        storyOptions.push(`You can travel to: ${destinations.join(", ")}.`);
+      }
+
+      const sceneWithOptions = storyOptions.length > 0
+        ? `${scene.text}\n\n${storyOptions.join("\n")}`
+        : scene.text;
+
+      document.getElementById("sceneTitle").textContent = scene.title;
+      document.getElementById("sceneText").textContent = sceneWithOptions;
+      document.getElementById("roundLabel").textContent = `Arrival ${Math.min(state.arrival, 6)}`;
     }
-  }
-  
-  // initial load and glitch effect meta subtle
-  function init() {
-    renderAll();
-    document.getElementById("restartGameBtn").addEventListener("click", () => {
-      restartGame();
-      const panel = document.getElementById("storyPanel");
-      panel.classList.add("glitch-moment");
-      setTimeout(() => panel.classList.remove("glitch-moment"), 300);
-    });
-    // add small style to locked branch tooltip 
-  }
-  
-  init();
-</script>
+
+    function showHelp() {
+      addLine("Commands: help, look, options, routes, stats, restart", "sys");
+      addLine("Scene commands are free-form. Try short forms like: board city, stay, ask back, enter artist.", "sys");
+      addLine("Classic parser commands are also supported: directions, go/enter/in/out, get/take, drop, open, close, read, examine, inventory, jump, pray, shout, and wand words.", "sys");
+    }
+
+    function describeSceneInTerminal() {
+      const scene = SCENES[state.sceneId];
+      if (!scene) return;
+
+      addLine(`[${scene.title}]`, "sys");
+      addLine(scene.text, "sys");
+
+      if (state.sceneId === "intro") {
+        addLine("You pat your pocket. The ticket is real, but the destination field is still blank.", "sys");
+      }
+    }
+
+    function showOptions() {
+      const scene = SCENES[state.sceneId];
+      if (!scene || state.ended) {
+        addLine("No scene options right now. Type restart.", "sys");
+        return;
+      }
+
+      const groups = categorizeOptions(scene.options);
+
+      addLine("Travel options:", "sys");
+      if (groups.travel.length === 0) addLine("- None in this scene.", "sys");
+      groups.travel.forEach((opt) => {
+        addLine(`- ${opt.hint}`, "sys");
+      });
+
+      addLine("People options:", "sys");
+      if (groups.people.length === 0) addLine("- None in this scene.", "sys");
+      groups.people.forEach((opt) => {
+        addLine(`- ${opt.hint}`, "sys");
+      });
+
+      if (groups.other.length > 0) {
+        addLine("Other options:", "sys");
+      }
+      groups.other.forEach((opt) => {
+        addLine(`- ${opt.hint}`, "sys");
+      });
+    }
+
+    function showRoutes() {
+      if (!state.chosenStops.length) {
+        addLine("Routes taken: none yet.", "sys");
+        return;
+      }
+      addLine("Routes taken:", "sys");
+      state.chosenStops.forEach((r) => addLine(`- ${r}`, "sys"));
+    }
+
+    function showStats() {
+      addLine(
+        `Scores -> curiosity:${state.scores.curiosity} belonging:${state.scores.belonging} honesty:${state.scores.honesty} risk:${state.scores.risk} wonder:${state.scores.wonder} avoidance:${state.scores.avoidance}`,
+        "sys"
+      );
+    }
+
+    function runOption(option) {
+      if (state.ended) return;
+
+      applyEffects(option.effects || {});
+      if (option.train) state.chosenStops.push(option.train);
+      document.getElementById("statusText").textContent = option.status;
+      addLine(option.status, "ok");
+
+      if (option.action === "reveal") {
+        const identity = chooseIdentity();
+        state.ended = true;
+
+        document.getElementById("sceneTitle").textContent = "Final Reveal";
+        document.getElementById("sceneText").textContent = `${identity.line}\n\n${identity.ending}\n\nRoutes you chose:\n${state.chosenStops.map((s) => `- ${s}`).join("\n") || "- You mostly stayed at Platform 8."}`;
+        document.getElementById("statusText").textContent = "Journey complete. Type restart to begin a new run.";
+        document.getElementById("roundLabel").textContent = "Journey Complete";
+        return;
+      }
+
+      state.sceneId = option.target;
+      state.arrival += 1;
+      renderScene();
+    }
+
+    function findSceneOption(command) {
+      const scene = SCENES[state.sceneId];
+      if (!scene || !scene.options) return null;
+
+      return scene.options.find((opt) => opt.aliases.some((alias) => aliasMatches(command, alias)));
+    }
+
+    function handleDirectionCommand(directionToken) {
+      const map = {
+        n: "north", s: "south", e: "east", w: "west",
+        ne: "northeast", nw: "northwest", se: "southeast", sw: "southwest",
+        u: "up", d: "down", in: "in", out: "out"
+      };
+      const dir = map[directionToken] || directionToken;
+      const option = findSceneOption(`go ${dir}`) || findSceneOption(`board ${dir}`) || findSceneOption(dir);
+      if (option) {
+        runOption(option);
+        return true;
+      }
+      return narrativeResponse(`You test the ${dir} side of the platform, but tonight all paths still loop through decision.`);
+    }
+
+    function handleClassicCommand(command) {
+      const oneWord = /^(north|south|east|west|northeast|northwest|southeast|southwest|up|down|in|out|n|s|e|w|ne|nw|se|sw|u|d)$/;
+      if (oneWord.test(command)) return handleDirectionCommand(command);
+
+      const goMatch = command.match(/^(go|enter|in|out)\s+(.+)$/);
+      if (goMatch) {
+        const option = findSceneOption(command) || findSceneOption(goMatch[2]);
+        if (option) {
+          runOption(option);
+          return true;
+        }
+        return narrativeResponse(`You try to go ${goMatch[2]}, but the station gives no clear route.`);
+      }
+
+      if (command === "climb") return narrativeResponse("You climb the footbridge and watch tracks split like threads of possibility.");
+      if (command === "save") return narrativeResponse("You commit this moment to memory. (Local save simulation complete.)");
+      if (command === "restore") return narrativeResponse("You steady yourself and return to the present platform.");
+      if (command === "verbose") {
+        state.verboseMode = true;
+        return narrativeResponse("Verbose mode on. The station will describe more.");
+      }
+      if (command === "brief") {
+        state.verboseMode = false;
+        return narrativeResponse("Brief mode on. Descriptions will stay compact.");
+      }
+      if (command === "superbrief") {
+        state.verboseMode = false;
+        return narrativeResponse("Superbrief mode on. The station will keep it terse.");
+      }
+      if (command === "score") return showStats(), true;
+      if (command === "diagnose") return narrativeResponse("You are physically fine. Emotionally: in transit.");
+      if (command === "quit" || command === "q") return narrativeResponse("You linger at the edge of leaving, then stay.");
+      if (command === "hello" || command === "hi") return narrativeResponse("A voice over the speaker answers: 'Good evening, traveler.'");
+      if (command === "zork") return narrativeResponse("At your service.");
+      if (command === "jump") return narrativeResponse("You jump once. The echo returns a second later.");
+
+      if (/^(get|take|grab) all$/.test(command)) return narrativeResponse("There is nothing you can carry except your next choice.");
+      if (/^(get|take|grab|pick)\s+.+$/.test(command)) return narrativeResponse("Your hand reaches out, but this station lends symbols, not possessions.");
+      if (/^drop\s+.+$/.test(command)) return narrativeResponse("You let go of it. The platform keeps no inventory.");
+      if (/^put\s+.+\s+in\s+.+$/.test(command)) return narrativeResponse("You try to tuck it away, but every container here is metaphorical.");
+      if (/^throw\s+.+\s+at\s+.+$/.test(command)) return narrativeResponse("You hold back at the last second. Nothing here needs violence.");
+      if (/^open\s+.+$/.test(command)) return narrativeResponse("You test the latch. Some doors open only when you choose a direction.");
+      if (/^close\s+.+$/.test(command)) return narrativeResponse("You close it gently and hear the click echo down the tracks.");
+      if (/^read\s+.+$/.test(command)) return narrativeResponse("You read carefully; the text blurs, then resolves into your own thoughts.");
+      if (/^(examine|x)\s+.+$/.test(command)) return narrativeResponse("On closer inspection, it reflects what you expected and what you feared.");
+      if (command === "inventory" || command === "i") return narrativeResponse("Inventory: 1 blank ticket, 1 uncertain memory, 0 certainties.");
+      if (/^turn on\s+.+$/.test(command)) return narrativeResponse("A small light wakes up nearby.");
+      if (/^turn off\s+.+$/.test(command)) return narrativeResponse("The glow dims and the station hum returns.");
+      if (/^turn\s+.+\s+with\s+.+$/.test(command)) return narrativeResponse("You apply careful force; somewhere, a mechanism answers.");
+      if (/^move\s+.+$/.test(command)) return narrativeResponse("It shifts an inch, then settles in its old meaning.");
+      if (/^(attack|kill)\s+.+$/.test(command)) return narrativeResponse("No combat here. The station asks for choices, not damage.");
+      if (/^kill self with\s+.+$/.test(command)) return narrativeResponse("Dark humor acknowledged. You choose to continue instead.");
+      if (/^break\s+.+\s+with\s+.+$/.test(command)) return narrativeResponse("You try to break it; it only becomes symbolic.");
+      if (/^tie\s+.+\s+to\s+.+$/.test(command)) return narrativeResponse("You knot them together. The bond holds.");
+      if (/^cut\s+.+\s+with\s+.+$/.test(command)) return narrativeResponse("The cut is clean, but the meaning remains.");
+      if (command === "eat" || /^eat\s+.+$/.test(command)) return narrativeResponse("You are not hungry, only searching.");
+      if (command === "drink" || /^drink\s+.+$/.test(command)) return narrativeResponse("You drink and feel the rails steady beneath you.");
+      if (command === "smell" || /^smell\s+.+$/.test(command)) return narrativeResponse("Cold air, metal, rain, and a faint memory of home.");
+      if (/^(shout|yell|scream)$/.test(command)) return narrativeResponse("Your voice bounces back louder than expected.");
+      if (command === "bar") return narrativeResponse("Bar bar... the station coughs static in response.");
+      if (/^listen(\s+.+)?$/.test(command)) return narrativeResponse("You listen: shoes on tile, distant brakes, someone turning a page.");
+      if (command === "pray") return narrativeResponse("You fold your hands. Somewhere a signal light turns green.");
+
+      const wandWords = [
+        "fall", "fantasize", "fear", "feeble", "fence", "ferment", "fierce", "filch", "fireproof", "float", "fluoresce",
+        "free", "freeze", "frobizz", "frobnoid", "frobozzle", "fry", "fudge", "fumble"
+      ];
+      if (wandWords.includes(command)) {
+        if (command === "fudge") return narrativeResponse("A strong odor of chocolate briefly permeates the room.");
+        return narrativeResponse(`The word '${command}' crackles in the air, but no wand answers your command.`);
+      }
+
+      return false;
+    }
+
+    function handleCommand(rawInput) {
+      const command = normalize(rawInput);
+      if (!command) return;
+
+      addLine(`> ${rawInput}`, "cmd");
+
+      if (command === "help" || command === "?") {
+        showHelp();
+        return;
+      }
+
+      if (command === "look" || command === "l") {
+        renderScene();
+        describeSceneInTerminal();
+        return;
+      }
+
+      if (command === "look at ticket" || command === "inspect ticket" || command === "check ticket" || command === "read ticket") {
+        if (state.sceneId === "intro") {
+          addLine("The ticket feels warm. Destination: [blank]. Platform: 8.", "sys");
+        } else {
+          addLine("The ticket is still blank where a destination should be.", "sys");
+        }
+        return;
+      }
+
+      if (command === "hints" || command === "hint") {
+        addLine("Hints are now shown directly in the scene text.", "sys");
+        return;
+      }
+
+      if (command === "options" || command === "commands") {
+        showOptions();
+        return;
+      }
+
+      if (command === "routes" || command === "route" || command === "history") {
+        showRoutes();
+        return;
+      }
+
+      if (command === "stats" || command === "score") {
+        showStats();
+        return;
+      }
+
+      if (command === "restart" || command === "reset" || command === "start over") {
+        resetGame();
+        addLine("Journey reset.", "sys");
+        return;
+      }
+
+      if (handleClassicCommand(command)) return;
+
+      if (state.ended) {
+        addLine("The journey is complete. Type restart to begin again.", "bad");
+        return;
+      }
+
+      const option = findSceneOption(command);
+      if (!option) {
+        addLine("The station does not understand that command. Type options.", "bad");
+        return;
+      }
+
+      runOption(option);
+    }
+
+    function resetGame() {
+      state.sceneId = "intro";
+      state.arrival = 1;
+      state.scores = {
+        curiosity: 0,
+        belonging: 0,
+        honesty: 0,
+        risk: 0,
+        wonder: 0,
+        avoidance: 0
+      };
+      state.chosenStops = [];
+      state.ended = false;
+
+      terminalEl.innerHTML = "";
+      document.getElementById("statusText").textContent = "A distant bell rings. Another train is arriving.";
+      renderScene();
+      addLine("Welcome to Platform 8. Type help to begin.", "sys");
+    }
+
+    function init() {
+      document.getElementById("commandForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = commandInputEl.value;
+        commandInputEl.value = "";
+        handleCommand(value);
+        commandInputEl.focus();
+      });
+
+      document.getElementById("restartBtn").addEventListener("click", () => {
+        resetGame();
+      });
+
+      resetGame();
+      addLine("Type help for command list.", "sys");
+      commandInputEl.focus();
+    }
+
+    init();
+  </script>
 </body>
 </html>
