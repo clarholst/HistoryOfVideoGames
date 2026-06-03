@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>心の蝕 - Mind's Eclipse</title>
+    <title>Mind's Eclipse</title>
     <style>
         :root {
             --bg: #1a1a24;
@@ -192,14 +192,16 @@
             left: 0;
             right: 0;
             height: 200px;
-            background: linear-gradient(to top, rgba(13,13,22,0.96) 0%, rgba(21,21,32,0.94) 30%, rgba(26,26,40,0.92) 100%);
-            border-top: 2px solid rgba(255, 255, 255, 0.08);
+            background:
+                linear-gradient(to top, rgba(10, 12, 20, 0.97) 0%, rgba(19, 20, 32, 0.95) 35%, rgba(27, 27, 44, 0.9) 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
             padding: 18px 20px 26px;
             z-index: 40;
             transition: filter 1.2s ease, background 1.2s ease;
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(8px);
+            box-shadow: 0 -12px 26px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         #speaker-name {
@@ -243,9 +245,9 @@
         }
 
         .choice-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #e8d5c0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #f0deca;
             padding: 10px 14px;
             border-radius: 6px;
             cursor: pointer;
@@ -260,12 +262,13 @@
             word-wrap: break-word;
             word-break: break-word;
             text-align: left;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 6px 12px rgba(0, 0, 0, 0.18);
         }
         .choice-btn:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.55);
             color: #fff;
-            box-shadow: 0 0 20px rgba(200, 160, 120, 0.2);
+            box-shadow: 0 0 22px rgba(230, 180, 135, 0.2), 0 8px 16px rgba(0, 0, 0, 0.26);
             transform: translateY(-1px);
         }
         .choice-btn:active {
@@ -333,6 +336,36 @@
             opacity: 1;
         }
 
+        /* Hallucination layer */
+        #hallucination-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 58;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(40, 0, 0, 0.16) 45%, rgba(0, 0, 0, 0.52) 100%);
+        }
+        #hallucination-layer.active {
+            opacity: 1;
+            animation: vignettePulse 0.45s ease-in-out 3;
+        }
+        #hallucination-whisper {
+            position: absolute;
+            left: 50%;
+            top: 46%;
+            transform: translate(-50%, -50%) rotate(-1deg);
+            color: rgba(230, 200, 185, 0.85);
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        #hallucination-layer.active #hallucination-whisper {
+            opacity: 1;
+        }
+
         @media (max-width: 540px) {
             body {
                 align-items: stretch;
@@ -390,10 +423,23 @@
 
         /* --- APARTMENT --- */
         .scene-apartment {
-            background: linear-gradient(180deg, #e8dcc8 0%, #d9cdb8 60%, #c4b99a 100%);
+            background:
+                radial-gradient(120% 70% at 50% -10%, rgba(255, 243, 224, 0.65) 0%, rgba(255, 243, 224, 0) 58%),
+                linear-gradient(180deg, #ecdfc9 0%, #d8c9b3 55%, #b8a588 100%);
             position: relative;
             width: 100%;
             height: 100%;
+        }
+        .scene-apartment::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(90deg, rgba(140, 118, 90, 0.07) 0, rgba(140, 118, 90, 0.07) 2px, transparent 2px, transparent 14px),
+                linear-gradient(180deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.12) 100%);
+            mix-blend-mode: multiply;
+            opacity: 0.42;
         }
         .apt-wall {
             position: absolute;
@@ -405,14 +451,17 @@
             left: 0;
             right: 0;
             height: 35%;
-            background: repeating-linear-gradient(0deg,
-                    #b8a88a 0px,
-                    #b8a88a 8px,
-                    #c2b295 8px,
-                    #c2b295 9px,
-                    #b8a88a 9px,
-                    #b8a88a 22px);
-            border-top: 3px solid #9b8b6f;
+            background:
+                repeating-linear-gradient(90deg, rgba(96, 76, 55, 0.14) 0, rgba(96, 76, 55, 0.14) 2px, transparent 2px, transparent 38px),
+                repeating-linear-gradient(0deg,
+                    #b9a889 0px,
+                    #b9a889 8px,
+                    #c8b79a 8px,
+                    #c8b79a 10px,
+                    #b9a889 10px,
+                    #b9a889 24px);
+            border-top: 3px solid #8f7f62;
+            box-shadow: inset 0 14px 26px rgba(255, 245, 225, 0.16);
         }
         .apt-window {
             position: absolute;
@@ -420,27 +469,25 @@
             left: 55%;
             width: 28%;
             height: 28%;
-            background: #0d1b2a;
-            border: 6px solid #6b4e3d;
-            border-radius: 3px;
-            box-shadow: inset 0 0 30px rgba(20, 40, 70, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: radial-gradient(circle at 50% 30%, #24374f 0%, #0d1b2a 62%, #08121c 100%);
+            border: 6px solid #604534;
+            border-radius: 4px;
+            box-shadow: inset 0 0 36px rgba(20, 40, 70, 0.72), 0 10px 22px rgba(0, 0, 0, 0.35);
             cursor: pointer;
             transition: all 0.5s ease;
         }
         .apt-window::after {
             content: '';
             position: absolute;
-            top: 15%;
-            left: 20%;
-            width: 8px;
-            height: 8px;
-            background: #f5f0e0;
-            border-radius: 50%;
-            box-shadow: 0 0 12px #f5f0e0, 0 0 25px rgba(240, 230, 200, 0.5);
-            opacity: 0.7;
+            inset: 0;
+            background:
+                radial-gradient(circle at 24% 20%, rgba(250, 242, 228, 0.9) 0 3px, transparent 4px),
+                linear-gradient(130deg, transparent 35%, rgba(190, 215, 240, 0.2) 45%, transparent 55%);
+            opacity: 0.75;
         }
         .apt-window:hover {
-            box-shadow: inset 0 0 40px rgba(30, 50, 80, 0.7), 0 4px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: inset 0 0 52px rgba(30, 50, 80, 0.78), 0 12px 26px rgba(0, 0, 0, 0.46);
+            transform: translateY(-1px);
         }
         .apt-plant-shelf {
             position: absolute;
@@ -448,9 +495,9 @@
             left: 18%;
             width: 55px;
             height: 8px;
-            background: #6b4e3d;
+            background: linear-gradient(180deg, #7b5d4a 0%, #52372a 100%);
             border-radius: 2px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 7px 10px rgba(0, 0, 0, 0.28);
         }
         .apt-plant {
             position: absolute;
@@ -549,9 +596,9 @@
             left: 10%;
             width: 35%;
             height: 18%;
-            background: #d5cfc5;
+            background: linear-gradient(180deg, #e2dbd0 0%, #cbc4b8 100%);
             border-radius: 18px 18px 4px 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24), inset 0 -3px 0 rgba(0, 0, 0, 0.1), inset 0 8px 18px rgba(255, 255, 255, 0.2);
             cursor: pointer;
             transition: all 0.4s ease;
         }
@@ -575,12 +622,12 @@
             right: 8%;
             width: 18%;
             height: 40%;
-            background: #8b6f5e;
+            background: linear-gradient(180deg, #947565 0%, #7f6353 100%);
             border: 4px solid #6b4e3d;
             border-radius: 4px 4px 0 0;
             cursor: pointer;
             transition: all 0.4s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: inset -8px 0 10px rgba(0, 0, 0, 0.12), 0 4px 14px rgba(0, 0, 0, 0.28);
         }
         .apt-door::after {
             content: '';
@@ -605,17 +652,29 @@
             height: 35px;
             background: radial-gradient(ellipse at center, #f5e6d0 0%, #d4b896 60%, #a08060 100%);
             border-radius: 50% 50% 30% 30%;
-            box-shadow: 0 0 40px rgba(240, 210, 170, 0.5), 0 0 80px rgba(220, 180, 140, 0.25);
+            box-shadow: 0 0 52px rgba(240, 210, 170, 0.58), 0 0 120px rgba(220, 180, 140, 0.34);
             pointer-events: none;
             transition: all 1.2s ease;
         }
 
         /* --- CORRIDOR --- */
         .scene-corridor {
-            background: linear-gradient(180deg, #c8c0b8 0%, #b8b0a8 50%, #9b9085 100%);
+            background:
+                linear-gradient(180deg, rgba(248, 244, 236, 0.24) 0%, rgba(248, 244, 236, 0) 28%),
+                linear-gradient(180deg, #c5beb7 0%, #a99f96 52%, #8f847a 100%);
             position: relative;
             width: 100%;
             height: 100%;
+        }
+        .scene-corridor::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(90deg, rgba(90, 82, 74, 0.08) 0, rgba(90, 82, 74, 0.08) 1px, transparent 1px, transparent 22px),
+                radial-gradient(120% 60% at 50% -4%, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            opacity: 0.5;
         }
         .corr-floor {
             position: absolute;
@@ -623,19 +682,20 @@
             left: 0;
             right: 0;
             height: 28%;
-            background: #8b8075;
+            background: linear-gradient(180deg, #877b71 0%, #6f645b 100%);
             border-top: 2px solid #70655c;
+            box-shadow: inset 0 12px 18px rgba(255, 255, 255, 0.08);
         }
         .corr-light {
             position: absolute;
             top: 5%;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
+            width: 76px;
             height: 8px;
             background: #f8f4ee;
             border-radius: 3px;
-            box-shadow: 0 0 40px rgba(255, 250, 240, 0.7), 0 0 80px rgba(240, 230, 210, 0.3);
+            box-shadow: 0 0 54px rgba(255, 250, 240, 0.76), 0 0 110px rgba(240, 230, 210, 0.4);
             pointer-events: none;
             transition: all 1.2s ease;
         }
@@ -644,19 +704,19 @@
             top: 14%;
             width: 16%;
             height: 42%;
-            background: #7a6a5c;
+            background: linear-gradient(180deg, #857467 0%, #6d5e52 100%);
             border: 3px solid #5a4a3c;
             border-radius: 3px 3px 0 0;
             cursor: pointer;
             transition: all 0.4s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: inset -10px 0 12px rgba(0, 0, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.26);
         }
         .corr-door.door-apt {
             right: 10%;
         }
         .corr-door.door-haruki {
             left: 12%;
-            background: #7d6d5f;
+            background: linear-gradient(180deg, #8a7a6c 0%, #756558 100%);
         }
         .corr-door:hover {
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
@@ -667,12 +727,12 @@
             left: 38%;
             width: 50px;
             height: 40px;
-            background: #e8e0d5;
+            background: linear-gradient(180deg, #ece5d9 0%, #d4cbbb 100%);
             border: 2px solid #c0b8a8;
             border-radius: 2px;
             cursor: pointer;
             transition: all 0.4s ease;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .corr-notice:hover {
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
@@ -711,11 +771,11 @@
             transform: translateX(-50%);
             width: 30%;
             height: 12%;
-            background: #70655c;
+            background: linear-gradient(180deg, #7c7067 0%, #655b53 100%);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.4s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 10px 12px rgba(255, 255, 255, 0.08), 0 5px 12px rgba(0, 0, 0, 0.28);
         }
         .corr-stairs::after {
             content: '▼';
@@ -733,10 +793,22 @@
 
         /* --- CONVENIENCE STORE --- */
         .scene-store {
-            background: linear-gradient(180deg, #f8f4ee 0%, #efe8dc 40%, #e0d8c8 100%);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.08) 25%, rgba(255, 255, 255, 0) 42%),
+                linear-gradient(180deg, #fbf7f0 0%, #ece2d1 46%, #d4c8b5 100%);
             position: relative;
             width: 100%;
             height: 100%;
+        }
+        .scene-store::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(90deg, rgba(194, 184, 160, 0.12) 0, rgba(194, 184, 160, 0.12) 1px, transparent 1px, transparent 18px),
+                linear-gradient(180deg, rgba(0, 0, 0, 0) 60%, rgba(90, 80, 64, 0.14) 100%);
+            opacity: 0.58;
         }
         .store-shelf {
             position: absolute;
@@ -744,10 +816,10 @@
             left: 10%;
             width: 35%;
             height: 50%;
-            background: #e8e0d0;
+            background: linear-gradient(180deg, #f1e8d9 0%, #ddd2bf 100%);
             border: 3px solid #c8c0a8;
             border-radius: 3px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: inset -12px 0 12px rgba(0, 0, 0, 0.09), 0 6px 14px rgba(0, 0, 0, 0.14);
             cursor: pointer;
             transition: all 0.4s ease;
         }
@@ -758,8 +830,8 @@
             left: 10%;
             right: 10%;
             height: 3px;
-            background: #d0c8b0;
-            box-shadow: 0 15px 0 #d0c8b0, 0 30px 0 #d0c8b0;
+            background: #c4b99e;
+            box-shadow: 0 18px 0 #c4b99e, 0 36px 0 #c4b99e;
         }
         .store-shelf:hover {
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
@@ -770,10 +842,10 @@
             left: 15%;
             width: 50%;
             height: 18%;
-            background: #d5cbb8;
+            background: linear-gradient(180deg, #dccfba 0%, #c7b79e 100%);
             border-top: 6px solid #c0b598;
             border-radius: 3px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            box-shadow: inset 0 10px 12px rgba(255, 255, 255, 0.15), 0 6px 14px rgba(0, 0, 0, 0.16);
             cursor: pointer;
             transition: all 0.4s ease;
         }
@@ -784,11 +856,11 @@
             position: absolute;
             top: 4%;
             left: 25%;
-            width: 50%;
+            width: 58%;
             height: 6px;
             background: #fffef8;
             border-radius: 3px;
-            box-shadow: 0 0 50px rgba(255, 252, 240, 0.8), 0 0 100px rgba(240, 235, 210, 0.4);
+            box-shadow: 0 0 64px rgba(255, 252, 240, 0.86), 0 0 130px rgba(240, 235, 210, 0.48);
             pointer-events: none;
         }
         .store-exit {
@@ -797,14 +869,136 @@
             right: 8%;
             width: 20%;
             height: 22%;
-            background: #c8c0b0;
+            background: linear-gradient(180deg, #d3c9b9 0%, #b2a893 100%);
             border: 3px solid #a09888;
             border-radius: 3px;
             cursor: pointer;
             transition: all 0.4s ease;
+            box-shadow: inset -8px 0 8px rgba(0, 0, 0, 0.1);
         }
         .store-exit:hover {
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        /* --- OUTSIDE DISTRICT HUB --- */
+        .scene-outside {
+            background:
+                radial-gradient(90% 65% at 50% 20%, rgba(255, 210, 150, 0.28) 0%, rgba(255, 210, 150, 0) 62%),
+                linear-gradient(180deg, #22293b 0%, #1b2435 52%, #111722 100%);
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .scene-outside::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(90deg, rgba(110, 124, 158, 0.07) 0, rgba(110, 124, 158, 0.07) 1px, transparent 1px, transparent 24px),
+                linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.35) 100%);
+            opacity: 0.62;
+        }
+        .outside-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 28%;
+            background: linear-gradient(180deg, #2d3444 0%, #1c2230 100%);
+            border-top: 2px solid rgba(190, 175, 150, 0.2);
+        }
+        .outside-node {
+            position: absolute;
+            width: 18%;
+            height: 18%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 245, 220, 0.24);
+            background: linear-gradient(180deg, rgba(244, 214, 172, 0.24), rgba(80, 74, 88, 0.5));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.34);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .outside-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.42), 0 0 20px rgba(245, 199, 146, 0.2);
+        }
+        .outside-node::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            color: rgba(236, 220, 198, 0.82);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+        .outside-store { top: 18%; left: 9%; }
+        .outside-shrine { top: 18%; left: 31%; }
+        .outside-bridge { top: 18%; left: 53%; }
+        .outside-alley { top: 18%; left: 75%; }
+        .outside-lantern { bottom: 12%; left: 40%; width: 20%; }
+
+        /* --- OUTSIDE SUB-AREAS --- */
+        .scene-lantern-court,
+        .scene-rail-bridge,
+        .scene-shrine-garden,
+        .scene-graffiti-alley {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .scene-lantern-court {
+            background: linear-gradient(180deg, #1e1a2b 0%, #171322 52%, #0f0c19 100%);
+        }
+        .scene-rail-bridge {
+            background: linear-gradient(180deg, #1a2436 0%, #182030 52%, #0f151f 100%);
+        }
+        .scene-shrine-garden {
+            background: linear-gradient(180deg, #202d2a 0%, #1a2521 56%, #111915 100%);
+        }
+        .scene-graffiti-alley {
+            background: linear-gradient(180deg, #2b1c24 0%, #1f1520 58%, #120c13 100%);
+        }
+        .outside-silhouette {
+            position: absolute;
+            bottom: 18%;
+            width: 26%;
+            height: 40%;
+            background: linear-gradient(180deg, rgba(40, 46, 66, 0.9) 0%, rgba(22, 25, 38, 0.98) 100%);
+            border-radius: 8px 8px 0 0;
+            border: 1px solid rgba(220, 210, 190, 0.1);
+        }
+        .outside-silhouette.left { left: 10%; }
+        .outside-silhouette.right { right: 10%; }
+        .outside-path {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 26%;
+            background: linear-gradient(180deg, rgba(120, 108, 90, 0.2) 0%, rgba(52, 46, 40, 0.5) 100%);
+            border-top: 1px solid rgba(255, 245, 220, 0.1);
+        }
+        .outside-focus {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 20%;
+            width: 34%;
+            height: 42%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 240, 200, 0.24);
+            background: linear-gradient(180deg, rgba(255, 220, 162, 0.22), rgba(90, 70, 100, 0.36));
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .outside-focus:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(238, 189, 138, 0.24);
         }
 
         /* --- HARUKI CHARACTER --- */
@@ -840,6 +1034,68 @@
             transform: scale(1.08);
             filter: brightness(1.1);
         }
+
+        /* --- ECHO CHAMBER / NEW GUIDES --- */
+        .scene-echo {
+            background:
+                radial-gradient(75% 48% at 50% 36%, rgba(112, 74, 122, 0.2) 0%, transparent 72%),
+                linear-gradient(180deg, #17101d 0%, #25192d 45%, #0c0913 100%);
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .scene-echo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 22% 24%, rgba(255, 220, 190, 0.1) 0%, transparent 34%),
+                radial-gradient(circle at 78% 64%, rgba(170, 110, 205, 0.12) 0%, transparent 38%);
+            opacity: 0.85;
+        }
+        .echo-ring {
+            position: absolute;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            width: 64%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 2px solid rgba(233, 200, 170, 0.36);
+            box-shadow: inset 0 0 38px rgba(0, 0, 0, 0.46), 0 0 52px rgba(200, 150, 120, 0.18);
+        }
+        .echo-node {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: 2px solid rgba(235, 220, 200, 0.55);
+            background: radial-gradient(circle at 28% 28%, rgba(255, 246, 235, 0.34), rgba(66, 32, 78, 0.6));
+            box-shadow: 0 0 20px rgba(200, 146, 120, 0.24);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .echo-node:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 24px rgba(230, 175, 140, 0.3);
+        }
+        .echo-node::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: rgba(232, 214, 196, 0.78);
+            white-space: nowrap;
+        }
+        .node-aerin { top: 15%; left: 50%; transform: translateX(-50%); }
+        .node-elion { top: 42%; left: 20%; }
+        .node-nyra { top: 42%; right: 20%; }
+        .node-tarn { bottom: 14%; left: 50%; transform: translateX(-50%); }
 
         /* ===== DEGRADATION CLASSES ===== */
         #game-container.degraded-mild {
@@ -937,11 +1193,13 @@
         <!-- Scanlines -->
         <div id="scanlines"></div>
         <!-- Loop indicator -->
-        <div id="loop-indicator">夜 ・ ループ</div>
+        <div id="loop-indicator">NIGHT LOOP</div>
         <!-- Timer -->
         <div id="timer-display"></div>
         <!-- Scene -->
         <div id="scene"></div>
+        <!-- Hallucinations -->
+        <div id="hallucination-layer"><div id="hallucination-whisper"></div></div>
         <!-- Fade overlay -->
         <div id="fade-overlay"></div>
         <!-- Dialogue -->
@@ -955,7 +1213,7 @@
         <div id="title-overlay">
             <div id="title-jp">心の蝕</div>
             <div id="title-en">MIND'S ECLIPSE</div>
-            <div id="title-start">click to begin</div>
+            <div id="title-start">Click to Begin</div>
         </div>
     </div>
 
@@ -964,6 +1222,8 @@
             // ==================== DOM ELEMENTS ====================
             const gameContainer = document.getElementById('game-container');
             const sceneEl = document.getElementById('scene');
+            const hallucinationLayer = document.getElementById('hallucination-layer');
+            const hallucinationWhisper = document.getElementById('hallucination-whisper');
             const fadeOverlay = document.getElementById('fade-overlay');
             const vignetteEl = document.getElementById('vignette');
             const scanlinesEl = document.getElementById('scanlines');
@@ -1011,6 +1271,7 @@
                 currentLocation: 'apartment',
                 loopActive: false,
                 loopTimeRemaining: 150, // seconds (2.5 min for demo)
+                loopDuration: 150,
                 loopTimerInterval: null,
                 dialogueHistory: [], // across loops for Haruki's memory
                 recentKindActions: [],
@@ -1018,7 +1279,23 @@
                 trueEndingUnlocked: false,
                 trueEndingTriggered: false,
                 badEndingTriggered: false,
+                deathCount: 0,
+                cruelStreak: 0,
+                aerinAffinity: 0,
+                elionTrust: 0,
+                nyraBalance: 0,
+                tarnWarnings: 0,
+                lastLoopReason: null,
+                outsideAreaChoiceUsed: {
+                    'lantern-court': false,
+                    'rail-bridge': false,
+                    'shrine-garden': false,
+                    'graffiti-alley': false,
+                },
+                usedOutsideChoices: [],
             };
+
+            let actionLocked = false;
 
             // ==================== HELPER FUNCTIONS ====================
             function clearScene() {
@@ -1028,6 +1305,108 @@
 
             function clearChoices() {
                 choicesContainer.innerHTML = '';
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            function getActionDelayMs() {
+                if (state.mentalState >= 70) return 0;
+                if (state.mentalState >= 45) return 250;
+                if (state.mentalState >= 25) return 650;
+                return 1100;
+            }
+
+            function increaseLoopTime(seconds, reason = '') {
+                if (!state.loopActive) return;
+                const cap = 420;
+                state.loopDuration = Math.min(cap, state.loopDuration + Math.ceil(seconds * 0.4));
+                state.loopTimeRemaining = Math.min(cap, state.loopTimeRemaining + seconds);
+                updateTimerDisplay();
+                if (reason) {
+                    loopIndicator.textContent = `NIGHT LOOP - ${reason}`;
+                    setTimeout(() => {
+                        loopIndicator.textContent = 'NIGHT LOOP';
+                    }, 1400);
+                }
+            }
+
+            function markCruelAction(label, timerGain = 15, mentalDrop = 3) {
+                state.cruelChoicesTotal++;
+                state.cruelStreak++;
+                state.recentCruelActions.push(label);
+                state.mentalState = Math.max(5, state.mentalState - mentalDrop);
+                increaseLoopTime(timerGain, '+時間');
+                applyDegradation();
+            }
+
+            function markKindAction(label, mentalGain = 2) {
+                state.kindChoicesTotal++;
+                state.cruelStreak = 0;
+                state.recentKindActions.push(label);
+                state.mentalState = Math.min(100, state.mentalState + mentalGain);
+                applyDegradation();
+            }
+
+            async function triggerHallucination(customText = null) {
+                const lines = [
+                    'you already chose this',
+                    'the loop likes your cruelty',
+                    'it is easier not to care',
+                    'someone is watching from yesterday',
+                ];
+                const line = customText || lines[Math.floor(Math.random() * lines.length)];
+                if (!hallucinationLayer || !hallucinationWhisper) return;
+                hallucinationWhisper.textContent = line;
+                hallucinationLayer.classList.add('active');
+                await sleep(450);
+                hallucinationLayer.classList.remove('active');
+            }
+
+            async function runAction(action) {
+                if (!action || actionLocked) return;
+                actionLocked = true;
+                const lag = getActionDelayMs();
+                if (lag > 0) {
+                    dialogueArea.style.filter = 'blur(0.2px)';
+                    await sleep(lag);
+                    dialogueArea.style.filter = '';
+                }
+                if (state.mentalState < 20 && Math.random() < 0.24) {
+                    await triggerHallucination();
+                }
+                try {
+                    await action();
+                } finally {
+                    actionLocked = false;
+                }
+            }
+
+            function bindSceneAction(id, action) {
+                document.getElementById(id)?.addEventListener('click', () => runAction(action));
+            }
+
+            function outsideAreaLocked(areaKey) {
+                return !!state.outsideAreaChoiceUsed[areaKey];
+            }
+
+            function beginOutsideAreaChoice(areaKey, choiceKey) {
+                if (outsideAreaLocked(areaKey)) {
+                    setDialogue('…', 'You already made your choice in this area tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return false;
+                }
+                if (state.usedOutsideChoices.includes(choiceKey)) {
+                    setDialogue('…', 'You cannot repeat that choice tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return false;
+                }
+                state.outsideAreaChoiceUsed[areaKey] = true;
+                state.usedOutsideChoices.push(choiceKey);
+                return true;
             }
 
             function setDialogue(speaker, text, choices = null) {
@@ -1047,10 +1426,27 @@
                         btn.textContent = choice.label;
                         btn.addEventListener('click', () => {
                             clearChoices();
-                            if (choice.action) choice.action();
+                            if (choice.action) runAction(choice.action);
                         });
                         choicesContainer.appendChild(btn);
                     });
+
+                    // Low mental state may generate a false choice (hallucination).
+                    if (state.mentalState < 28 && Math.random() < 0.22) {
+                        const fake = document.createElement('button');
+                        fake.className = 'choice-btn special';
+                        fake.textContent = 'Follow the whisper';
+                        fake.addEventListener('click', async () => {
+                            clearChoices();
+                            await triggerHallucination('there is no safe option');
+                            state.mentalState = Math.max(5, state.mentalState - 4);
+                            applyDegradation();
+                            setDialogue('…', 'You blink. There was never another path here.');
+                            await waitForNext();
+                            setDialogue('…', 'Focus. Choose again.');
+                        });
+                        choicesContainer.appendChild(fake);
+                    }
                 }
                 // Apply glitch if mental state is low
                 if (state.mentalState < 35 && Math.random() < 0.3) {
@@ -1112,7 +1508,10 @@
             function updateTimerDisplay() {
                 const mins = Math.floor(state.loopTimeRemaining / 60);
                 const secs = state.loopTimeRemaining % 60;
-                timerDisplay.textContent = `残り ${mins}:${secs.toString().padStart(2, '0')}`;
+                timerDisplay.textContent = `TIME LEFT ${mins}:${secs.toString().padStart(2, '0')}`;
+                if (state.deathCount > 0) {
+                    timerDisplay.textContent += ` ・ D${state.deathCount}`;
+                }
                 if (state.loopTimeRemaining < 30) {
                     timerDisplay.style.color = 'rgba(200,140,120,0.6)';
                 } else {
@@ -1121,7 +1520,7 @@
             }
 
             function startLoopTimer() {
-                state.loopTimeRemaining = 150;
+                state.loopTimeRemaining = state.loopDuration;
                 updateTimerDisplay();
                 if (state.loopTimerInterval) clearInterval(state.loopTimerInterval);
                 state.loopTimerInterval = setInterval(() => {
@@ -1169,6 +1568,20 @@
                 if (!state.plantWateredThisLoop) state.mentalState -= 4;
                 if (!state.harukiInteractionsThisLoop) state.mentalState -= 2;
                 if (state.cruelChoicesTotal > state.kindChoicesTotal) state.mentalState -= 3;
+
+                const deathReasons = ['passed-out', 'exhaustion', 'murder-collapse'];
+                state.lastLoopReason = reason;
+                if (deathReasons.includes(reason)) {
+                    state.deathCount++;
+                    state.mentalState -= (4 + state.deathCount * 2);
+                    state.loopDuration = Math.min(420, state.loopDuration + 12);
+                }
+
+                // Repeatedly kind loops slowly shorten the punishment.
+                if (state.cruelStreak === 0 && state.kindChoicesTotal >= state.cruelChoicesTotal) {
+                    state.loopDuration = Math.max(110, state.loopDuration - 4);
+                }
+
                 state.mentalState = Math.max(5, Math.min(100, state.mentalState));
 
                 // Graffiti updates
@@ -1178,7 +1591,8 @@
 
                 // Check for true ending conditions
                 if (state.harukiTrust >= 7 && state.plantHealth >= 3 && state.kindChoicesTotal >= 5 &&
-                    state.loopCount >= 3 && !state.trueEndingUnlocked) {
+                    state.aerinAffinity >= 3 && state.elionTrust >= 2 && state.nyraBalance >= 2 &&
+                    state.deathCount <= 3 && state.loopCount >= 3 && !state.trueEndingUnlocked) {
                     state.trueEndingUnlocked = true;
                 }
 
@@ -1204,6 +1618,13 @@
                 state.readNoticeThisLoop = false;
                 state.recentKindActions = [];
                 state.recentCruelActions = [];
+                state.outsideAreaChoiceUsed = {
+                    'lantern-court': false,
+                    'rail-bridge': false,
+                    'shrine-garden': false,
+                    'graffiti-alley': false,
+                };
+                state.usedOutsideChoices = [];
 
                 state.loopCount++;
                 startNewLoop();
@@ -1252,6 +1673,7 @@
                 ];
                 if (state.loopCount === 0) {
                     wakeLines.push({ s: '…', t: 'A quiet evening. Nothing out of the ordinary. You feel... fine.' });
+                    wakeLines.push({ s: '…', t: 'Then the thought returns: you did something terrible, and this loop is your sentence.' });
                 } else if (state.loopCount === 1) {
                     wakeLines.push({ s: '…',
                         t: 'You blink. Wasn\'t it just...? No. Must have been a dream. Just a dream.' });
@@ -1259,6 +1681,8 @@
                     wakeLines.push({ s: '…',
                         t: 'Again. The weight of repetition settles on your chest. You know this evening. You\'ve lived it before.'
                         });
+                    wakeLines.push({ s: '…',
+                        t: 'Outside, different corners of the district keep calling your name. The spirits are no longer hiding in one place.' });
                 }
                 if (state.plantHealth <= 1 && state.loopCount >= 2) {
                     wakeLines.push({ s: '…',
@@ -1267,6 +1691,14 @@
                 if (state.graffitiLevel >= 2 && state.loopCount >= 3) {
                     wakeLines.push({ s: '…',
                         t: 'A faint memory of something written on a wall flickers through your mind.' });
+                }
+                if (state.deathCount > 0) {
+                    wakeLines.push({ s: '…',
+                        t: `Your body remembers ending ${state.deathCount} time${state.deathCount > 1 ? 's' : ''}. Waking up feels heavier.` });
+                }
+                if (state.loopDuration > 170) {
+                    wakeLines.push({ s: '…',
+                        t: 'The evening feels longer than it should. As if the loop itself is delaying your release.' });
                 }
 
                 for (const line of wakeLines) {
@@ -1316,10 +1748,10 @@
                 `;
 
                 // Add click handlers
-                document.getElementById('click-window')?.addEventListener('click', lookOutWindow);
-                document.getElementById('click-plant')?.addEventListener('click', interactWithPlant);
-                document.getElementById('click-futon')?.addEventListener('click', restOnFuton);
-                document.getElementById('click-door')?.addEventListener('click', goToCorridor);
+                bindSceneAction('click-window', lookOutWindow);
+                bindSceneAction('click-plant', interactWithPlant);
+                bindSceneAction('click-futon', restOnFuton);
+                bindSceneAction('click-door', goToCorridor);
             }
 
             async function lookOutWindow() {
@@ -1366,13 +1798,10 @@
             async function waterPlant() {
                 if (!state.loopActive) return;
                 state.plantWateredThisLoop = true;
-                state.recentKindActions.push('watered plant');
-                state.kindChoicesTotal++;
-                state.mentalState = Math.min(100, state.mentalState + 3);
+                markKindAction('watered plant', 3);
                 setDialogue('…',
                     'You pour water into the small pot. The soil darkens. For a moment, the plant seems to stand a little taller.'
                     );
-                applyDegradation();
                 // Refresh plant visual
                 const plantEl = document.getElementById('click-plant');
                 if (plantEl) {
@@ -1384,11 +1813,8 @@
 
             async function leavePlant() {
                 if (!state.loopActive) return;
-                state.recentCruelActions.push('ignored plant');
-                state.cruelChoicesTotal++;
-                state.mentalState = Math.max(5, state.mentalState - 2);
+                markCruelAction('ignored plant', 10, 2);
                 setDialogue('…', 'You turn away. It\'s just a plant. It doesn\'t matter. (Does it?)');
-                applyDegradation();
                 await waitForNext();
             }
 
@@ -1426,27 +1852,27 @@
                     <div class="corr-door door-apt" id="click-my-door" title="Your apartment"></div>
                     <div class="corr-notice" id="click-notice" title="Notice board"></div>
                     <div class="${graffitiClasses}" id="graffiti-text">${gText}</div>
-                    <div class="corr-stairs" id="click-stairs" title="Downstairs"></div>
+                    <div class="corr-stairs" id="click-stairs" title="Outside district"></div>
                     <div class="haruki-figure" id="click-haruki" title="Haruki" style="bottom:18%;left:18%;">
                         <div class="head"></div><div class="body"></div>
                     </div>
                 `;
 
-                document.getElementById('click-haruki-door')?.addEventListener('click', interactWithHaruki);
-                document.getElementById('click-haruki')?.addEventListener('click', interactWithHaruki);
-                document.getElementById('click-my-door')?.addEventListener('click', () => {
+                bindSceneAction('click-haruki-door', interactWithHaruki);
+                bindSceneAction('click-haruki', interactWithHaruki);
+                bindSceneAction('click-my-door', async () => {
                     renderApartment();
                     presentApartmentChoices();
                 });
-                document.getElementById('click-notice')?.addEventListener('click', checkNoticeBoard);
-                document.getElementById('click-stairs')?.addEventListener('click', goToStore);
+                bindSceneAction('click-notice', checkNoticeBoard);
+                bindSceneAction('click-stairs', goOutsideDistrict);
 
                 setDialogue('…', 'The corridor is quiet. Fluorescent light hums overhead. Haruki\'s door is to the left.',
                     [
                         { label: 'Knock on Haruki\'s door', action: () => interactWithHaruki() },
                         { label: 'Check the notice board', action: () => checkNoticeBoard() },
-                        { label: 'Go downstairs to the store',
-                            action: () => goToStore() },
+                        { label: 'Go outside',
+                            action: () => goOutsideDistrict() },
                         { label: 'Return to your apartment', action: () => { renderApartment();
                                 presentApartmentChoices(); } },
                     ]);
@@ -1460,7 +1886,7 @@
                     setDialogue('…', 'Haruki is not available right now.');
                     await waitForNext();
                     setDialogue('…', 'The corridor is quiet.', [
-                        { label: 'Go downstairs', action: () => goToStore() },
+                        { label: 'Go outside', action: () => goOutsideDistrict() },
                         { label: 'Return to your apartment', action: () => { renderApartment(); presentApartmentChoices(); } },
                     ]);
                     return;
@@ -1475,66 +1901,57 @@
                 let harukiChoices = [];
 
                 if (state.harukiTalksThisLoop === 1) {
-                    // First conversation: original behavior based on loopCount
                     if (state.loopCount === 0) {
                         harukiDialogue =
-                            'Haruki opens the door. He looks at you with a faint, puzzled smile. "Oh, hey. Funny, I was just thinking about you. Have we... met before? I feel like I know you from somewhere."';
+                            'Haruki opens the door with groceries in hand. "Hey, neighbor. Perfect timing. I keep buying too much food and pretending I planned it."';
                         harukiChoices = [
-                            { label: '"I don\'t think so. I\'m your neighbour."', action: () => harukiResponse('neutral', 'He looks a little relieved. "Oh, right. Sorry, you just looked familiar. I guess I was thinking too much."') },
-                            { label: '"Maybe in another life." (smile)', action: () => harukiResponse('kind', 'His smile deepens. "Maybe… that would explain why you seem familiar. I like that idea."') },
-                            { label: '"I doubt it." (look away)', action: () => harukiResponse('cruel', 'He stiffens slightly. "Oh. Alright then. Sorry to bother you."') },
+                            { label: '"Need help carrying that?"', action: () => harukiResponse('kind', 'He laughs. "You\'d do that? Thanks. You\'re kinder than most people in this building."') },
+                            { label: '"Long day?"', action: () => harukiResponse('neutral', 'He nods. "Yeah. New shift at work. Still getting used to it."') },
+                            { label: '"Not my problem."', action: () => harukiResponse('cruel', 'His smile thins. "Right. Sorry for stopping you."') },
                         ];
                     } else if (state.loopCount === 1) {
                         harukiDialogue =
-                            'Haruki leans against the doorframe. "I had the strangest dream last night. You were in it. We were... I don\'t know, talking about something important. But I can\'t remember what."';
+                            'Haruki leans against the doorframe. "I found a tiny ramen place by the station. Cheap, loud, perfect. You seem like the type who would appreciate it."';
                         harukiChoices = [
-                            { label: '"Dreams are weird like that."', action: () => harukiResponse('neutral', 'He chuckles nervously. "Yeah, they are. But this one felt weirdly real, like a memory I can\'t place."') },
-                            { label: '"Maybe it wasn\'t a dream." (hold his gaze)', action: () => harukiResponse('kind', 'He studies you. "If it wasn\'t, then what are we supposed to do with it?"') },
-                            { label: '"I don\'t have time for this."', action: () => harukiResponse('cruel', 'His smile fades. "Right. Sorry. I didn\'t mean to take up your time."') },
+                            { label: '"That sounds great, thank you."', action: () => harukiResponse('kind', 'He brightens. "Then I\'ll text you the address. It\'s easy to miss if you\'re not looking for it."') },
+                            { label: '"Maybe another day."', action: () => harukiResponse('neutral', 'He shrugs lightly. "No pressure. Just thought you might like it."') },
+                            { label: '"Keep your recommendations."', action: () => harukiResponse('cruel', 'He looks away. "Understood."') },
                         ];
                     } else {
-                        const memoryRef = state.dialogueHistory.length >= 2 ? state.dialogueHistory[state.dialogueHistory.length - 2] : null;
-                        let extraLine = '';
-                        if (memoryRef && memoryRef.kindActions && memoryRef.kindActions.includes('was kind to Haruki')) {
-                            extraLine = ' "In my dream... you were kind to me. It felt warm. I keep holding onto that feeling."';
-                        } else if (memoryRef && memoryRef.cruelActions && memoryRef.cruelActions.includes('was rude to Haruki')) {
-                            extraLine = ' "There was something cold in my dream. Something I can\'t shake off. Like being alone in a crowded room."';
-                        }
-                        harukiDialogue = `Haruki looks at you with an intensity that wasn't there before. "It keeps happening. The dreams. They're getting clearer. I remember... fragments. Conversations we've never had.${extraLine}"`;
+                        harukiDialogue = 'Haruki adjusts the strap of his bag. "I\'m trying to start over properly here. New job, new routine. Some days I feel like I\'m failing at all of it."';
                         harukiChoices = [
-                            { label: '"Tell me more about these dreams."', action: () => harukiResponse('kind', 'His eyes widen. "I wish I could. They come in pieces, but they always feel like they\'re trying to tell me something important about you."') },
-                            { label: '"That sounds... unsettling."', action: () => harukiResponse('neutral', 'He nods slowly. "It is. But it also feels like it means something. Like I\'m supposed to remember it."') },
-                            { label: '"You should probably get more sleep." (dismissive)', action: () => harukiResponse('cruel', 'He flinches. "Maybe I should. I just can\'t stop thinking about it."') },
+                            { label: '"You\'re doing better than you think."', action: () => harukiResponse('kind', 'His shoulders loosen. "Thanks. I needed to hear that from someone."') },
+                            { label: '"That sounds hard."', action: () => harukiResponse('neutral', 'He nods once. "Yeah. But maybe hard is fine for now."') },
+                            { label: '"Everyone has problems."', action: () => harukiResponse('cruel', 'He gives a tired smile. "Right. I\'ll keep it to myself."') },
                         ];
                         if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
-                            harukiChoices.push({ label: '"Haruki... I think I remember too. I think we\'re connected."', action: () => harukiTrueEndingChoice(), special: true });
+                            harukiChoices.push({ label: '"Let\'s leave this building and watch the sunrise."', action: () => harukiTrueEndingChoice(), special: true });
                         }
                     }
                 } else {
-                    // Second conversation: retalk with different lines and choices
                     if (state.loopCount === 0) {
                         harukiDialogue = 'Haruki seems more relaxed this time. "Hey again. You seem different tonight, did something happen?"';
                         harukiChoices = [
-                            { label: '"I was just thinking about you again."', action: () => harukiResponse('kind', 'He blushes faintly. "Really? That... that means a lot. I guess I felt like you were here even before I saw you."') },
-                            { label: '"I felt like talking to you."', action: () => harukiResponse('neutral', 'He tilts his head. "I\'m glad you did. I was actually wondering if I should come out and say something."') },
-                            { label: '"It\'s nothing."', action: () => harukiResponse('cruel', 'He looks down for a second. "Okay. If you say so."') },
+                            { label: '"Just needed fresh air."', action: () => harukiResponse('neutral', 'He nods. "Fair. This hallway can feel small at night."') },
+                            { label: '"I wanted to see you."', action: () => harukiResponse('kind', 'He smiles, a little shy. "Then I\'m glad I opened the door."') },
+                            { label: '"None of your business."', action: () => harukiResponse('cruel', 'He steps back slightly. "Okay. I won\'t ask again."') },
                         ];
                     } else if (state.loopCount === 1) {
-                        harukiDialogue = 'Haruki pauses, then asks quietly: "Do you ever remember things between evenings? I keep getting flashes."';
+                        harukiDialogue = 'Haruki glances at the stairwell. "The city feels heavier lately. Maybe it\'s just the weather. Maybe it\'s me."';
                         harukiChoices = [
-                            { label: '"Sometimes. Small things."', action: () => harukiResponse('neutral', 'He nods slowly. "Same here. It\'s like an echo that won\'t fade. I don\'t know what it means."') },
-                            { label: '"I remember you in them."', action: () => harukiResponse('kind', 'His eyes widen. "You do? Then maybe it isn\'t just me. That makes it... less lonely."') },
-                            { label: '"No, I don\'t."', action: () => harukiResponse('cruel', 'He sighs quietly. "I guess I\'m the only one who gets them then."') },
+                            { label: '"You\'re not imagining it."', action: () => harukiResponse('kind', 'He exhales. "Thanks. I thought I was being dramatic."') },
+                            { label: '"Could just be stress."', action: () => harukiResponse('neutral', 'He gives a small shrug. "Could be. Either way, it helps to say it out loud."') },
+                            { label: '"Stop complaining."', action: () => harukiResponse('cruel', 'His expression hardens. "Right. Message received."') },
                         ];
                     } else {
-                        harukiDialogue = 'Haruki speaks with a new certainty: "The dreams are like signals. I think we\'re connected somehow. Does that scare you?"';
+                        harukiDialogue = 'Haruki offers a tired smile. "I keep trying to become someone I\'m proud of. It\'s slower than I hoped."';
                         harukiChoices = [
-                            { label: '"A little."', action: () => harukiResponse('neutral', 'He holds your gaze. "A little is enough to make this feel real, though. That\'s the strange part."') },
-                            { label: '"No, it feels like hope."', action: () => harukiResponse('kind', 'He exhales, relief softening his face. "Thank you. I wanted someone else to feel that too."') },
-                            { label: '"We should stop this."', action: () => harukiResponse('cruel', 'He flinches, then asks quietly. "Stop what? The dreams, or whatever this is between us?"') },
+                            { label: '"I\'ll walk with you for a while."', action: () => harukiResponse('kind', 'He smiles for real. "I\'d like that."') },
+                            { label: '"Keep going. You\'ll get there."', action: () => harukiResponse('neutral', 'He nods. "I\'ll try."') },
+                            { label: '"Do it alone."', action: () => harukiResponse('cruel', 'He looks hurt. "Understood."') },
                         ];
                         if (state.trueEndingUnlocked && !state.trueEndingTriggered) {
-                            harukiChoices.push({ label: '"Maybe together we can leave."', action: () => harukiTrueEndingChoice(), special: true });
+                            harukiChoices.push({ label: '"Come on. Let\'s go see dawn."', action: () => harukiTrueEndingChoice(), special: true });
                         }
                     }
                 }
@@ -1546,14 +1963,10 @@
                 if (!state.loopActive) return;
                 if (type === 'kind') {
                     state.harukiTrust = Math.min(10, state.harukiTrust + 2);
-                    state.kindChoicesTotal++;
-                    state.recentKindActions.push('was kind to Haruki');
-                    state.mentalState = Math.min(100, state.mentalState + 2);
+                    markKindAction('was kind to Haruki', 2);
                 } else if (type === 'cruel') {
                     state.harukiTrust = Math.max(0, state.harukiTrust - 1);
-                    state.cruelChoicesTotal++;
-                    state.recentCruelActions.push('was rude to Haruki');
-                    state.mentalState = Math.max(5, state.mentalState - 3);
+                    markCruelAction('was rude to Haruki', 14, 3);
                 } else {
                     state.harukiTrust = Math.min(10, state.harukiTrust + 1);
                 }
@@ -1569,7 +1982,7 @@
                 setDialogue('…', 'Haruki lingers for a moment, then retreats into his apartment. The corridor is quiet again.',
                     [
                         { label: 'Check the notice board', action: () => checkNoticeBoard() },
-                        { label: 'Go downstairs', action: () => goToStore() },
+                        { label: 'Go outside', action: () => goOutsideDistrict() },
                         { label: 'Return to your apartment', action: () => { renderApartment();
                                 presentApartmentChoices(); } },
                     ]);
@@ -1580,15 +1993,15 @@
                 state.harukiTrust = 10;
                 state.mentalState = 100;
                 setDialogue('Haruki',
-                    'His eyes widen. For a long moment, he just stares at you. Then, barely above a whisper: "...You feel it too. The repetition. The loops. I thought I was going insane. I thought I was the only one."'
+                    'Haruki blinks, surprised, then smiles softly. "Dawn? That\'s impulsive. I like impulsive."'
                     );
                 await waitForNext();
                 setDialogue('Haruki',
-                    '"The plant. The store. The evenings that never end. You\'ve been here too. With me. Every time." Tears form at the corners of his eyes. "What if... what if we\'re the ones keeping each other here? And what if we\'re the only way out?"'
+                    '"I came here to start over," he says. "Maybe starting over is easier when someone walks beside you."'
                     );
                 await waitForNext();
                 setDialogue('…',
-                    'Haruki reaches out and takes your hand. His grip is warm and steady. The fluorescent light above flickers, and for the first time, it feels like something is *changing*. The loop is breaking. Not because of a puzzle solved, but because of a connection made.'
+                    'You and Haruki leave the building before the first train. The sky brightens from charcoal to blue. For the first time, your chest feels lighter.'
                     );
                 await waitForNext();
                 endLoop('true-ending');
@@ -1611,9 +2024,338 @@
                 await waitForNext();
                 setDialogue('…', 'The corridor waits.', [
                     { label: 'Talk to Haruki', action: () => interactWithHaruki() },
-                    { label: 'Go downstairs', action: () => goToStore() },
+                    { label: 'Go outside', action: () => goOutsideDistrict() },
                     { label: 'Return to your apartment', action: () => { renderApartment();
                             presentApartmentChoices(); } },
+                ]);
+            }
+
+            // ==================== OUTSIDE DISTRICT ====================
+            async function goOutsideDistrict() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-outside';
+                state.currentLocation = 'outside';
+
+                sceneEl.innerHTML = `
+                    <div class="outside-ground"></div>
+                    <div class="outside-node outside-store" id="outside-store" data-label="KONBINI"></div>
+                    <div class="outside-node outside-shrine" id="outside-shrine" data-label="SHRINE GARDEN"></div>
+                    <div class="outside-node outside-bridge" id="outside-bridge" data-label="RAIL BRIDGE"></div>
+                    <div class="outside-node outside-alley" id="outside-alley" data-label="GRAFFITI ALLEY"></div>
+                    <div class="outside-node outside-lantern" id="outside-lantern" data-label="LANTERN COURT"></div>
+                `;
+
+                bindSceneAction('outside-store', goToStore);
+                bindSceneAction('outside-shrine', goToShrineGarden);
+                bindSceneAction('outside-bridge', goToRailBridge);
+                bindSceneAction('outside-alley', goToGraffitiAlley);
+                bindSceneAction('outside-lantern', goToLanternCourt);
+
+                setDialogue('…',
+                    'You step into the district. The evening stretches wider than before: shrine bells, rail vibrations, neon, and shadowed murals all waiting.', [
+                        { label: 'Go to the convenience store', action: () => goToStore() },
+                        { label: 'Visit the shrine garden', action: () => goToShrineGarden() },
+                        { label: 'Walk to the rail bridge', action: () => goToRailBridge() },
+                        { label: 'Explore graffiti alley', action: () => goToGraffitiAlley() },
+                        { label: 'Follow the lantern glow', action: () => goToLanternCourt() },
+                        { label: 'Return upstairs', action: () => goToCorridor() },
+                    ]);
+            }
+
+            async function goToLanternCourt() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-lantern-court';
+                state.currentLocation = 'lantern-court';
+                sceneEl.innerHTML = `
+                    <div class="outside-silhouette left"></div>
+                    <div class="outside-silhouette right"></div>
+                    <div class="outside-focus" id="focus-lantern" title="Lantern circle"></div>
+                    <div class="outside-path"></div>
+                `;
+                if (outsideAreaLocked('lantern-court')) {
+                    setDialogue('…', 'Lantern Court is quiet now. You already made your choice here tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return;
+                }
+                bindSceneAction('focus-lantern', async () => {
+                    if (!beginOutsideAreaChoice('lantern-court', 'lantern-talk')) return;
+                    await talkAerin();
+                });
+                setDialogue('…',
+                    'Paper lanterns sway in a wind you cannot feel. Warm light pools across wet stone. Someone is waiting in that glow.', [
+                        { label: 'Speak with Mikkel', action: async () => {
+                                if (!beginOutsideAreaChoice('lantern-court', 'lantern-talk')) return;
+                                await talkAerin();
+                            } },
+                        { label: 'Stand still and breathe', action: async () => {
+                                if (!beginOutsideAreaChoice('lantern-court', 'lantern-breathe')) return;
+                                markKindAction('grounded at lantern court', 2);
+                                setDialogue('…', 'You count your breaths until your pulse slows. One choice made. The rest of this place closes for tonight.');
+                                await waitForNext();
+                                goToLanternCourt();
+                            } },
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+            }
+
+            async function goToRailBridge() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-rail-bridge';
+                state.currentLocation = 'rail-bridge';
+                sceneEl.innerHTML = `
+                    <div class="outside-silhouette left"></div>
+                    <div class="outside-focus" id="focus-bridge" title="Bridge overlook"></div>
+                    <div class="outside-path"></div>
+                `;
+                if (outsideAreaLocked('rail-bridge')) {
+                    setDialogue('…', 'The bridge hums beneath your feet. You already made your choice here tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return;
+                }
+                bindSceneAction('focus-bridge', async () => {
+                    if (!beginOutsideAreaChoice('rail-bridge', 'bridge-talk')) return;
+                    await talkElion();
+                });
+                setDialogue('…',
+                    'Trains pass below in strict intervals, as if the city itself is a metronome. A traveler leans on the railing, looking lost.', [
+                        { label: 'Speak with Sven', action: async () => {
+                                if (!beginOutsideAreaChoice('rail-bridge', 'bridge-talk')) return;
+                                await talkElion();
+                            } },
+                        { label: 'Watch the trains', action: async () => {
+                                if (!beginOutsideAreaChoice('rail-bridge', 'bridge-watch')) return;
+                                setDialogue('…', 'Two trains pass. Then the same two pass again. The pattern is too exact to be chance.');
+                                await waitForNext();
+                                goToRailBridge();
+                            } },
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+            }
+
+            async function goToShrineGarden() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-shrine-garden';
+                state.currentLocation = 'shrine-garden';
+                sceneEl.innerHTML = `
+                    <div class="outside-silhouette right"></div>
+                    <div class="outside-focus" id="focus-shrine" title="Shrine altar"></div>
+                    <div class="outside-path"></div>
+                `;
+                if (outsideAreaLocked('shrine-garden')) {
+                    setDialogue('…', 'Only drifting incense remains. You already made your choice here tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return;
+                }
+                bindSceneAction('focus-shrine', async () => {
+                    if (!beginOutsideAreaChoice('shrine-garden', 'shrine-talk')) return;
+                    await talkNyra();
+                });
+                setDialogue('…',
+                    'Incense smoke hangs low among dark trees. Moss-covered stone and old offerings frame a quiet altar.', [
+                        { label: 'Speak with Greta', action: async () => {
+                                if (!beginOutsideAreaChoice('shrine-garden', 'shrine-talk')) return;
+                                await talkNyra();
+                            } },
+                        { label: 'Clean the offering bowl', action: async () => {
+                                if (!beginOutsideAreaChoice('shrine-garden', 'shrine-clean')) return;
+                                markKindAction('cleaned shrine bowl', 2);
+                                setDialogue('…', 'You wipe away ash and rainwater. The air grows a little calmer around you.');
+                                await waitForNext();
+                                goToShrineGarden();
+                            } },
+                        { label: 'Rip up sacred moss', action: async () => {
+                                if (!beginOutsideAreaChoice('shrine-garden', 'shrine-rip')) return;
+                                markCruelAction('damaged shrine garden', 18, 4);
+                                setDialogue('…', 'Your fingers tear through roots and moss. The shrine falls silent in a way that feels accusatory.');
+                                await waitForNext();
+                                goToShrineGarden();
+                            } },
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+            }
+
+            async function goToGraffitiAlley() {
+                if (!state.loopActive) return;
+                clearScene();
+                sceneEl.className = 'scene-graffiti-alley';
+                state.currentLocation = 'graffiti-alley';
+                sceneEl.innerHTML = `
+                    <div class="outside-silhouette left"></div>
+                    <div class="outside-focus" id="focus-alley" title="Mural wall"></div>
+                    <div class="outside-path"></div>
+                `;
+                if (outsideAreaLocked('graffiti-alley')) {
+                    setDialogue('…', 'The alley stares back in silence. You already made your choice here tonight.', [
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+                    return;
+                }
+                bindSceneAction('focus-alley', async () => {
+                    if (!beginOutsideAreaChoice('graffiti-alley', 'alley-talk')) return;
+                    await talkTarn();
+                });
+                setDialogue('…',
+                    'A narrow alley opens between shuttered buildings. The walls are layered with old paint and newer warnings.', [
+                        { label: 'Speak with Vaelor', action: async () => {
+                                if (!beginOutsideAreaChoice('graffiti-alley', 'alley-talk')) return;
+                                await talkTarn();
+                            } },
+                        { label: 'Study the mural', action: async () => {
+                                if (!beginOutsideAreaChoice('graffiti-alley', 'alley-study')) return;
+                                setDialogue('…', 'The mural changes when you look away: faces, then masks, then empty outlines.');
+                                await waitForNext();
+                                goToGraffitiAlley();
+                            } },
+                        { label: 'Deface the wall', action: async () => {
+                                if (!beginOutsideAreaChoice('graffiti-alley', 'alley-deface')) return;
+                                markCruelAction('defaced alley mural', 16, 4);
+                                setDialogue('…', 'You carve through fresh paint. For a second, the alley smells like iron instead of spray paint.');
+                                await waitForNext();
+                                goToGraffitiAlley();
+                            } },
+                        { label: 'Return to district', action: () => goOutsideDistrict() },
+                    ]);
+            }
+
+            function returnToSpiritLocation() {
+                if (state.currentLocation === 'lantern-court') return goToLanternCourt();
+                if (state.currentLocation === 'rail-bridge') return goToRailBridge();
+                if (state.currentLocation === 'shrine-garden') return goToShrineGarden();
+                if (state.currentLocation === 'graffiti-alley') return goToGraffitiAlley();
+                return goOutsideDistrict();
+            }
+
+            async function talkAerin() {
+                if (!state.loopActive) return;
+                const hostile = state.cruelChoicesTotal > state.kindChoicesTotal + 2;
+                const opening = hostile ?
+                    'Mikkel stands under a paper lantern, hands in his coat pockets. "People here are polite, but some nights I still feel like an outsider watching through glass."' :
+                    'Mikkel smiles and offers a warm nod. "I\'m from Aarhus. Moved here for work. Beautiful city, but it takes time before it feels like home."';
+                setDialogue('Mikkel', opening, [
+                    {
+                        label: '"What helps you settle in?"',
+                        action: async () => {
+                            state.aerinAffinity = Math.min(10, state.aerinAffinity + 2);
+                            markKindAction('trusted Mikkel', 1);
+                            setDialogue('Mikkel',
+                                '"Rituals," he says. "Watering a plant. Learning your neighbors\' names. Small care makes a foreign place feel less foreign."');
+                            await waitForNext();
+                            returnToSpiritLocation();
+                        },
+                    },
+                    {
+                        label: '"You\'ll never belong here."',
+                        action: async () => {
+                            state.aerinAffinity = Math.max(0, state.aerinAffinity - 2);
+                            markCruelAction('rejected Mikkel', 20, 5);
+                            setDialogue('Mikkel',
+                                'His jaw tightens. "Maybe. But I\'ll still keep trying."');
+                            await waitForNext();
+                            returnToSpiritLocation();
+                        },
+                    },
+                ]);
+            }
+
+            async function talkElion() {
+                if (!state.loopActive) return;
+                const warm = state.kindChoicesTotal >= state.cruelChoicesTotal;
+                const opening = warm ?
+                    'Sven leans on the railing, scarf pulled tight. "I\'m from Gothenburg. Tokyo is louder than home, but I\'m starting to love the noise."' :
+                    'Sven keeps his eyes on the tracks. "Some nights I miss Sweden enough to feel it in my chest. I hate that feeling."';
+                setDialogue('Sven', opening, [
+                    {
+                        label: 'Offer help',
+                        action: async () => {
+                            state.elionTrust = Math.min(10, state.elionTrust + 2);
+                            markKindAction('helped Sven', 2);
+                            setDialogue('Sven',
+                                '"Thanks. Maybe tomorrow you can show me a quiet place nearby," he says. "I still get lost."');
+                            await waitForNext();
+                            returnToSpiritLocation();
+                        },
+                    },
+                    {
+                        label: 'Exploit his confusion',
+                        action: async () => {
+                            state.elionTrust = Math.max(0, state.elionTrust - 3);
+                            markCruelAction('manipulated Sven', 25, 6);
+                            setDialogue('Sven',
+                                'He frowns and steps back. "I trusted the wrong person tonight."');
+                            await waitForNext();
+                            returnToSpiritLocation();
+                        },
+                    },
+                ]);
+            }
+
+            async function talkNyra() {
+                if (!state.loopActive) return;
+                const plantLine = state.plantHealth >= 2 ?
+                    '"Your hands look like someone who still cares for living things."' :
+                    '"You look tired, like someone carrying too much and dropping what matters."';
+                setDialogue('Greta',
+                    `Greta adjusts her gloves and kneels near the moss. ${plantLine} "I moved from Berlin to study shrine ecology. I came for plants, stayed for the quiet."`, [
+                        {
+                            label: 'Help with her notes',
+                            action: async () => {
+                                state.nyraBalance = Math.min(10, state.nyraBalance + 2);
+                                markKindAction('listened to Greta', 1);
+                                setDialogue('Greta',
+                                    '"Thank you," she says. "Most people rush past this place. You actually looked."');
+                                await waitForNext();
+                                returnToSpiritLocation();
+                            },
+                        },
+                        {
+                            label: 'Mock her research',
+                            action: async () => {
+                                state.nyraBalance = Math.max(0, state.nyraBalance - 2);
+                                markCruelAction('mocked Greta', 18, 4);
+                                setDialogue('Greta',
+                                    'Her expression cools. "You don\'t have to respect me, but at least respect this place."');
+                                await waitForNext();
+                                returnToSpiritLocation();
+                            },
+                        },
+                    ]);
+            }
+
+            async function talkTarn() {
+                if (!state.loopActive) return;
+                state.tarnWarnings++;
+                const deathWarning = state.deathCount >= 2 ?
+                    'Vaelor speaks softly, accent hard to place. "Some nights this city feels like a maze. People can get sharp when they are lonely."' :
+                    'Vaelor stands by the mural with paint on his sleeves. "I\'m new here. Street art pays little, but at least it tells the truth."';
+                setDialogue('Vaelor', deathWarning, [
+                    {
+                        label: 'Ask about his art',
+                        action: async () => {
+                            markKindAction('heard Vaelor', 1);
+                            setDialogue('Vaelor',
+                                '"I paint migrants, runaways, and workers," he says. "People who are seen but not noticed."');
+                            await waitForNext();
+                            returnToSpiritLocation();
+                        },
+                    },
+                    {
+                        label: 'Threaten him to move',
+                        action: async () => {
+                            markCruelAction('embraced Vaelor warning', 30, 8);
+                            setDialogue('Vaelor',
+                                'He raises his hands and steps away from the wall. "Fine. It\'s yours. I\'ll find another alley."');
+                            await waitForNext();
+                            await triggerHallucination('future you is still here');
+                            returnToSpiritLocation();
+                        },
+                    },
                 ]);
             }
 
@@ -1631,13 +2373,13 @@
                     <div class="store-exit" id="click-store-exit" title="Go back"></div>
                 `;
 
-                document.getElementById('click-shelf')?.addEventListener('click', browseStore);
-                document.getElementById('click-counter')?.addEventListener('click', approachCounter);
-                document.getElementById('click-store-exit')?.addEventListener('click', () => {
+                bindSceneAction('click-shelf', browseStore);
+                bindSceneAction('click-counter', approachCounter);
+                bindSceneAction('click-store-exit', async () => {
                     clearScene();
-                    sceneEl.className = 'scene-corridor';
-                    state.currentLocation = 'corridor';
-                    goToCorridor();
+                    sceneEl.className = 'scene-outside';
+                    state.currentLocation = 'outside';
+                    goOutsideDistrict();
                 });
 
                 setDialogue('…',
@@ -1645,10 +2387,10 @@
                     [
                         { label: 'Browse the shelves', action: () => browseStore() },
                         { label: 'Approach the counter', action: () => approachCounter() },
-                        { label: 'Go back upstairs', action: () => { clearScene();
-                                sceneEl.className = 'scene-corridor';
-                                state.currentLocation = 'corridor';
-                                goToCorridor(); } },
+                        { label: 'Return to district', action: () => { clearScene();
+                            sceneEl.className = 'scene-outside';
+                            state.currentLocation = 'outside';
+                            goOutsideDistrict(); } },
                     ]);
             }
 
@@ -1669,7 +2411,7 @@
                     { label: 'Buy Strong Zero (beer)', action: () => buyItem('strong-zero') },
                     { label: 'Buy Onigiri', action: () => buyItem('onigiri') },
                     { label: 'Buy Instant Ramen', action: () => buyItem('ramen') },
-                    { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
+                    { label: 'Return to district', action: () => { clearScene(); sceneEl.className = 'scene-outside'; state.currentLocation = 'outside'; goOutsideDistrict(); } },
                 ]);
             }
 
@@ -1677,8 +2419,7 @@
             async function buyItem(itemKey) {
                 if (!state.loopActive) return;
                 if (itemKey === 'strong-zero') {
-                    state.cruelChoicesTotal++;
-                    state.recentCruelActions.push('bought strong zero');
+                    markCruelAction('bought strong zero', 22, 8);
                     state.harukiTrust = Math.max(0, state.harukiTrust - 1);
                     setDialogue('…', 'You grab a can of Strong Zero from the shelf. It tastes sharp and empty. The clerk does not look pleased, but he does not stop you.' );
                     await waitForNext();
@@ -1686,33 +2427,31 @@
                     await waitForNext();
                     setDialogue('…', 'The world tilts. You collapse to the floor of the store, the fluorescent lights buzzing overhead. When you wake, the evening has reset and your choices are gone.' );
                     // harsh mental penalty to reflect a bad choice
-                    state.mentalState = Math.max(5, state.mentalState - 30);
+                    state.mentalState = Math.max(5, state.mentalState - 26);
                     await waitForNext();
                     endLoop('passed-out');
                     return;
                 }
 
                 if (itemKey === 'onigiri') {
-                    state.kindChoicesTotal++;
+                    markKindAction('bought onigiri', 2);
                     setDialogue('…', 'You buy an onigiri. It feels comforting, small, familiar, warm in your hands.');
                     await waitForNext();
                     setDialogue('…', 'You eat it and feel a little steadier.');
-                    state.mentalState = Math.min(100, state.mentalState + 2);
                     await waitForNext();
                     setDialogue('…', 'The store hums with fluorescent light.', [
                         { label: 'Approach the counter', action: () => approachCounter() },
-                        { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
+                                { label: 'Return to district', action: () => { clearScene(); sceneEl.className = 'scene-outside'; state.currentLocation = 'outside'; goOutsideDistrict(); } },
                     ]);
                     return;
                 }
 
                 if (itemKey === 'ramen') {
-                    state.kindChoicesTotal++;
+                    markKindAction('bought ramen', 1);
                     setDialogue('…', 'You buy some instant ramen. The packet promises warmth and predictable taste.');
                     await waitForNext();
-                    state.mentalState = Math.min(100, state.mentalState + 1);
-                    setDialogue('…', 'You put it in your bag and head back upstairs.', [
-                        { label: 'Go back upstairs', action: () => { clearScene(); sceneEl.className = 'scene-corridor'; state.currentLocation = 'corridor'; goToCorridor(); } },
+                    setDialogue('…', 'You put it in your bag and step back toward the district streets.', [
+                        { label: 'Return to district', action: () => { clearScene(); sceneEl.className = 'scene-outside'; state.currentLocation = 'outside'; goOutsideDistrict(); } },
                     ]);
                     return;
                 }
@@ -1723,17 +2462,43 @@
                 setDialogue('…',
                     'The clerk looks up. A tired young man with kind eyes. "Find everything okay?" There\'s something familiar about his tone. But of course there is, you\'ve been here before. Many times.'
                     );
-                state.kindChoicesTotal++;
-                state.mentalState = Math.min(100, state.mentalState + 1);
-                applyDegradation();
                 await waitForNext();
-                setDialogue('…', 'You nod and step away from the counter.', [
-                    { label: 'Browse shelves', action: () => browseStore() },
-                    { label: 'Go back upstairs', action: () => { clearScene();
-                            sceneEl.className = 'scene-corridor';
-                            state.currentLocation = 'corridor';
-                            goToCorridor(); } },
+                setDialogue('…', 'Your chest tightens. You can answer with care, or let the loop strip that away.', [
+                    {
+                        label: 'Speak politely',
+                        action: async () => {
+                            markKindAction('spoke kindly to clerk', 1);
+                            setDialogue('…', 'You thank him and step aside. For a second, your thoughts settle.');
+                            await waitForNext();
+                            setDialogue('…', 'The store hums with fluorescent light.', [
+                                { label: 'Browse shelves', action: () => browseStore() },
+                                { label: 'Return to district', action: () => { clearScene(); sceneEl.className = 'scene-outside'; state.currentLocation = 'outside'; goOutsideDistrict(); } },
+                            ]);
+                        },
+                    },
+                    {
+                        label: 'Attack the clerk without thinking',
+                        action: () => thoughtlessKillAtStore(),
+                        special: true,
+                    },
+                    { label: 'Back away', action: () => browseStore() },
                 ]);
+            }
+
+            async function thoughtlessKillAtStore() {
+                if (!state.loopActive) return;
+                markCruelAction('killed without thought', 45, 12);
+                setDialogue('…',
+                    'Your hand moves before your mind does. A flash of violence. A scream. Then silence. The shelves stare back at you like witnesses.'
+                );
+                await waitForNext();
+                setDialogue('…',
+                    'Blood on tile. Breath shaking. You wanted to feel nothing, but the loop makes sure you feel everything.'
+                );
+                await waitForNext();
+                state.mentalState = Math.max(5, state.mentalState - 18);
+                await triggerHallucination('no consequence outside, all consequence inside');
+                endLoop('murder-collapse');
             }
 
             // ==================== ENDINGS ====================
@@ -1758,7 +2523,7 @@
                 sceneEl.style.padding = '40px';
                 const endDiv = document.createElement('div');
                 endDiv.innerHTML = `
-                    <div style="font-size:28px;color:#6b4e3d;letter-spacing:0.1em;margin-bottom:16px;">心の蝕</div>
+                    <div style="font-size:28px;color:#6b4e3d;letter-spacing:0.1em;margin-bottom:16px;">MIND'S ECLIPSE</div>
                     <div style="font-size:15px;color:#8b6f5e;line-height:1.8;max-width:350px;">
                         The loop breaks not with a bang,<br>but with a hand held in the dark.<br><br>
                         Haruki remembers. You remember.<br>
@@ -1768,14 +2533,14 @@
                         <span style="color:#5a6a7a;">Morning comes.</span>
                     </div>
                     <div style="margin-top:30px;font-size:12px;color:#a09080;letter-spacing:0.15em;">
-                        真実の結末 ・ TRUE ENDING
+                        TRUE ENDING
                     </div>
                 `;
                 sceneEl.appendChild(endDiv);
                 setDialogue('…', '');
                 speakerName.textContent = '';
                 timerDisplay.textContent = '';
-                loopIndicator.textContent = '朝 ・ 終わり';
+                loopIndicator.textContent = 'MORNING - RELEASE';
                 loopIndicator.style.color = 'rgba(180,160,140,0.8)';
                 gameContainer.className = '';
                 vignetteEl.style.opacity = '0.2';
@@ -1803,7 +2568,7 @@
                 sceneEl.style.textAlign = 'center';
                 const endDiv = document.createElement('div');
                 endDiv.innerHTML = `
-                    <div style="font-size:24px;color:#3a2a2a;letter-spacing:0.15em;margin-bottom:16px;">心の蝕</div>
+                    <div style="font-size:24px;color:#3a2a2a;letter-spacing:0.15em;margin-bottom:16px;">MIND'S ECLIPSE</div>
                     <div style="font-size:14px;color:#5a4040;line-height:1.8;max-width:320px;">
                         The mind erodes.<br>
                         The loops blur together.<br>
@@ -1813,14 +2578,14 @@
                         The eclipse is total.
                     </div>
                     <div style="margin-top:30px;font-size:11px;color:#4a3030;letter-spacing:0.12em;">
-                        悪い結末 ・ BAD ENDING
+                        BAD ENDING
                     </div>
                 `;
                 sceneEl.appendChild(endDiv);
                 setDialogue('…', '');
                 speakerName.textContent = '';
                 timerDisplay.textContent = '';
-                loopIndicator.textContent = '闇 ・ 終わり';
+                loopIndicator.textContent = 'DARKNESS - END';
                 loopIndicator.style.color = 'rgba(80,40,40,0.6)';
                 gameContainer.className = 'degraded-critical';
                 vignetteEl.style.opacity = '0.8';
@@ -1841,9 +2606,24 @@
                 state.graffitiLevel = 0;
                 state.kindChoicesTotal = 0;
                 state.cruelChoicesTotal = 0;
+                state.cruelStreak = 0;
                 state.dialogueHistory = [];
                 state.recentKindActions = [];
                 state.recentCruelActions = [];
+                state.loopDuration = 150;
+                state.deathCount = 0;
+                state.aerinAffinity = 0;
+                state.elionTrust = 0;
+                state.nyraBalance = 0;
+                state.tarnWarnings = 0;
+                state.lastLoopReason = null;
+                state.outsideAreaChoiceUsed = {
+                    'lantern-court': false,
+                    'rail-bridge': false,
+                    'shrine-garden': false,
+                    'graffiti-alley': false,
+                };
+                state.usedOutsideChoices = [];
                 state.trueEndingUnlocked = false;
                 state.trueEndingTriggered = false;
                 state.badEndingTriggered = false;
@@ -1853,7 +2633,7 @@
                 gameContainer.className = '';
                 vignetteEl.style.opacity = '0.35';
                 scanlinesEl.style.opacity = '0.4';
-                loopIndicator.textContent = '夜 ・ ループ';
+                loopIndicator.textContent = 'NIGHT LOOP';
                 loopIndicator.style.color = 'rgba(255,255,255,0.3)';
                 loopIndicator.style.opacity = '0.7';
                 timerDisplay.style.color = 'rgba(255,255,255,0.25)';
@@ -1910,7 +2690,7 @@
             loopIndicator.textContent = '';
             gameContainer.className = '';
 
-            console.log('心の蝕 - Mind\'s Eclipse');
+            console.log('Mind\'s Eclipse');
             console.log('A time-loop narrative game');
             console.log('Click the title screen to begin.');
             console.log('Pay attention. Your choices matter.');
