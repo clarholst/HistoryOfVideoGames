@@ -17,6 +17,8 @@
       --week6-soft: #ffe4d8;
       --week7: #3cb38a;
       --week7-soft: #dbf7eb;
+      --week8: #8a7060;
+      --week8-soft: #f0e8de;
     }
 
     * {
@@ -98,7 +100,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
     }
 
@@ -177,6 +179,12 @@
       background: #ffefe8;
     }
 
+    .week8 ~ details .readmore summary,
+    .card:has(.week8) .readmore summary {
+      color: #4a3020;
+      background: var(--week8-soft);
+    }
+
     .readmore summary::-webkit-details-marker {
       display: none;
     }
@@ -245,6 +253,17 @@
     .btn7 {
       background: linear-gradient(180deg, #43c79a 0%, #28946f 100%);
       border-color: #1f7c5d;
+    }
+
+    .week8 {
+      color: #4a3020;
+      background: var(--week8-soft);
+      border-color: var(--week8);
+    }
+
+    .btn8 {
+      background: linear-gradient(180deg, #a08878 0%, #7a5848 100%);
+      border-color: #6a4838;
     }
 
     @media (max-width: 840px) {
@@ -350,6 +369,57 @@
           In this game, a traveller arrives at a mysterious train station with no memory of who they are and must choose which trains to board, which destinations to explore, and how to respond to the people they meet along the way.
         </p>
         <a class="btn btn7" href="week7.html">Play Week 7 Game</a>
+      </article>
+
+      <article class="card">
+        <div class="week week8">Week 8</div>
+        <h2>Sediment</h2>
+        <p class="desc">
+          <strong>Assignment:</strong> Design an art game where the player has a clear interpretive objective.
+          You play an obituary writer entering the home of someone who has recently died. Your goal is to gather memory clues from their belongings and understand the life they lived.
+        </p>
+        <details class="readmore">
+          <summary>Read more</summary>
+          <div class="readmore-content">
+            <h3>Concept</h3>
+            <p>
+              Sediment is an art game about grief, memory, and writing a life after death.
+              You move between four rooms (hallway, living room, kitchen, bedroom) as an obituary writer,
+              touching objects the deceased left behind. Each object reveals a short auditory memory: a fragment
+              of routine, relationship, or unfinished intention.
+            </p>
+            <p>
+              The objective is not speed or perfection, but interpretation. As you collect enough clues,
+              you attempt a final reconstruction of who they were. Completion comes from understanding their
+              patterns of care, habit, and what they left unresolved.
+            </p>
+
+            <h3>Theoretical Grounding</h3>
+            <p>
+              The game shifts Juul's third aesthetic layer into a goal-driven form. Rather than removing orientation,
+              it uses a reflective goal: infer a life from fragments. Progress is measured through interpretive clarity,
+              not mastery or competition.
+            </p>
+            <p>
+              It also connects to Nguyen's idea that games can crystallize aesthetic experiences: grief, and
+              the specific ritual of handling a dead person's things, is a very particular kind of human moment.
+              Games are uniquely positioned to concentrate that experience, to make it inhabitable rather than
+              merely described.
+            </p>
+
+            <h3>Design Choices</h3>
+            <p>
+              Sound is the primary medium for memory. The Web Audio API generates a unique melodic tone
+              sequence for each object, alongside a low ambient drone throughout. Text appears as a transcript
+              of what the player hears, serving as an accessibility fallback.
+            </p>
+            <p>
+              Visual design is deliberately quiet: sepia-toned rooms, dust motes, no UI chrome beyond
+              room navigation. The game does not tell the player when the ending is near.
+            </p>
+          </div>
+        </details>
+        <a class="btn btn8" href="week8.html">Play Week 8 Game</a>
       </article>
     </section>
   </main>
