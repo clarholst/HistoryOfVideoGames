@@ -4,34 +4,39 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Meow Adventure</title>
+<link rel="icon" href="C:\Users\ClaraHolst\Personal\MindEclipse\adventure_images\cat.jpg" type="image">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:        #0f1117;
-    --surface:   #181c27;
-    --surface2:  #1f2435;
-    --border:    #2a2f42;
-    --border2:   #3a4060;
-    --text:      #e8e4d9;
-    --muted:     #8b8fa8;
-    --accent:    #c2a86e;
-    --accent2:   #7db8a0;
-    --danger:    #c26e6e;
-    --hp-hi:     #7db8a0;
-    --hp-mid:    #c2a86e;
-    --hp-lo:     #c26e6e;
-    --radius:    10px;
-    --radius-lg: 16px;
+    --bg:        #f2e8cc;
+    --surface:   #fff8e9;
+    --surface2:  #f9f0d8;
+    --border:    #d0b886;
+    --border2:   #9b7d45;
+    --text:      #3b2e1f;
+    --muted:     #7a6540;
+    --accent:    #8a5a21;
+    --accent2:   #2f7d49;
+    --danger:    #9a2f2f;
+    --hp-hi:     #3f9a53;
+    --hp-mid:    #cf9e31;
+    --hp-lo:     #b84f32;
+    --radius:    14px;
+    --radius-lg: 20px;
+    --shadow:    0 10px 30px rgba(74, 47, 17, 0.15);
   }
 
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255, 244, 191, 0.8), transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(175, 227, 172, 0.5), transparent 35%),
+      linear-gradient(180deg, #f7efcf 0%, #efe4bc 52%, #e2d5a7 100%);
     color: var(--text);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 15px;
     line-height: 1.6;
     min-height: 100vh;
@@ -39,29 +44,58 @@
     flex-direction: column;
     align-items: center;
     padding: 2rem 1rem 4rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: '';
+    position: fixed;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.3;
+  }
+
+  body::before {
+    width: 340px;
+    height: 340px;
+    left: -90px;
+    bottom: -120px;
+    background: radial-gradient(circle, #7fa75b 0%, transparent 68%);
+  }
+
+  body::after {
+    width: 380px;
+    height: 380px;
+    right: -120px;
+    top: -120px;
+    background: radial-gradient(circle, #c8a36a 0%, transparent 70%);
   }
 
   h1 {
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(22px, 5vw, 34px);
     font-weight: 600;
     color: var(--accent);
     text-align: center;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     margin-bottom: 4px;
+    text-shadow: 0 1px 0 #fbeebf;
   }
 
   .subtitle {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
     text-align: center;
     margin-bottom: 1.75rem;
     font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
   }
 
   #game {
     width: 100%;
-    max-width: 620px;
+    max-width: 980px;
   }
 
   /* HUD */
@@ -74,15 +108,16 @@
 
   .hud-card {
     background: var(--surface);
-    border: 0.5px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.65rem 0.9rem;
+    box-shadow: var(--shadow);
   }
 
   .hud-label {
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--muted);
     margin-bottom: 3px;
   }
@@ -95,7 +130,7 @@
 
   .hp-bar {
     height: 5px;
-    background: var(--border);
+    background: #ddca99;
     border-radius: 3px;
     margin-top: 7px;
     overflow: hidden;
@@ -110,30 +145,35 @@
   /* Inventory toggle */
   .inv-toggle {
     width: 100%;
-    background: none;
-    border: 0.5px solid var(--border);
+    background: linear-gradient(180deg, #f8e7ba 0%, #edd39c 100%);
+    border: 1px solid var(--border2);
     border-radius: var(--radius);
     padding: 0.5rem 1rem;
-    font-size: 13px;
-    color: var(--muted);
+    font-size: 14px;
+    color: var(--text);
     cursor: pointer;
     text-align: left;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 6px 18px rgba(111, 74, 26, 0.2);
   }
 
-  .inv-toggle:hover { background: var(--surface); color: var(--text); }
+  .inv-toggle:hover {
+    background: linear-gradient(180deg, #f8eecf 0%, #f2dba9 100%);
+    transform: translateY(-1px);
+  }
 
   .inv-panel {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
+    background: linear-gradient(180deg, #fff8e8 0%, #f6eacc 100%);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.75rem 1rem;
     margin-bottom: 10px;
     display: none;
+    box-shadow: var(--shadow);
   }
 
   .inv-panel.open { display: block; }
@@ -151,33 +191,63 @@
   .inv-item {
     font-size: 12px;
     background: var(--surface2);
-    border: 0.5px solid var(--border);
+    border: 1px solid #d8c08d;
     border-radius: 6px;
     padding: 3px 9px;
     color: var(--text);
   }
 
-  /* Scene card */
-  .scene-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem 1.5rem 1.25rem;
+  /* Scene layout */
+  .scene-wrap {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) 120px;
+    gap: 14px;
+    align-items: stretch;
   }
 
-  .scene-art {
-    font-size: 26px;
-    letter-spacing: 5px;
-    margin-bottom: 0.75rem;
-    line-height: 1;
+  .scene-side {
+    padding: 0.85rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .scene-card {
+    background:
+      linear-gradient(180deg, rgba(255, 248, 231, 0.96), rgba(250, 237, 204, 0.96)),
+      repeating-linear-gradient(45deg, rgba(162, 128, 73, 0.06), rgba(162, 128, 73, 0.06) 3px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0) 10px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.5rem 1.25rem;
+    box-shadow: 0 14px 36px rgba(96, 69, 28, 0.2);
+    animation: cardFade 0.45s ease;
+  }
+
+  .scene-sprite,
+  .end-sprite,
+  .inv-icon {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    mix-blend-mode: multiply;
+    filter: saturate(1.08) contrast(1.04);
+  }
+
+  .scene-sprite {
+    width: 82px;
+    height: 82px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   .scene-title {
-    font-family: 'Lora', Georgia, serif;
-    font-size: 19px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 27px;
     font-weight: 600;
     color: var(--accent);
     margin-bottom: 0.75rem;
+    line-height: 1.05;
   }
 
   .result-msg {
@@ -189,23 +259,24 @@
     display: none;
   }
 
-  .result-msg.good { background: rgba(125,184,160,0.12); color: var(--accent2); display: block; }
-  .result-msg.bad  { background: rgba(194,110,110,0.12); color: var(--danger);  display: block; }
+  .result-msg.good { background: rgba(63,154,83,0.12); color: #226133; display: block; border: 1px solid rgba(63,154,83,0.28); }
+  .result-msg.bad  { background: rgba(184,79,50,0.1); color: var(--danger); display: block; border: 1px solid rgba(184,79,50,0.24); }
 
   .scene-desc {
     font-size: 15px;
-    color: #bdb8ae;
+    color: #5b4730;
     line-height: 1.75;
     margin-bottom: 1.25rem;
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
     font-style: italic;
   }
 
   .scene-desc strong { font-style: normal; font-weight: 600; color: var(--accent); }
 
   .divider {
-    height: 0.5px;
-    background: var(--border);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #cbaf75, transparent);
     margin: 0 0 1.1rem;
   }
 
@@ -213,30 +284,40 @@
   .choices { display: flex; flex-direction: column; gap: 8px; }
 
   .choice-btn {
-    background: var(--surface2);
-    border: 0.5px solid var(--border);
+    background: linear-gradient(180deg, #f4e2bb 0%, #ebce92 100%);
+    border: 1px solid #b58f4f;
     border-radius: var(--radius);
     padding: 0.65rem 1rem;
     font-size: 14px;
-    color: var(--text);
+    color: #3f2e1c;
     cursor: pointer;
     text-align: left;
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s, transform 0.12s;
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 6px 14px rgba(104, 71, 26, 0.15);
   }
 
-  .choice-btn::before { content: '›'; color: var(--accent); font-size: 16px; flex-shrink: 0; }
-  .choice-btn:hover { background: #252a3a; border-color: var(--border2); }
+  .choice-btn::before { content: '›'; color: #5e471f; font-size: 16px; flex-shrink: 0; }
+  .choice-btn:hover { background: linear-gradient(180deg, #f8eac8 0%, #f0d9a6 100%); border-color: var(--border2); }
   .choice-btn:active { transform: scale(0.98); }
 
   /* End screens */
   .end-screen { text-align: center; padding: 1.5rem 0.5rem; }
-  .end-icon { font-size: 52px; margin-bottom: 1rem; }
+  .end-icon {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+  }
+  .end-sprite { width: 52px; height: 52px; object-fit: contain; }
   .end-title {
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 0.75rem;
@@ -245,11 +326,12 @@
   .end-title.lose { color: var(--danger); }
   .end-body {
     font-size: 15px;
-    color: #bdb8ae;
+    color: #5b4730;
     line-height: 1.75;
     max-width: 440px;
     margin: 0 auto 1rem;
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
     font-style: italic;
   }
   .end-stats {
@@ -259,17 +341,25 @@
   }
 
   .restart-btn {
-    background: var(--surface2);
-    border: 0.5px solid var(--border2);
+    background: linear-gradient(180deg, #f4e2bb 0%, #ebce92 100%);
+    border: 1px solid #b58f4f;
     border-radius: var(--radius);
     padding: 0.65rem 1.5rem;
     font-size: 14px;
-    color: var(--text);
+    color: #3f2e1c;
     cursor: pointer;
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: background 0.15s;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    transition: background 0.2s;
   }
-  .restart-btn:hover { background: #252a3a; }
+  .restart-btn:hover { background: linear-gradient(180deg, #f8eac8 0%, #f0d9a6 100%); }
+
+  .inv-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
 
   /* Subtle page footer */
   .page-footer {
@@ -277,11 +367,32 @@
     font-size: 12px;
     color: var(--muted);
     text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+  }
+
+  @keyframes cardFade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @media (max-width: 480px) {
     body { padding: 1rem 0.75rem 3rem; }
     .scene-card { padding: 1.1rem 1.1rem 1rem; }
+    .scene-title { font-size: 23px; }
+    .scene-desc, .end-body { font-size: 19px; }
+  }
+
+  @media (max-width: 780px) {
+    .scene-wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .scene-side {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -292,7 +403,7 @@
 <body>
 
 <h1>Meow Adventure</h1>
-<p class="subtitle">A choose-your-own-adventure · find your missing cat</p>
+<p class="subtitle">A bright woodland quest to find your missing cat</p>
 
 <div id="game">
   <!-- HUD -->
@@ -310,7 +421,7 @@
 
   <!-- Inventory -->
   <button class="inv-toggle" onclick="toggleInv()" aria-expanded="false" aria-controls="inv-panel">
-    🎒 Inventory
+    <img class="inv-icon" src="adventure_images/backpack.jpg" alt="" aria-hidden="true"> Inventory
   </button>
   <div class="inv-panel" id="inv-panel" role="region" aria-label="Inventory">
     <div class="inv-title">Your items</div>
@@ -318,17 +429,20 @@
   </div>
 
   <!-- Scene -->
-  <div class="scene-card" id="scene-card">
-    <div class="scene-art"  id="scene-art"></div>
-    <div class="scene-title" id="scene-title"></div>
-    <div class="result-msg" id="result-msg"></div>
-    <div class="scene-desc" id="scene-desc"></div>
-    <div class="divider"></div>
-    <div class="choices"    id="choices"></div>
+  <div class="scene-wrap">
+    <div class="scene-side" id="scene-art-left"></div>
+    <div class="scene-card" id="scene-card">
+      <div class="scene-title" id="scene-title"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="scene-desc" id="scene-desc"></div>
+      <div class="divider"></div>
+      <div class="choices"    id="choices"></div>
+    </div>
+    <div class="scene-side" id="scene-art-right"></div>
   </div>
 </div>
 
-<p class="page-footer">Based on a PICO-8 game by Clara &nbsp;·&nbsp; built with HTML &amp; JS</p>
+<p class="page-footer">Based on a PICO-8 game by Clara </p>
 
 <script>
 /* ============================================================
@@ -374,6 +488,49 @@ function updateHud(loc) {
   renderInv();
 }
 
+function spriteSrc(fileName) {
+  return `adventure_images/${encodeURIComponent(fileName)}`;
+}
+
+function spriteImg(fileName, cls = 'scene-sprite') {
+  return `<img class="${cls}" src="${spriteSrc(fileName)}" alt="" aria-hidden="true">`;
+}
+
+function balanceArtForSides(artFiles) {
+  if (!Array.isArray(artFiles) || artFiles.length === 0) return { left: [], right: [] };
+  const balanced = [...artFiles];
+  if (balanced.length % 2 !== 0) balanced.push(balanced[balanced.length - 1]);
+  const half = balanced.length / 2;
+  return { left: balanced.slice(0, half), right: balanced.slice(half) };
+}
+
+function renderSceneArt(sideFiles) {
+  if (!Array.isArray(sideFiles) || sideFiles.length === 0) return '';
+  return sideFiles.map(f => spriteImg(f)).join('');
+}
+
+function setSceneArt(artFiles) {
+  if (!Array.isArray(artFiles) || artFiles.length === 0) {
+    document.getElementById('scene-art-left').innerHTML = '';
+    document.getElementById('scene-art-right').innerHTML = '';
+    return;
+  }
+  const { left, right } = balanceArtForSides(artFiles);
+  document.getElementById('scene-art-left').innerHTML = renderSceneArt(left);
+  document.getElementById('scene-art-right').innerHTML = renderSceneArt(right);
+}
+
+function centerSceneCard() {
+  const sceneCard = document.getElementById('scene-card');
+  if (!sceneCard) return;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  sceneCard.scrollIntoView({
+    behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    block: 'center',
+    inline: 'nearest',
+  });
+}
+
 /* ============================================================
    Show a scene
    ============================================================ */
@@ -384,7 +541,7 @@ function show(key, resultMsg, resultType) {
   G.scene = key;
   updateHud(s.loc || key);
 
-  document.getElementById('scene-art').textContent   = s.art  || '';
+  setSceneArt(s.art || []);
   document.getElementById('scene-title').textContent = s.title || '';
 
   const rm = document.getElementById('result-msg');
@@ -410,7 +567,7 @@ function show(key, resultMsg, resultType) {
   });
 
   if (s.onEnter) s.onEnter();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  requestAnimationFrame(centerSceneCard);
 }
 
 /* ============================================================
@@ -418,9 +575,11 @@ function show(key, resultMsg, resultType) {
    ============================================================ */
 function showWin() {
   stopCave();
+  document.getElementById('scene-art-left').innerHTML = '';
+  document.getElementById('scene-art-right').innerHTML = '';
   document.getElementById('scene-card').innerHTML = `
     <div class="end-screen">
-      <div class="end-icon">🐱💛</div>
+      <div class="end-icon">${spriteImg('cat.jpg', 'end-sprite')}${spriteImg('yellow_heart.png', 'end-sprite')}</div>
       <div class="end-title win">You found her!</div>
       <p class="end-body">
         Parting the tall grass, you find her curled in a warm patch of sun, tail flicking lazily.
@@ -434,18 +593,24 @@ function showWin() {
       </div>
       <button class="restart-btn" onclick="restartGame()">Play again</button>
     </div>`;
+  requestAnimationFrame(centerSceneCard);
 }
 
 function showDeath(msg) {
   stopCave();
+  G.hp = 0;
+  updateHud();
+  document.getElementById('scene-art-left').innerHTML = '';
+  document.getElementById('scene-art-right').innerHTML = '';
   document.getElementById('scene-card').innerHTML = `
     <div class="end-screen">
-      <div class="end-icon">💀</div>
+      <div class="end-icon">${spriteImg('skull.png', 'end-sprite')}</div>
       <div class="end-title lose">Game over</div>
       <p class="end-body">${msg}</p>
       <div class="end-stats">HP remaining: 0</div>
       <button class="restart-btn" onclick="restartGame()">Try again</button>
     </div>`;
+  requestAnimationFrame(centerSceneCard);
 }
 
 function restartGame() {
@@ -456,7 +621,6 @@ function restartGame() {
   document.querySelector('.inv-toggle').setAttribute('aria-expanded', 'false');
   // Rebuild the scene card structure (it may have been replaced by end screen)
   document.getElementById('scene-card').innerHTML = `
-    <div class="scene-art"  id="scene-art"></div>
     <div class="scene-title" id="scene-title"></div>
     <div class="result-msg" id="result-msg"></div>
     <div class="scene-desc" id="scene-desc"></div>
@@ -473,25 +637,27 @@ const SCENES = {
   /* ── MEADOW START ── */
   start: {
     loc: 'Starting meadow',
-    art: '🌸🌼🌊',
+    art: ['blossom.png', 'cherry_blossom.png', 'water_wave.jpg'],
     title: 'The Meadow',
     desc: () => `A warm breeze carries the scent of wildflowers. You stand in a sunlit meadow dotted
       with daisies and buttercups. A gentle river burbles nearby, crossed by a mossy wooden bridge.
       To the east, the meadow stretches into open grass. Somewhere out there your cat is missing.
-      <br><br>Glinting near a flower patch, you spot an iron key half-buried in the soil.`,
+      <br><br>${hasItem('Iron key')
+        ? 'The flower patch where you found the key is now just damp earth and petals.'
+        : 'Glinting near a flower patch, you spot an iron key half-buried in the soil.'}`,
     choices: () => [
       { label: 'Pick up the iron key',
         action: () => { addItem('Iron key'); show('start_keytaken', 'You pocket the iron key. It feels cold and heavy.'); } },
-      { label: 'Leave the key  cross the bridge over the river',
+      { label: 'Cross the bridge over the river',
         action: () => show('bridge') },
-      { label: 'Leave the key  head east into the open meadow',
+      { label: 'Head east into the open meadow',
         action: () => show('death_meadow') },
     ],
   },
 
   start_keytaken: {
     loc: 'Starting meadow',
-    art: '🌸🗝️🌊',
+    art: ['blossom.png', 'old_key.png', 'water_wave.jpg'],
     title: 'The Meadow',
     desc: () => `Key in hand, you survey the meadow. The mossy bridge waits to the west. The open grassland stretches east.`,
     choices: () => [
@@ -505,10 +671,10 @@ const SCENES = {
   /* ── DEATH: EASTERN MEADOW ── */
   death_meadow: {
     loc: 'Eastern meadow',
-    art: '👁️🌫️',
+    art: ['eye.jpg', 'warning_sign.png'],
     title: 'The Eastern Meadow',
     desc: () => `The grass grows tall and strange here. A low humming fills the air. Then something
-      shifts. A creature emerges from the fog, eyes wide and wrong, lurching toward you with
+      shifts. A creature emerges, eyes wide and wrong, lurching toward you with
       unnatural speed. You have no way to fight it.`,
     choices: () => [
       { label: 'Run back to the meadow',
@@ -521,13 +687,15 @@ const SCENES = {
   /* ── BRIDGE ── */
   bridge: {
     loc: 'River crossing',
-    art: '🌉🌿',
+    art: ['bridge.jpg', 'tree.png'],
     title: 'The Old Bridge',
     desc: () => `The wooden bridge sways gently over the clear river. On the far bank sits a stone
       cottage with ivy climbing its walls. The front door is fitted with a heavy iron lock.`,
     choices: () => [
-      { label: 'Try the cottage door',
+      { label: 'Open the cottage door',
         action: () => hasItem('Iron key') ? show('cottage') : show('cottage_locked') },
+      { label: 'Walk past the cottage',
+        action: () => show('hedge_entrance') },
       { label: 'Go back to the meadow',
         action: () => show('start') },
     ],
@@ -535,7 +703,7 @@ const SCENES = {
 
   cottage_locked: {
     loc: 'River cottage',
-    art: '🏠🔒',
+    art: ['house.jpg', 'lock.jpg'],
     title: 'Locked Cottage',
     desc: () => `The door doesn't budge. The lock is solid iron. You need a key.`,
     choices: () => [
@@ -549,11 +717,21 @@ const SCENES = {
   /* ── COTTAGE ── */
   cottage: {
     loc: 'River cottage',
-    art: '🏠🪨',
+    art: ['house.jpg', 'rock.png'],
     title: 'Inside the Cottage',
-    desc: () => `Dusty shelves line the walls. On a peg by the window hangs a <strong>slingshot</strong>.
-      Beside it, a small cloth pouch holds <strong>5 smooth rocks</strong>. Whoever lived here
-      hasn't been back in a while.`,
+    desc: () => {
+      const slingshotHere = !hasItem('Slingshot');
+      const rocksHere = !hasItem('5 rocks');
+      const lootText = slingshotHere && rocksHere
+        ? `On a peg by the window hangs a <strong>slingshot</strong>.
+      Beside it, a small cloth pouch holds <strong>5 smooth rocks</strong>.`
+        : slingshotHere
+          ? `On a peg by the window hangs a <strong>slingshot</strong>. The rock pouch is empty.`
+          : rocksHere
+            ? `An empty peg hangs by the window. Beside it, a small cloth pouch still holds <strong>5 smooth rocks</strong>.`
+            : `The peg is bare and the cloth pouch lies empty. You've already taken everything useful.`;
+      return `Dusty shelves line the walls. ${lootText} Whoever lived here hasn't been back in a while.`;
+    },
     choices: () => [
       ...(!hasItem('Slingshot') && !hasItem('5 rocks') ? [
         { label: 'Take both the slingshot and the rocks',
@@ -577,10 +755,10 @@ const SCENES = {
   /* ── HEDGE LABYRINTH ── */
   hedge_entrance: {
     loc: 'Hedge labyrinth',
-    art: '🌿🌿🌿',
+    art: ['tree.png', 'tree.png', 'tree.png'],
     title: 'The Hedge Labyrinth',
     desc: () => `The hedges tower over you, dense and dark green. Three paths branch ahead. There are
-      no signs. Somewhere deep inside, something moves.`,
+      no signs. Somewhere deep inside, something moves. Every wrong turn here hurts.`,
     choices: () => [
       { label: 'Take the left path',
         action: () => show('hedge_left') },
@@ -595,12 +773,12 @@ const SCENES = {
 
   hedge_left: {
     loc: 'Hedge labyrinth  left path',
-    art: '🌿⚠️',
+    art: ['tree.png', 'warning_sign.png'],
     title: 'Thorn Dead End',
-    desc: () => `The path narrows into a wall of thorns. You push back out, arms scratched. ${
-      G.hp <= 0 ? '' : '−15 HP.'}`,
+    desc: () => `The path narrows into a wall of thorns. You push back out, arms gashed and bleeding. ${
+      G.hp <= 0 ? '' : '−35 HP.'}`,
     onEnter: () => {
-      G.hp = Math.max(0, G.hp - 15); updateHud();
+      G.hp = Math.max(0, G.hp - 35); updateHud();
       if (G.hp <= 0) setTimeout(() => showDeath('The thorns were too much. You collapse.'), 300);
     },
     choices: () => G.hp > 0 ? [
@@ -611,31 +789,45 @@ const SCENES = {
 
   hedge_middle: {
     loc: 'Hedge labyrinth  middle path',
-    art: '🌿🌿',
+    art: ['tree.png', 'tree.png'],
     title: 'A Fork in the Maze',
     desc: () => `The middle path bends and opens to another split: left or right?`,
     choices: () => [
       { label: 'Go left', action: () => show('hedge_success') },
       { label: 'Go right',
-        action: () => { G.hp = Math.max(0, G.hp - 20); show('hedge_ditch', 'A hidden ditch! You scramble out. −20 HP.', 'bad'); } },
-      { label: 'Go back to the entrance', action: () => show('hedge_entrance') },
+        action: () => {
+          G.hp = Math.max(0, G.hp - 35);
+          if (G.hp <= 0) { showDeath('You plunge into the ditch and do not get back up.'); return; }
+          show('hedge_ditch', 'A hidden ditch! You scramble out. −35 HP.', 'bad');
+        } },
+      { label: 'Go back to the entrance',
+        action: () => {
+          G.hp = Math.max(0, G.hp - 15);
+          if (G.hp <= 0) { showDeath('You bleed out trying to force your way back through the hedge.'); return; }
+          show('hedge_entrance', 'Thorns rake your arms on the retreat. −15 HP.', 'bad');
+        } },
     ],
   },
 
   hedge_ditch: {
     loc: 'Hedge labyrinth  ditch',
-    art: '🌿🕳️',
+    art: ['tree.png', 'rock.png'],
     title: 'The Ditch',
-    desc: () => `Muddy and bruised, you pull yourself out. The left fork is still visible.`,
+    desc: () => `Muddy and bruised, you pull yourself out. The left fork is still visible, but your legs are shaking.`,
     choices: () => G.hp > 0 ? [
       { label: 'Take the left fork this time', action: () => show('hedge_success') },
-      { label: 'Go back to the entrance',       action: () => show('hedge_entrance') },
+      { label: 'Go back to the entrance',
+        action: () => {
+          G.hp = Math.max(0, G.hp - 20);
+          if (G.hp <= 0) { showDeath('You collapse while climbing back from the ditch.'); return; }
+          show('hedge_entrance', 'The climb back drains you badly. −20 HP.', 'bad');
+        } },
     ] : [],
   },
 
   hedge_right: {
     loc: 'Hedge labyrinth  right path',
-    art: '🌿✨',
+    art: ['tree.png', 'sparkles.png'],
     title: 'A Lucky Path',
     desc: () => `The right path curves and to your surprise opens directly onto the far side of
       the maze. You made it through unscathed.`,
@@ -646,19 +838,69 @@ const SCENES = {
 
   hedge_success: {
     loc: 'Hedge labyrinth  exit',
-    art: '🌿🏁',
+    art: ['tree.png', 'glowing_star.png'],
     title: 'Through the Maze!',
     desc: () => `The hedges thin and fall away. You emerge blinking into grey daylight. Ahead, a dark
       cave mouth yawns in the hillside.`,
     choices: () => [
       { label: 'Approach the cave', action: () => show('cave_entrance') },
+      { label: 'Go back through the maze', action: () => show('hedge_return_start') },
+    ],
+  },
+
+  hedge_return_start: {
+    loc: 'Hedge labyrinth  return path',
+    art: ['tree.png', 'tree.png', 'sparkles.png'],
+    title: 'Back Into the Maze',
+    desc: () => `You step back beneath the high hedges. Paths that seemed clear before now twist into
+      unfamiliar turns. Two narrow routes open ahead.`,
+    choices: () => [
+      { label: 'Follow the path with broken branches', action: () => show('hedge_return_fork') },
+      { label: 'Take the narrow tunnel',
+        action: () => {
+          G.hp = Math.max(0, G.hp - 20);
+          if (G.hp <= 0) { showDeath('You lose your footing in the tight passage and never recover.'); return; }
+          show('hedge_return_start', 'You squeeze through thorns and stone. −20 HP.', 'bad');
+        } },
+      { label: 'Turn back toward the cave side', action: () => show('hedge_success') },
+    ],
+  },
+
+  hedge_return_fork: {
+    loc: 'Hedge labyrinth  inner fork',
+    art: ['tree.png', 'warning_sign.png', 'tree.png'],
+    title: 'A Tangled Fork',
+    desc: () => `The path splits again. One way smells of wet earth and ivy. The other is darker,
+      packed with brambles and low stone roots.`,
+    choices: () => [
+      { label: 'Take the ivy-scented path', action: () => show('hedge_return_cottage') },
+      { label: 'Cut through the darker path',
+        action: () => {
+          G.hp = Math.max(0, G.hp - 25);
+          if (G.hp <= 0) { showDeath('The brambles drag you down before you can climb free.'); return; }
+          show('hedge_return_fork', 'Thorns tear at you in the dark. −25 HP.', 'bad');
+        } },
+      { label: 'Retreat to the previous fork', action: () => show('hedge_return_start') },
+    ],
+  },
+
+  hedge_return_cottage: {
+    loc: 'River cottage',
+    art: ['house.jpg', 'tree.png', 'bridge.jpg'],
+    title: 'Back by the Cottage',
+    desc: () => `At last the hedges thin. You step out beside the stone cottage, with the river bridge
+      just beyond the trees.`,
+    choices: () => [
+      { label: 'Go to the cottage door', action: () => hasItem('Iron key') ? show('cottage') : show('cottage_locked') },
+      { label: 'Walk to the bridge', action: () => show('bridge') },
+      { label: 'Re-enter the maze', action: () => show('hedge_success') },
     ],
   },
 
   /* ── CAVE ── */
   cave_entrance: {
     loc: 'Cave entrance',
-    art: '🦇🪨',
+    art: ['bat.png', 'rock.png'],
     title: 'The Cave Entrance',
     desc: () => `The cave smells of damp earth and something else something living. A high-pitched
       chittering echoes from within. You can hear wings in the dark.
@@ -673,7 +915,7 @@ const SCENES = {
 
   cave_inside: {
     loc: 'Inside the cave',
-    art: '🦇🦇🦇',
+    art: ['bat.png', 'bat.png', 'bat.png'],
     title: 'Bat Cave',
     desc: () => `Dozens of bats swoop and screech around you. The thin, cold air drains you by the second.
       <br><br>${hasItem('Slingshot') && hasItem('5 rocks')
@@ -698,24 +940,26 @@ const SCENES = {
 
   cave_survived: {
     loc: 'Far side of the cave',
-    art: '🪨✨',
+    art: ['rock.png', 'sparkles.png'],
     title: 'Through the Cave',
     desc: () => `Sunlight filters in from the far end. You emerge onto a rocky hillside.
       A dense forest stretches to the left. To the right, rooftops peek above the treeline.`,
     choices: () => [
-      { label: 'Head into the forest (left)',    action: () => show('forest_left') },
-      { label: 'Go toward the house (right)',     action: () => show('house2_approach') },
+      { label: 'Head into the forest',    action: () => show('forest_left') },
+      { label: 'Go toward the house',     action: () => show('house2_approach') },
     ],
   },
 
   /* ── LEFT FOREST ── */
   forest_left: {
     loc: 'Forest path',
-    art: '🌲🌲🌲',
+    art: ['tree.png', 'tree.png', 'tree.png'],
     title: 'The Dark Forest',
     desc: () => `Tall pines close in around you. It is quiet and cool. Then unmistakably a faint
       <em>meow</em> drifts through the trees. Your heart leaps.
-      <br><br>Glinting on a mossy stone you spot a <strong>brass key</strong>.`,
+      <br><br>${hasItem('Brass key')
+        ? 'The mossy stone where the brass key rested is now empty.'
+        : 'Glinting on a mossy stone you spot a <strong>brass key</strong>.'}`,
     choices: () => [
       ...(!hasItem('Brass key') ? [
         { label: 'Pick up the brass key',
@@ -729,7 +973,7 @@ const SCENES = {
   /* ── HILLTOP HOUSE ── */
   house2_approach: {
     loc: 'Hilltop house',
-    art: '🏡🔒',
+    art: ['house_with_garden.jpg', 'lock.jpg'],
     title: 'The Hilltop House',
     desc: () => `A charming house with a blue door sits at the top of the hill. The door has a brass
       lock. ${hasItem('Brass key')
@@ -739,7 +983,7 @@ const SCENES = {
       ...(hasItem('Brass key') ? [
         { label: 'Unlock the door and go inside', action: () => show('house2_inside') },
       ] : [
-        { label: 'Go into the forest to look for a key', action: () => show('forest_left') },
+        { label: 'Go into the forest', action: () => show('forest_left') },
       ]),
       { label: 'Go back to the cave exit', action: () => show('cave_survived') },
     ],
@@ -747,11 +991,18 @@ const SCENES = {
 
   house2_inside: {
     loc: 'Hilltop house inside',
-    art: '🪴🐾🧶',
+    art: ['potted_plant2.png', 'paw prints.png', 'yarn.png'],
     title: 'Inside the Hilltop House',
-    desc: () => `A clay pot of ferns has been knocked over, soil spilled across the floor. A small toy
-      mouse lies chewed beneath the window. Dried catnip is scattered across the bookshelf. Your cat
-      was <em>here</em>.`,
+    desc: () => {
+      const details = [];
+      if (!hasItem('Clay pot shard')) details.push('A clay pot of ferns has been knocked over, soil spilled across the floor.');
+      if (!hasItem('Cat toy')) details.push('A small toy mouse lies chewed beneath the window.');
+      if (!hasItem('Catnip')) details.push('Dried catnip is scattered across the bookshelf.');
+      const clueText = details.length > 0
+        ? details.join(' ')
+        : 'The room is picked clean now, but the scent of your cat still lingers in the air.';
+      return `${clueText} Your cat was <em>here</em>.`;
+    },
     choices: () => [
       ...(!hasItem('Cat toy') ? [
         { label: 'Take the toy mouse',
@@ -765,7 +1016,7 @@ const SCENES = {
         { label: 'Take a shard of the broken pot',
           action: () => { addItem('Clay pot shard'); show('house2_inside', 'A small memory of where she waited for you.'); } },
       ] : []),
-      { label: 'Go back through the cave (shortcut)', action: () => show('cave_survived') },
+      { label: 'Go back through the cave', action: () => show('cave_survived') },
       { label: 'Head left into the deep forest',       action: () => show('deep_forest') },
     ],
   },
@@ -773,7 +1024,7 @@ const SCENES = {
   /* ── DEEP FOREST ── */
   deep_forest: {
     loc: 'Deep forest',
-    art: '🌲🌲🌟',
+    art: ['tree.png', 'tree.png', 'glowing_star.png'],
     title: 'The Deep Forest',
     desc: () => `The forest grows dense and old. The light turns golden through the canopy. With every
       step the meowing grows louder  clearer  closer. Your chest tightens with hope.`,
@@ -786,13 +1037,13 @@ const SCENES = {
   /* ── FINAL MEADOW ── */
   final_meadow: {
     loc: 'Sunlit meadow',
-    art: '🌸🐱🌸',
+    art: ['blossom.png', 'cat.jpg', 'cherry_blossom.png'],
     title: 'The Sunlit Meadow',
     desc: () => `The trees open into a quiet, flower-filled meadow. Sunlight pours down. Butterflies
       drift between the blossoms. Somewhere in the tall grass  a soft, insistent meow.`,
     choices: () => [
       { label: 'Search the grass for your cat', action: () => showWin() },
-      { label: 'Pick wildflowers first (+15 HP)',
+      { label: 'Pick wildflowers first',
         action: () => {
           addItem('Wildflowers');
           G.hp = Math.min(100, G.hp + 15);
@@ -806,7 +1057,7 @@ const SCENES = {
 
   final_meadow_flowers: {
     loc: 'Sunlit meadow',
-    art: '🌸🌼💐',
+    art: ['blossom.png', 'bouquet.png', 'cherry_blossom.png'],
     title: 'Picking Flowers',
     desc: () => `Arms full of wildflowers, you feel a little better. The meowing is still calling to you.`,
     choices: () => [
