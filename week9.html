@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cat Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --surface2:  #1f2435;
+    --border:    #2a2f42;
+    --border2:   #3a4060;
+    --text:      #e8e4d9;
+    --muted:     #8b8fa8;
+    --accent:    #c2a86e;
+    --accent2:   #7db8a0;
+    --danger:    #c26e6e;
+    --hp-hi:     #7db8a0;
+    --hp-mid:    #c2a86e;
+    --hp-lo:     #c26e6e;
+    --radius:    10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  h1 {
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 1.75rem;
+    font-style: italic;
+  }
+
+  #game {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  /* HUD */
+  .hud {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .hud-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.9rem;
+  }
+
+  .hud-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .hud-val {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .hp-bar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-top: 7px;
+    overflow: hidden;
+  }
+
+  .hp-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  /* Inventory toggle */
+  .inv-toggle {
+    width: 100%;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .inv-toggle:hover { background: var(--surface); color: var(--text); }
+
+  .inv-panel {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    margin-bottom: 10px;
+    display: none;
+  }
+
+  .inv-panel.open { display: block; }
+
+  .inv-title {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+  }
+
+  .inv-items { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .inv-item {
+    font-size: 12px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 9px;
+    color: var(--text);
+  }
+
+  /* Scene card */
+  .scene-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+
+  .scene-art {
+    font-size: 26px;
+    letter-spacing: 5px;
+    margin-bottom: 0.75rem;
+    line-height: 1;
+  }
+
+  .scene-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .result-msg {
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 0.75rem;
+    display: none;
+  }
+
+  .result-msg.good { background: rgba(125,184,160,0.12); color: var(--accent2); display: block; }
+  .result-msg.bad  { background: rgba(194,110,110,0.12); color: var(--danger);  display: block; }
+
+  .scene-desc {
+    font-size: 15px;
+    color: #bdb8ae;
+    line-height: 1.75;
+    margin-bottom: 1.25rem;
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+  }
+
+  .scene-desc strong { font-style: normal; font-weight: 600; color: var(--accent); }
+
+  .divider {
+    height: 0.5px;
+    background: var(--border);
+    margin: 0 0 1.1rem;
+  }
+
+  /* Choices */
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+
+  .choice-btn {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .choice-btn::before { content: '›'; color: var(--accent); font-size: 16px; flex-shrink: 0; }
+  .choice-btn:hover { background: #252a3a; border-color: var(--border2); }
+  .choice-btn:active { transform: scale(0.98); }
+
+  /* End screens */
+  .end-screen { text-align: center; padding: 1.5rem 0.5rem; }
+  .end-icon { font-size: 52px; margin-bottom: 1rem; }
+  .end-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .end-title.win  { color: var(--accent2); }
+  .end-title.lose { color: var(--danger); }
+  .end-body {
+    font-size: 15px;
+    color: #bdb8ae;
+    line-height: 1.75;
+    max-width: 440px;
+    margin: 0 auto 1rem;
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+  }
+  .end-stats {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .restart-btn {
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 0.65rem 1.5rem;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background 0.15s;
+  }
+  .restart-btn:hover { background: #252a3a; }
+
+  /* Subtle page footer */
+  .page-footer {
+    margin-top: 2.5rem;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 1rem 0.75rem 3rem; }
+    .scene-card { padding: 1.1rem 1.1rem 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hp-fill, .choice-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Cat Adventure</h1>
+<p class="subtitle">A choose-your-own-adventure · find your missing cat</p>
+
+<div id="game">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-card">
+      <div class="hud-label">HP</div>
+      <div class="hud-val" id="hp-val">100</div>
+      <div class="hp-bar"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="hud-card">
+      <div class="hud-label">Location</div>
+      <div class="hud-val" id="loc-val" style="font-size:13px">Starting meadow</div>
+    </div>
+  </div>
+
+  <!-- Inventory -->
+  <button class="inv-toggle" onclick="toggleInv()" aria-expanded="false" aria-controls="inv-panel">
+    🎒 Inventory
+  </button>
+  <div class="inv-panel" id="inv-panel" role="region" aria-label="Inventory">
+    <div class="inv-title">Your items</div>
+    <div class="inv-items" id="inv-items"></div>
+  </div>
+
+  <!-- Scene -->
+  <div class="scene-card" id="scene-card">
+    <div class="scene-art"  id="scene-art"></div>
+    <div class="scene-title" id="scene-title"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="scene-desc" id="scene-desc"></div>
+    <div class="divider"></div>
+    <div class="choices"    id="choices"></div>
+  </div>
+</div>
+
+<p class="page-footer">Based on a PICO-8 game by Clara &nbsp;·&nbsp; built with HTML &amp; JS</p>
+
+<script>
+/* ============================================================
+   Game state
+   ============================================================ */
+const G = { hp: 100, inv: [], scene: null, loc: '', caveTimer: null };
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+function hasItem(x) { return G.inv.includes(x); }
+function addItem(x) { if (!hasItem(x)) G.inv.push(x); }
+
+function stopCave() {
+  if (G.caveTimer) { clearInterval(G.caveTimer); G.caveTimer = null; }
+}
+
+function toggleInv() {
+  const panel = document.getElementById('inv-panel');
+  const btn   = document.querySelector('.inv-toggle');
+  const open  = panel.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open);
+  renderInv();
+}
+
+function renderInv() {
+  const el = document.getElementById('inv-items');
+  if (G.inv.length === 0) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted)">Nothing yet.</span>';
+  } else {
+    el.innerHTML = G.inv.map(i => `<span class="inv-item">${i}</span>`).join('');
+  }
+}
+
+function updateHud(loc) {
+  if (loc) G.loc = loc;
+  const hp  = Math.max(0, Math.round(G.hp));
+  document.getElementById('hp-val').textContent = hp;
+  document.getElementById('loc-val').textContent = G.loc;
+  const fill = document.getElementById('hp-fill');
+  fill.style.width = hp + '%';
+  fill.style.background = hp > 60 ? 'var(--hp-hi)' : hp > 30 ? 'var(--hp-mid)' : 'var(--hp-lo)';
+  renderInv();
+}
+
+/* ============================================================
+   Show a scene
+   ============================================================ */
+function show(key, resultMsg, resultType) {
+  stopCave();
+  const s = SCENES[key];
+  if (!s) return;
+  G.scene = key;
+  updateHud(s.loc || key);
+
+  document.getElementById('scene-art').textContent   = s.art  || '';
+  document.getElementById('scene-title').textContent = s.title || '';
+
+  const rm = document.getElementById('result-msg');
+  if (resultMsg) {
+    rm.textContent = resultMsg;
+    rm.className   = 'result-msg ' + (resultType || 'good');
+  } else {
+    rm.textContent = '';
+    rm.className   = 'result-msg';
+  }
+
+  document.getElementById('scene-desc').innerHTML = s.desc ? s.desc() : '';
+
+  const cc = document.getElementById('choices');
+  cc.innerHTML = '';
+  const choices = s.choices ? s.choices() : [];
+  choices.forEach(c => {
+    const b  = document.createElement('button');
+    b.className   = 'choice-btn';
+    b.textContent = c.label;
+    b.onclick     = () => c.action();
+    cc.appendChild(b);
+  });
+
+  if (s.onEnter) s.onEnter();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============================================================
+   End screens
+   ============================================================ */
+function showWin() {
+  stopCave();
+  document.getElementById('scene-card').innerHTML = `
+    <div class="end-screen">
+      <div class="end-icon">🐱💛</div>
+      <div class="end-title win">You found her!</div>
+      <p class="end-body">
+        Parting the tall grass, you find her curled in a warm patch of sun, tail flicking lazily.
+        She looks up at you and blinks slowly. Then she trots over and presses her head against
+        your leg, purring like a tiny engine.<br><br>
+        <em>You're home now. Both of you.</em>
+      </p>
+      <div class="end-stats">
+        Final HP: ${Math.round(G.hp)} &nbsp;·&nbsp;
+        Items collected: ${G.inv.length > 0 ? G.inv.join(', ') : 'none'}
+      </div>
+      <button class="restart-btn" onclick="restartGame()">Play again</button>
+    </div>`;
+}
+
+function showDeath(msg) {
+  stopCave();
+  document.getElementById('scene-card').innerHTML = `
+    <div class="end-screen">
+      <div class="end-icon">💀</div>
+      <div class="end-title lose">Game over</div>
+      <p class="end-body">${msg}</p>
+      <div class="end-stats">HP remaining: 0</div>
+      <button class="restart-btn" onclick="restartGame()">Try again</button>
+    </div>`;
+}
+
+function restartGame() {
+  G.hp = 100; G.inv = []; G.scene = null; G.loc = '';
+  stopCave();
+  const panel = document.getElementById('inv-panel');
+  panel.classList.remove('open');
+  document.querySelector('.inv-toggle').setAttribute('aria-expanded', 'false');
+  // Rebuild the scene card structure (it may have been replaced by end screen)
+  document.getElementById('scene-card').innerHTML = `
+    <div class="scene-art"  id="scene-art"></div>
+    <div class="scene-title" id="scene-title"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="scene-desc" id="scene-desc"></div>
+    <div class="divider"></div>
+    <div class="choices"    id="choices"></div>`;
+  show('start');
+}
+
+/* ============================================================
+   Scene definitions
+   ============================================================ */
+const SCENES = {
+
+  /* ── MEADOW START ── */
+  start: {
+    loc: 'Starting meadow',
+    art: '🌸🌼🌊',
+    title: 'The Meadow',
+    desc: () => `A warm breeze carries the scent of wildflowers. You stand in a sunlit meadow dotted
+      with daisies and buttercups. A gentle river burbles nearby, crossed by a mossy wooden bridge.
+      To the east, the meadow stretches into open grass. Somewhere out there your cat is missing.
+      <br><br>Glinting near a flower patch, you spot an iron key half-buried in the soil.`,
+    choices: () => [
+      { label: 'Pick up the iron key',
+        action: () => { addItem('Iron key'); show('start_keytaken', 'You pocket the iron key. It feels cold and heavy.'); } },
+      { label: 'Leave the key  cross the bridge over the river',
+        action: () => show('bridge') },
+      { label: 'Leave the key  head east into the open meadow',
+        action: () => show('death_meadow') },
+    ],
+  },
+
+  start_keytaken: {
+    loc: 'Starting meadow',
+    art: '🌸🗝️🌊',
+    title: 'The Meadow',
+    desc: () => `Key in hand, you survey the meadow. The mossy bridge waits to the west. The open grassland stretches east.`,
+    choices: () => [
+      { label: 'Cross the bridge over the river',
+        action: () => show('bridge') },
+      { label: 'Head east into the open meadow',
+        action: () => show('death_meadow') },
+    ],
+  },
+
+  /* ── DEATH: EASTERN MEADOW ── */
+  death_meadow: {
+    loc: 'Eastern meadow',
+    art: '👁️🌫️',
+    title: 'The Eastern Meadow',
+    desc: () => `The grass grows tall and strange here. A low humming fills the air. Then something
+      shifts. A creature emerges from the fog, eyes wide and wrong, lurching toward you with
+      unnatural speed. You have no way to fight it.`,
+    choices: () => [
+      { label: 'Run back to the meadow',
+        action: () => { G.hp = Math.max(0, G.hp - 30); show('start', 'You barely escape. −30 HP.', 'bad'); } },
+      { label: 'Stand your ground...',
+        action: () => showDeath('The creature reaches you. Everything goes dark.') },
+    ],
+  },
+
+  /* ── BRIDGE ── */
+  bridge: {
+    loc: 'River crossing',
+    art: '🌉🌿',
+    title: 'The Old Bridge',
+    desc: () => `The wooden bridge sways gently over the clear river. On the far bank sits a stone
+      cottage with ivy climbing its walls. The front door is fitted with a heavy iron lock.`,
+    choices: () => [
+      { label: 'Try the cottage door',
+        action: () => hasItem('Iron key') ? show('cottage') : show('cottage_locked') },
+      { label: 'Go back to the meadow',
+        action: () => show('start') },
+    ],
+  },
+
+  cottage_locked: {
+    loc: 'River cottage',
+    art: '🏠🔒',
+    title: 'Locked Cottage',
+    desc: () => `The door doesn't budge. The lock is solid iron. You need a key.`,
+    choices: () => [
+      { label: 'Go back to the bridge',
+        action: () => show('bridge') },
+      { label: 'Return to the meadow to look for a key',
+        action: () => show('start') },
+    ],
+  },
+
+  /* ── COTTAGE ── */
+  cottage: {
+    loc: 'River cottage',
+    art: '🏠🪨',
+    title: 'Inside the Cottage',
+    desc: () => `Dusty shelves line the walls. On a peg by the window hangs a <strong>slingshot</strong>.
+      Beside it, a small cloth pouch holds <strong>5 smooth rocks</strong>. Whoever lived here
+      hasn't been back in a while.`,
+    choices: () => [
+      ...(!hasItem('Slingshot') && !hasItem('5 rocks') ? [
+        { label: 'Take both the slingshot and the rocks',
+          action: () => { addItem('Slingshot'); addItem('5 rocks'); show('cottage', 'You grab both. They might come in handy.'); } },
+      ] : []),
+      ...(!hasItem('Slingshot') ? [
+        { label: 'Take only the slingshot',
+          action: () => { addItem('Slingshot'); show('cottage', 'You take the slingshot.'); } },
+      ] : []),
+      ...(!hasItem('5 rocks') ? [
+        { label: 'Take only the rocks',
+          action: () => { addItem('5 rocks'); show('cottage', 'You pocket the rocks.'); } },
+      ] : []),
+      { label: 'Head to the hedge labyrinth',
+        action: () => show('hedge_entrance') },
+      { label: 'Go back to the bridge',
+        action: () => show('bridge') },
+    ],
+  },
+
+  /* ── HEDGE LABYRINTH ── */
+  hedge_entrance: {
+    loc: 'Hedge labyrinth',
+    art: '🌿🌿🌿',
+    title: 'The Hedge Labyrinth',
+    desc: () => `The hedges tower over you, dense and dark green. Three paths branch ahead. There are
+      no signs. Somewhere deep inside, something moves.`,
+    choices: () => [
+      { label: 'Take the left path',
+        action: () => show('hedge_left') },
+      { label: 'Take the middle path',
+        action: () => show('hedge_middle') },
+      { label: 'Take the right path',
+        action: () => show('hedge_right') },
+      { label: 'Go back to the cottage',
+        action: () => show('cottage') },
+    ],
+  },
+
+  hedge_left: {
+    loc: 'Hedge labyrinth  left path',
+    art: '🌿⚠️',
+    title: 'Thorn Dead End',
+    desc: () => `The path narrows into a wall of thorns. You push back out, arms scratched. ${
+      G.hp <= 0 ? '' : '−15 HP.'}`,
+    onEnter: () => {
+      G.hp = Math.max(0, G.hp - 15); updateHud();
+      if (G.hp <= 0) setTimeout(() => showDeath('The thorns were too much. You collapse.'), 300);
+    },
+    choices: () => G.hp > 0 ? [
+      { label: 'Try the middle path', action: () => show('hedge_middle') },
+      { label: 'Try the right path',  action: () => show('hedge_right') },
+    ] : [],
+  },
+
+  hedge_middle: {
+    loc: 'Hedge labyrinth  middle path',
+    art: '🌿🌿',
+    title: 'A Fork in the Maze',
+    desc: () => `The middle path bends and opens to another split: left or right?`,
+    choices: () => [
+      { label: 'Go left', action: () => show('hedge_success') },
+      { label: 'Go right',
+        action: () => { G.hp = Math.max(0, G.hp - 20); show('hedge_ditch', 'A hidden ditch! You scramble out. −20 HP.', 'bad'); } },
+      { label: 'Go back to the entrance', action: () => show('hedge_entrance') },
+    ],
+  },
+
+  hedge_ditch: {
+    loc: 'Hedge labyrinth  ditch',
+    art: '🌿🕳️',
+    title: 'The Ditch',
+    desc: () => `Muddy and bruised, you pull yourself out. The left fork is still visible.`,
+    choices: () => G.hp > 0 ? [
+      { label: 'Take the left fork this time', action: () => show('hedge_success') },
+      { label: 'Go back to the entrance',       action: () => show('hedge_entrance') },
+    ] : [],
+  },
+
+  hedge_right: {
+    loc: 'Hedge labyrinth  right path',
+    art: '🌿✨',
+    title: 'A Lucky Path',
+    desc: () => `The right path curves and to your surprise opens directly onto the far side of
+      the maze. You made it through unscathed.`,
+    choices: () => [
+      { label: 'Continue to the cave', action: () => show('cave_entrance') },
+    ],
+  },
+
+  hedge_success: {
+    loc: 'Hedge labyrinth  exit',
+    art: '🌿🏁',
+    title: 'Through the Maze!',
+    desc: () => `The hedges thin and fall away. You emerge blinking into grey daylight. Ahead, a dark
+      cave mouth yawns in the hillside.`,
+    choices: () => [
+      { label: 'Approach the cave', action: () => show('cave_entrance') },
+    ],
+  },
+
+  /* ── CAVE ── */
+  cave_entrance: {
+    loc: 'Cave entrance',
+    art: '🦇🪨',
+    title: 'The Cave Entrance',
+    desc: () => `The cave smells of damp earth and something else something living. A high-pitched
+      chittering echoes from within. You can hear wings in the dark.
+      <br><br>${hasItem('Slingshot') && hasItem('5 rocks')
+        ? '<strong>Your slingshot is loaded and ready.</strong>'
+        : 'You have no weapon. Whatever is in there, you cannot fight it.'}`,
+    choices: () => [
+      { label: 'Enter the cave', action: () => show('cave_inside') },
+      { label: 'Go back to the hedge labyrinth exit', action: () => show('hedge_success') },
+    ],
+  },
+
+  cave_inside: {
+    loc: 'Inside the cave',
+    art: '🦇🦇🦇',
+    title: 'Bat Cave',
+    desc: () => `Dozens of bats swoop and screech around you. The thin, cold air drains you by the second.
+      <br><br>${hasItem('Slingshot') && hasItem('5 rocks')
+        ? 'You have your slingshot  use it before your HP runs out!'
+        : 'Without a weapon you are helpless. Every second here costs you.'}`,
+    onEnter: () => {
+      G.caveTimer = setInterval(() => {
+        G.hp = Math.max(0, G.hp - 2);
+        updateHud('Inside the cave');
+        if (G.hp <= 0) { stopCave(); showDeath('The bats overwhelmed you in the darkness.'); }
+      }, 800);
+    },
+    choices: () => [
+      ...(hasItem('Slingshot') && hasItem('5 rocks') ? [
+        { label: 'Fire your slingshot at the bats!',
+          action: () => show('cave_survived', 'You scatter the bats with well-aimed shots. The cave falls silent.') },
+      ] : []),
+      { label: 'Run back out',
+        action: () => { stopCave(); G.hp = Math.max(0, G.hp - 10); show('cave_entrance', 'You flee, scratched and shaken. −10 HP.', 'bad'); } },
+    ],
+  },
+
+  cave_survived: {
+    loc: 'Far side of the cave',
+    art: '🪨✨',
+    title: 'Through the Cave',
+    desc: () => `Sunlight filters in from the far end. You emerge onto a rocky hillside.
+      A dense forest stretches to the left. To the right, rooftops peek above the treeline.`,
+    choices: () => [
+      { label: 'Head into the forest (left)',    action: () => show('forest_left') },
+      { label: 'Go toward the house (right)',     action: () => show('house2_approach') },
+    ],
+  },
+
+  /* ── LEFT FOREST ── */
+  forest_left: {
+    loc: 'Forest path',
+    art: '🌲🌲🌲',
+    title: 'The Dark Forest',
+    desc: () => `Tall pines close in around you. It is quiet and cool. Then unmistakably a faint
+      <em>meow</em> drifts through the trees. Your heart leaps.
+      <br><br>Glinting on a mossy stone you spot a <strong>brass key</strong>.`,
+    choices: () => [
+      ...(!hasItem('Brass key') ? [
+        { label: 'Pick up the brass key',
+          action: () => { addItem('Brass key'); show('forest_left', 'You pocket the brass key. The meowing came from the direction of the house.'); } },
+      ] : []),
+      { label: 'Head toward the house', action: () => show('house2_approach') },
+      { label: 'Go back to the cave exit', action: () => show('cave_survived') },
+    ],
+  },
+
+  /* ── HILLTOP HOUSE ── */
+  house2_approach: {
+    loc: 'Hilltop house',
+    art: '🏡🔒',
+    title: 'The Hilltop House',
+    desc: () => `A charming house with a blue door sits at the top of the hill. The door has a brass
+      lock. ${hasItem('Brass key')
+        ? 'Your brass key might fit.'
+        : 'You can hear something faintly inside  but the door is locked tight.'}`,
+    choices: () => [
+      ...(hasItem('Brass key') ? [
+        { label: 'Unlock the door and go inside', action: () => show('house2_inside') },
+      ] : [
+        { label: 'Go into the forest to look for a key', action: () => show('forest_left') },
+      ]),
+      { label: 'Go back to the cave exit', action: () => show('cave_survived') },
+    ],
+  },
+
+  house2_inside: {
+    loc: 'Hilltop house inside',
+    art: '🪴🐾🧶',
+    title: 'Inside the Hilltop House',
+    desc: () => `A clay pot of ferns has been knocked over, soil spilled across the floor. A small toy
+      mouse lies chewed beneath the window. Dried catnip is scattered across the bookshelf. Your cat
+      was <em>here</em>.`,
+    choices: () => [
+      ...(!hasItem('Cat toy') ? [
+        { label: 'Take the toy mouse',
+          action: () => { addItem('Cat toy'); show('house2_inside', 'You pocket the little toy mouse.'); } },
+      ] : []),
+      ...(!hasItem('Catnip') ? [
+        { label: 'Take some catnip',
+          action: () => { addItem('Catnip'); show('house2_inside', 'You take a pinch of catnip.'); } },
+      ] : []),
+      ...(!hasItem('Clay pot shard') ? [
+        { label: 'Take a shard of the broken pot',
+          action: () => { addItem('Clay pot shard'); show('house2_inside', 'A small memory of where she waited for you.'); } },
+      ] : []),
+      { label: 'Go back through the cave (shortcut)', action: () => show('cave_survived') },
+      { label: 'Head left into the deep forest',       action: () => show('deep_forest') },
+    ],
+  },
+
+  /* ── DEEP FOREST ── */
+  deep_forest: {
+    loc: 'Deep forest',
+    art: '🌲🌲🌟',
+    title: 'The Deep Forest',
+    desc: () => `The forest grows dense and old. The light turns golden through the canopy. With every
+      step the meowing grows louder  clearer  closer. Your chest tightens with hope.`,
+    choices: () => [
+      { label: 'Follow the sound deeper', action: () => show('final_meadow') },
+      { label: 'Go back to the house',     action: () => show('house2_inside') },
+    ],
+  },
+
+  /* ── FINAL MEADOW ── */
+  final_meadow: {
+    loc: 'Sunlit meadow',
+    art: '🌸🐱🌸',
+    title: 'The Sunlit Meadow',
+    desc: () => `The trees open into a quiet, flower-filled meadow. Sunlight pours down. Butterflies
+      drift between the blossoms. Somewhere in the tall grass  a soft, insistent meow.`,
+    choices: () => [
+      { label: 'Search the grass for your cat', action: () => showWin() },
+      { label: 'Pick wildflowers first (+15 HP)',
+        action: () => {
+          addItem('Wildflowers');
+          G.hp = Math.min(100, G.hp + 15);
+          updateHud('Sunlit meadow');
+          show('final_meadow_flowers', 'The wildflowers smell wonderful. +15 HP restored.');
+        }
+      },
+      { label: 'Go back into the forest', action: () => show('deep_forest') },
+    ],
+  },
+
+  final_meadow_flowers: {
+    loc: 'Sunlit meadow',
+    art: '🌸🌼💐',
+    title: 'Picking Flowers',
+    desc: () => `Arms full of wildflowers, you feel a little better. The meowing is still calling to you.`,
+    choices: () => [
+      { label: 'Now search the grass for your cat', action: () => showWin() },
+      { label: 'Go back into the forest',            action: () => show('deep_forest') },
+    ],
+  },
+
+}; // end SCENES
+
+/* ── Boot ── */
+show('start');
+</script>
+</body>
+</html>
